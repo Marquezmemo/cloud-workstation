@@ -5,7 +5,7 @@ Registro inicial de validaciones manuales realizadas sobre la imagen base oficia
 ## Imagen base
 
 ```text
-runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
+runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:6878d595cd929b97acb8cce666c3db7e6709971547d46b2d94362460695f5b29
 ```
 
 ## Resultados validados
@@ -13,7 +13,7 @@ runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
 - `nvidia-smi` exitoso
 - CUDA funcional
 - GPU NVIDIA detectada correctamente
-- NVENC detectado por `ffmpeg`
+- NVENC previamente validado
 - SSH funcional
 - networking funcional en Runpod
 - compatibilidad general con Runpod validada
@@ -28,4 +28,11 @@ runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
 
 ## Notas
 
-Estas validaciones corresponden al baseline previo a cualquier modificacion del entorno grafico. Las siguientes iteraciones deben ampliar este documento con comandos, salidas relevantes y criterios de aceptacion.
+Estas validaciones corresponden al baseline previo a cualquier modificacion del entorno grafico. En el fingerprint final, `ffmpeg` no estaba instalado en la imagen base, por lo que NVENC queda registrado como validacion previa y no como prueba reproducida por `ffmpeg` dentro del snapshot final.
+
+Para la validacion oficial congelada de `Workstation_v0.1`, ver:
+
+- `docs/baseline.md`
+- `docs/gpu-validation.md`
+- `docs/nvidia-smi.txt`
+- `docs/freeze-policy.md`
