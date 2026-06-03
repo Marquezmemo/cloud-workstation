@@ -7,9 +7,9 @@ This version is immutable. Do not modify it directly, move its historical tags, 
 ## Base Image
 
 - Image tag: `runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04`
-- SHA256 digest: `sha256:6878d595cd929b97acb8cce666c3db7e6709971547d46b2d94362460695f5b29`
+- SHA256 manifest digest: `sha256:892a770019c7dc6f4078893924429020fbe30e241c1522d7982894f417c93ffe`
 - Dockerfile source:
-  `runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:6878d595cd929b97acb8cce666c3db7e6709971547d46b2d94362460695f5b29`
+  `runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:892a770019c7dc6f4078893924429020fbe30e241c1522d7982894f417c93ffe`
 
 ## System Fingerprint
 
@@ -64,3 +64,7 @@ See `docs/gpu-validation.md`, `docs/nvidia-smi.txt`, and `docs/evidence/nvidia-s
 - `docs/freeze-policy.md`
 
 All future functional changes must happen in a new version, starting with `Workstation_v0.2-dev`.
+
+## Digest Correction
+
+The freeze record was corrected to use the platform manifest digest. The previously recorded index digest was not usable for the `v0.2-dev` build path.

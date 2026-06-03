@@ -1,9 +1,9 @@
-FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:6878d595cd929b97acb8cce666c3db7e6709971547d46b2d94362460695f5b29
+FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:892a770019c7dc6f4078893924429020fbe30e241c1522d7982894f417c93ffe
 
 LABEL org.opencontainers.image.title="cloud-workstation"
 LABEL org.opencontainers.image.version="v0.2-dev"
 LABEL org.opencontainers.image.description="Experimental desktop integration layer for a Runpod GPU interactive workstation."
-LABEL org.opencontainers.image.base.name="runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:6878d595cd929b97acb8cce666c3db7e6709971547d46b2d94362460695f5b29"
+LABEL org.opencontainers.image.base.name="runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:892a770019c7dc6f4078893924429020fbe30e241c1522d7982894f417c93ffe"
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV WORKSTATION_VERSION=Workstation_v0.2-dev

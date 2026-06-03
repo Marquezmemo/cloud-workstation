@@ -4,6 +4,11 @@
 
 Desktop integration development branch.
 
+### Fixed
+
+- Replaced the mistakenly recorded base image index digest with the correct platform manifest digest:
+  `sha256:892a770019c7dc6f4078893924429020fbe30e241c1522d7982894f417c93ffe`
+
 ### Added
 
 - Experimental Ubuntu desktop layer with `ubuntu-desktop-minimal`
