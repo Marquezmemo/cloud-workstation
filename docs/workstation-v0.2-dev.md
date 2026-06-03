@@ -9,7 +9,7 @@ The goal is not a perfect desktop stack. The goal is to install a real Ubuntu de
 This version derives from the frozen `Workstation_v0.1` digest:
 
 ```text
-runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:892a770019c7dc6f4078893924429020fbe30e241c1522d7982894f417c93ffe
+runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd773f11eefa378929d5a687bd775febeb78eac62fc824141fb5
 ```
 
 Do not move or modify:

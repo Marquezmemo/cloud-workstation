@@ -7,9 +7,9 @@ This version is immutable. Do not modify it directly, move its historical tags, 
 ## Base Image
 
 - Image tag: `runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04`
-- SHA256 manifest digest: `sha256:892a770019c7dc6f4078893924429020fbe30e241c1522d7982894f417c93ffe`
+- SHA256 manifest digest: `sha256:61a4aafb0094cd773f11eefa378929d5a687bd775febeb78eac62fc824141fb5`
 - Dockerfile source:
-  `runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:892a770019c7dc6f4078893924429020fbe30e241c1522d7982894f417c93ffe`
+  `runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd773f11eefa378929d5a687bd775febeb78eac62fc824141fb5`
 
 ## System Fingerprint
 
