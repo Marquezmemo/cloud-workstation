@@ -1,5 +1,30 @@
 # Changelog
 
+## Workstation_v0.2-dev
+
+Desktop integration development branch.
+
+### Added
+
+- Experimental Ubuntu desktop layer with `ubuntu-desktop-minimal`
+- `mesa-utils`, `dbus-x11`, `xorg`, and `supervisor`
+- Supervisor-based startup without introducing systemd
+- Workstation logs under `/var/log/workstation/`
+- Startup, GDM, dbus, GPU, Xorg, and desktop probe logging
+- Diagnostic collection script
+- Desktop healthcheck script
+- Error journal for integration attempts
+- Docker Hub development workflow for `cloud-workstation:v0.2-dev`
+
+### Constraints
+
+- Derived from frozen `Workstation_v0.1` digest
+- No `apt upgrade`
+- No `apt dist-upgrade`
+- No forced X11 configuration
+- No Wayland disablement
+- No Blender, Houdini, Parsec, Sunshine, or audio stack
+
 ## Workstation_v0.1 Frozen Baseline
 
 Baseline officially frozen and marked immutable.

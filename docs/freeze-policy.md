@@ -30,11 +30,12 @@ Before any version is treated as a frozen baseline, it must include:
 
 The next official development version is `Workstation_v0.2-dev`.
 
-Its first goal is to validate a minimal accelerated desktop layer:
+Its first goal is to validate a real Ubuntu desktop layer with observable logs:
 
-- X11
-- XFCE
-- OpenGL
+- Ubuntu desktop minimal
+- GDM startup behavior
+- Wayland or Xorg session behavior
+- OpenGL when a display is available
 - Functional graphical session
 
 Do not install Blender, Houdini, or complex DCC tooling in the first desktop validation pass.

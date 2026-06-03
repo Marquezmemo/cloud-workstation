@@ -43,24 +43,35 @@ La imagen base fue validada manualmente para:
 
 ## Estado actual del proyecto
 
-`Workstation_v0.1` es una baseline minima.
+`Workstation_v0.1` es una baseline minima congelada.
+
+`Workstation_v0.2-dev` es la primera rama experimental de integracion desktop.
 
 Incluye:
 
 - Dockerfile reproducible
 - documentacion inicial
 - estructura de carpetas para futuras iteraciones
-- workflow de GitHub Actions para publicar la imagen al crear el tag `v0.1`
+- workflow de GitHub Actions para publicar la imagen congelada `v0.1`
+- workflow de GitHub Actions para publicar la imagen experimental `v0.2-dev`
+
+`Workstation_v0.2-dev` agrega:
+
+- `ubuntu-desktop-minimal`
+- `mesa-utils`
+- `dbus-x11`
+- `xorg`
+- `supervisor`
+- startup observable con logs en `/var/log/workstation/`
+- script de recoleccion de diagnosticos
 
 No incluye todavia:
 
-- XFCE u otro entorno grafico
 - Blender
 - Houdini
 - Parsec
 - Sunshine
 - audio stack
-- X11 o sesion de escritorio
 - capa de streaming
 
 ## Roadmap inicial
@@ -93,13 +104,20 @@ cloud-workstation/
 
 ## Publicacion de imagen
 
-La imagen esperada para `v0.1` es:
+La imagen congelada esperada para `v0.1` es:
 
 ```text
 docker.io/${DOCKERHUB_USERNAME}/cloud-workstation:v0.1
 ```
 
-El workflow publica la imagen solo cuando se empuja el tag Git `v0.1`.
+La imagen experimental esperada para `v0.2-dev` es:
+
+```text
+docker.io/${DOCKERHUB_USERNAME}/cloud-workstation:v0.2-dev
+```
+
+El workflow de `v0.1` publica la imagen solo cuando se empuja el tag Git `v0.1`.
+El workflow de `v0.2-dev` publica la imagen cuando se actualiza la rama `workstation-v0.2-dev` o se ejecuta manualmente.
 
 Secretos requeridos en GitHub:
 
