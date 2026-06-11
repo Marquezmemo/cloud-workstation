@@ -10,7 +10,7 @@ ENV WORKSTATION_VERSION=Workstation_v0.2-dev
 ENV WORKSTATION_LOG_DIR=/var/log/workstation
 
 RUN apt-get update \
-    && apt-get install \
+    && apt-get install -y \
         ubuntu-desktop-minimal \
         mesa-utils \
         dbus-x11 \
