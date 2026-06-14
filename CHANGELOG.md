@@ -43,9 +43,19 @@ Added minimal headless base tooling for future GPU training work.
 - No `apt upgrade` or `apt dist-upgrade`.
 - `CMD ["/bin/bash"]` retained.
 
-### Local Build Note
+### Local Validation
 
-Before and during Phase 3, local Docker validation could not run because the Docker/OrbStack daemon was not active. This was not a known Dockerfile error.
+- Local `linux/amd64` Docker build completed successfully.
+- Local non-GPU smoke test confirmed:
+  - container starts
+  - `WORKDIR` is `/workspace`
+  - persistent workspace directories exist
+  - PyTorch imports
+  - `torch.__version__` is `2.4.1+cu124`
+  - `torch.version.cuda` is `12.4`
+- `torch.cuda.is_available()` returned `False` locally because the Mac host does not expose an NVIDIA GPU.
+- Local `--gpus all` validation could not run because Docker reported no known GPU vendor from CDI.
+- Full GPU validation remains pending on RunPod.
 
 ## Headless Gaussian Splatting Pivot — Phase 2
 

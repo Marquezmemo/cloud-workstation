@@ -45,15 +45,77 @@ Expected use inside a RunPod GPU container:
 validate-gpu.sh
 ```
 
-## Local Build Note
+## Phase 3 Local Validation
 
-Before and during Phase 3, local Docker validation could not run because the Docker/OrbStack daemon was not active:
+Host:
 
-```text
-failed to connect to the docker API at unix:///Users/guillermomarquez/.orbstack/run/docker.sock
+- MacBook Air
+- Host platform: `linux/arm64/v8` through Docker/OrbStack
+- Target image platform: `linux/amd64`
+
+Build command:
+
+```bash
+docker build --platform linux/amd64 \
+  -t cloud-workstation:headless-gsplat-v0.1-dev .
 ```
 
-This was an environment availability issue, not a known Dockerfile error.
+Result:
+
+- Build completed successfully.
+- Build duration: `106.5s`
+- Build steps completed: `11/11`
+- Image tag created locally:
+  `cloud-workstation:headless-gsplat-v0.1-dev`
+
+Smoke test command without GPU:
+
+```bash
+docker run --rm --platform linux/amd64 \
+  cloud-workstation:headless-gsplat-v0.1-dev \
+  bash -lc "pwd && ls -la /workspace && python -c 'import torch; print(torch.__version__); print(torch.version.cuda); print(torch.cuda.is_available())'"
+```
+
+Observed result:
+
+- Container started.
+- `WORKDIR` was `/workspace`.
+- Persistent directories existed:
+  - `/workspace/checkpoints`
+  - `/workspace/datasets`
+  - `/workspace/logs`
+  - `/workspace/outputs`
+  - `/workspace/scenes`
+- PyTorch imported successfully.
+- `torch.__version__`: `2.4.1+cu124`
+- `torch.version.cuda`: `12.4`
+- `torch.cuda.is_available()`: `False`
+
+Interpretation:
+
+- This is expected on the local Mac host without NVIDIA GPU passthrough.
+- NVIDIA container startup warned that no NVIDIA driver was detected.
+- This does not indicate a known Dockerfile error.
+
+GPU validation attempt on local Mac:
+
+```bash
+docker run --rm --gpus all \
+  cloud-workstation:headless-gsplat-v0.1-dev \
+  bash scripts/validate-gpu.sh
+```
+
+Observed result:
+
+```text
+docker: Error response from daemon: failed to discover GPU vendor from CDI: no known GPU vendor found
+```
+
+Interpretation:
+
+- Local GPU validation did not run because the host has no NVIDIA GPU/CDI vendor available.
+- `scripts/validate-gpu.sh` still needs to be run inside a RunPod GPU container.
+- This is a host capability limitation, not a known Dockerfile error.
 
 ## Notas
 
