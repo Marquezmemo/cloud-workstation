@@ -12,6 +12,12 @@ Phase 2 removes the active desktop/workstation objective and prepares the headle
 
 Phase 2 still does not install `gsplat`, implement training, install Nerfstudio, or add benchmark dependencies.
 
+## Phase 3 Status
+
+Phase 3 adds minimal headless base tools and `scripts/validate-gpu.sh`.
+
+Phase 3 still does not install `gsplat`, implement training, install Nerfstudio, install COLMAP, or add benchmark dependencies.
+
 ## New Objective
 
 Build a reproducible headless training image for Gaussian Splatting.

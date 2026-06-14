@@ -20,10 +20,40 @@ runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd77
 
 ## Estado actual pendiente
 
-- Headless CUDA validation for the new training image pending
-- PyTorch CUDA operation validation pending
+- Headless CUDA validation with `scripts/validate-gpu.sh` pending on RunPod
+- PyTorch CUDA operation validation with `scripts/validate-gpu.sh` pending on RunPod
 - `gsplat` import/build validation pending
 - Training log/output persistence validation pending
+
+## Phase 3 Validation Script
+
+`scripts/validate-gpu.sh` was added to validate the headless training base.
+
+It checks:
+
+- `nvidia-smi`
+- Python import of `torch`
+- `torch.__version__`
+- `torch.version.cuda`
+- `torch.cuda.is_available()`
+- CUDA GPU name
+- a simple CUDA matrix multiplication
+
+Expected use inside a RunPod GPU container:
+
+```bash
+validate-gpu.sh
+```
+
+## Local Build Note
+
+Before and during Phase 3, local Docker validation could not run because the Docker/OrbStack daemon was not active:
+
+```text
+failed to connect to the docker API at unix:///Users/guillermomarquez/.orbstack/run/docker.sock
+```
+
+This was an environment availability issue, not a known Dockerfile error.
 
 ## Notas
 

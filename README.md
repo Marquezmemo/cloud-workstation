@@ -20,7 +20,7 @@ The active branch is:
 headless-gsplat-v0.1-dev
 ```
 
-Phase 2 prepares a clean headless base. It does not install `gsplat`, implement training, install Nerfstudio, or add benchmark dependencies.
+Phase 3 adds minimal headless tooling for future GPU training work. It does not install `gsplat`, implement training, install Nerfstudio, install COLMAP, or add benchmark dependencies.
 
 ## Base Image
 
@@ -76,6 +76,16 @@ Nerfstudio/Splatfacto is a future benchmark placeholder only. It is not installe
 COLMAP is optional for the first image.
 
 It should be added only if it does not introduce heavy desktop dependencies or build complexity. If it complicates the image, move it to a later phase and document the decision.
+
+## GPU Validation
+
+After starting the container on a GPU RunPod instance, run:
+
+```bash
+validate-gpu.sh
+```
+
+This validates `nvidia-smi`, PyTorch import, CUDA availability, GPU name, and a simple CUDA operation.
 
 ## Repository Structure
 

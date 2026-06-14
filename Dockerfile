@@ -13,12 +13,32 @@ ENV OUTPUTS_DIR=/workspace/outputs
 ENV LOGS_DIR=/workspace/logs
 ENV CHECKPOINTS_DIR=/workspace/checkpoints
 
+RUN apt-get update \
+    && apt-get install -y --no-upgrade \
+        git \
+        cmake \
+        ninja-build \
+        build-essential \
+        ffmpeg \
+        wget \
+        curl \
+        unzip \
+        nano \
+        htop \
+        tmux \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY scripts/validate-gpu.sh /usr/local/bin/validate-gpu.sh
+
 RUN mkdir -p \
     /workspace/datasets \
     /workspace/scenes \
     /workspace/outputs \
     /workspace/logs \
     /workspace/checkpoints
+
+RUN chmod +x /usr/local/bin/validate-gpu.sh
 
 WORKDIR /workspace
 

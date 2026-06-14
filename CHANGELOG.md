@@ -1,5 +1,52 @@
 # Changelog
 
+## Headless Gaussian Splatting Pivot — Phase 3
+
+Added minimal headless base tooling for future GPU training work.
+
+### Added
+
+- Installed base tooling only:
+  - `git`
+  - `cmake`
+  - `ninja-build`
+  - `build-essential`
+  - `ffmpeg`
+  - `wget`
+  - `curl`
+  - `unzip`
+  - `nano`
+  - `htop`
+  - `tmux`
+  - `ca-certificates`
+- Added `scripts/validate-gpu.sh`.
+- Copied `validate-gpu.sh` into the image as `/usr/local/bin/validate-gpu.sh`.
+
+### Validation Coverage
+
+`validate-gpu.sh` checks:
+
+- `nvidia-smi`
+- Python import of `torch`
+- `torch.__version__`
+- `torch.version.cuda`
+- `torch.cuda.is_available()`
+- CUDA GPU name
+- simple CUDA matrix multiplication
+
+### Constraints
+
+- No desktop packages added.
+- No `gsplat` installation.
+- No Nerfstudio installation.
+- No COLMAP installation.
+- No `apt upgrade` or `apt dist-upgrade`.
+- `CMD ["/bin/bash"]` retained.
+
+### Local Build Note
+
+Before and during Phase 3, local Docker validation could not run because the Docker/OrbStack daemon was not active. This was not a known Dockerfile error.
+
 ## Headless Gaussian Splatting Pivot — Phase 2
 
 Prepared the active branch for a headless training image.
