@@ -16,6 +16,7 @@ echo
 echo "===== python / torch / cuda ====="
 python - <<'PY'
 import sys
+from importlib.metadata import PackageNotFoundError, version
 
 print(f"python={sys.version.split()[0]}")
 
@@ -27,6 +28,21 @@ except Exception as exc:
 
 print(f"torch={torch.__version__}")
 print(f"torch_cuda={torch.version.cuda}")
+
+try:
+    import gsplat  # noqa: F401
+except Exception as exc:
+    print(f"ERROR: failed to import gsplat: {exc}", file=sys.stderr)
+    raise SystemExit(1)
+
+try:
+    gsplat_version = version("gsplat")
+except PackageNotFoundError:
+    print("ERROR: gsplat package metadata not found", file=sys.stderr)
+    raise SystemExit(1)
+
+print(f"gsplat={gsplat_version}")
+print("gsplat_import=success")
 
 cuda_available = torch.cuda.is_available()
 print(f"cuda_available={cuda_available}")

@@ -1,6 +1,57 @@
 # Changelog
 
-## Headless Gaussian Splatting Pivot — Phase 4
+## Headless Gaussian Splatting Pivot — Phase 4 gsplat Import Baseline
+
+Added the first minimal `gsplat` installation for import and CUDA compatibility validation.
+
+### Added
+
+- Pinned `gsplat==1.5.3` from PyPI.
+- Added `requirements-gsplat.txt` for the pinned minimal `gsplat` install set.
+- `GSPLAT_VERSION=1.5.3` image environment variable.
+- Docker image labels recording the `gsplat` version and source.
+- `scripts/validate-gpu.sh` now checks:
+  - Python import of `gsplat`
+  - installed `gsplat` package version
+  - existing PyTorch/CUDA smoke validation
+
+### Source Registration
+
+- Source: PyPI
+- Package: `gsplat`
+- Version: `1.5.3`
+- PyPI wheel SHA256: `515a3773641f5e7f7717acab6276c0b1d6dbcad087b7968ca653337c3189a982`
+- Pinned pip install set:
+  - `gsplat==1.5.3`
+  - `jaxtyping==0.3.11`
+  - `markdown-it-py==4.2.0`
+  - `mdurl==0.1.2`
+  - `ninja==1.13.0`
+  - `rich==15.0.0`
+  - `wadler-lindig==0.1.7`
+
+### Constraints
+
+- No training pipeline.
+- No large training run.
+- No Nerfstudio installation.
+- No COLMAP installation.
+- No viewer.
+- No desktop packages.
+- No optimization work.
+
+### Pending Validation
+
+- Run a local container import smoke test, if desired.
+- Run `validate-gpu.sh` on RunPod with NVIDIA GPU access.
+- Confirm `gsplat` import, PyTorch CUDA availability, GPU name, and simple CUDA operation.
+
+### Build Observation
+
+- Local Docker build completed successfully with `requirements-gsplat.txt`.
+- Existing Phase 3 system packages still need a later review because Ubuntu dependency resolution pulled multimedia/display-adjacent libraries and reported some system package upgrades despite `--no-upgrade`.
+
+## Headless Gaussian Splatting Pivot — Phase 3.6
 
 Added headless training diagnostics.
 

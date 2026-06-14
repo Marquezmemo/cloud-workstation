@@ -20,9 +20,11 @@ Phase 3 still does not install `gsplat`, implement training, install Nerfstudio,
 
 ## Phase 4 Status
 
-Phase 4 adds diagnostics for the headless training environment.
+Phase 3.6 added diagnostics for the headless training environment.
 
-Phase 4 still does not install `gsplat`, implement training, install Nerfstudio, install COLMAP, or add benchmark dependencies.
+Phase 4 adds a minimal pinned `gsplat` installation and import validation.
+
+Phase 4 still does not implement training, install Nerfstudio, install COLMAP, add a viewer, or add benchmark dependencies.
 
 ## New Objective
 

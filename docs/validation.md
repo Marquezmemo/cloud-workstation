@@ -22,7 +22,7 @@ runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd77
 
 - Headless CUDA validation with `scripts/validate-gpu.sh` pending on RunPod
 - PyTorch CUDA operation validation with `scripts/validate-gpu.sh` pending on RunPod
-- `gsplat` import/build validation pending
+- `gsplat` import validation pending on RunPod
 - Training log/output persistence validation pending
 
 ## Phase 3 Validation Script
@@ -35,6 +35,8 @@ It checks:
 - Python import of `torch`
 - `torch.__version__`
 - `torch.version.cuda`
+- Python import of `gsplat`
+- installed `gsplat` package version
 - `torch.cuda.is_available()`
 - CUDA GPU name
 - a simple CUDA matrix multiplication
@@ -45,7 +47,7 @@ Expected use inside a RunPod GPU container:
 validate-gpu.sh
 ```
 
-## Phase 4 Training Diagnostics
+## Phase 3.6 Training Diagnostics
 
 `scripts/collect-training-diagnostics.sh` was added to collect training-environment evidence without requiring a training implementation.
 
@@ -90,6 +92,74 @@ Local script validation:
   - `recent-logs/`
 
 This local validation does not replace RunPod GPU validation.
+
+## Phase 4 Minimal gsplat Installation
+
+`gsplat` is now installed as the first technical Gaussian Splatting backend baseline.
+
+Installation source:
+
+- Package index: PyPI
+- Package: `gsplat`
+- Pinned version: `1.5.3`
+- PyPI wheel SHA256 reported by PyPI: `515a3773641f5e7f7717acab6276c0b1d6dbcad087b7968ca653337c3189a982`
+
+Pinned install set:
+
+- `gsplat==1.5.3`
+- `jaxtyping==0.3.11`
+- `markdown-it-py==4.2.0`
+- `mdurl==0.1.2`
+- `ninja==1.13.0`
+- `rich==15.0.0`
+- `wadler-lindig==0.1.7`
+
+`torch` and `numpy` are provided by the pinned RunPod PyTorch base image.
+
+The Dockerfile installs from:
+
+```text
+requirements-gsplat.txt
+```
+
+using:
+
+```bash
+python -m pip install --no-cache-dir --upgrade-strategy only-if-needed -r /tmp/requirements-gsplat.txt
+```
+
+This phase validates package availability and import compatibility only.
+
+Explicitly not included:
+
+- no training pipeline
+- no large training run
+- no Nerfstudio
+- no COLMAP
+- no viewer
+- no desktop stack
+
+`scripts/validate-gpu.sh` now verifies:
+
+- `import gsplat`
+- installed `gsplat` package version
+- PyTorch CUDA availability
+- simple CUDA operation
+
+RunPod validation remains required because the local Mac host cannot expose an NVIDIA GPU to the container.
+
+Local build validation:
+
+- `docker build --platform linux/amd64 -t cloud-workstation:headless-gsplat-v0.1-dev .` completed successfully with the final `requirements-gsplat.txt` install path.
+- The pip install step installed `gsplat-1.5.3` plus the pinned dependencies listed above.
+- No Nerfstudio, COLMAP, viewer, desktop service, or training pipeline was installed.
+- Local container runtime import smoke test was not executed in this pass.
+
+Build observation:
+
+- The existing Phase 3 `ffmpeg` system dependency pulls multimedia/display-adjacent libraries through Ubuntu packages.
+- The build log also showed some existing system packages being upgraded as dependency resolution side effects despite `--no-upgrade`.
+- This is not caused by `gsplat`, but it should be reviewed before freezing the headless baseline.
 
 Dockerfile check note:
 

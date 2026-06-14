@@ -20,7 +20,7 @@ The active branch is:
 headless-gsplat-v0.1-dev
 ```
 
-Phase 3 adds minimal headless tooling for future GPU training work. It does not install `gsplat`, implement training, install Nerfstudio, install COLMAP, or add benchmark dependencies.
+Phase 4 installs the minimal pinned `gsplat` baseline and validates import/CUDA compatibility. It does not implement training, install Nerfstudio, install COLMAP, add a viewer, or add benchmark dependencies.
 
 ## Base Image
 
@@ -67,6 +67,18 @@ The previous desktop integration branch remains legacy only.
 
 `gsplat` is the initial technical baseline, but the training workflow must remain backend-configurable.
 
+Current pinned baseline:
+
+```text
+gsplat==1.5.3 from PyPI
+```
+
+The pinned install set is recorded in:
+
+```text
+requirements-gsplat.txt
+```
+
 Future scripts should keep scene path, output path, log path, checkpoint path, and backend entrypoint explicit. The design should not be hardcoded to a single repo or command.
 
 Nerfstudio/Splatfacto is a future benchmark placeholder only. It is not installed in this phase.
@@ -86,6 +98,8 @@ validate-gpu.sh
 ```
 
 This validates `nvidia-smi`, PyTorch import, CUDA availability, GPU name, and a simple CUDA operation.
+
+It also validates that `gsplat` imports successfully and reports the installed package version.
 
 ## Training Diagnostics
 
