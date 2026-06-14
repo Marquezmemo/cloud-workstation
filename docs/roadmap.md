@@ -15,7 +15,8 @@ Roadmap for the headless Gaussian Splatting training pivot.
 
 - Phase 1 complete: pivot audit documented.
 - Phase 2 complete: headless cleanup and persistent `/workspace` structure.
-- Phase 3 in progress: minimal headless tooling and GPU validation script.
+- Phase 3 complete: minimal headless tooling and GPU validation script.
+- Phase 4 in progress: GPU validation and training diagnostics.
 
 ## Criteria
 

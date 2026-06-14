@@ -30,6 +30,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY scripts/validate-gpu.sh /usr/local/bin/validate-gpu.sh
+COPY scripts/collect-training-diagnostics.sh /usr/local/bin/collect-training-diagnostics.sh
 
 RUN mkdir -p \
     /workspace/datasets \
@@ -38,7 +39,9 @@ RUN mkdir -p \
     /workspace/logs \
     /workspace/checkpoints
 
-RUN chmod +x /usr/local/bin/validate-gpu.sh
+RUN chmod +x \
+    /usr/local/bin/validate-gpu.sh \
+    /usr/local/bin/collect-training-diagnostics.sh
 
 WORKDIR /workspace
 

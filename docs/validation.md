@@ -45,6 +45,58 @@ Expected use inside a RunPod GPU container:
 validate-gpu.sh
 ```
 
+## Phase 4 Training Diagnostics
+
+`scripts/collect-training-diagnostics.sh` was added to collect training-environment evidence without requiring a training implementation.
+
+It collects:
+
+- timestamp and image/workspace metadata
+- OS and kernel information
+- `/workspace` disk usage
+- `/workspace` tree
+- process list
+- environment variables
+- `nvidia-smi` output when available
+- GPU memory/utilization query when available
+- Python/PyTorch/CUDA versions
+- `pip freeze`
+- snapshots of datasets, scenes, outputs, logs, and checkpoints
+- recent training log tails from `/workspace/logs`
+
+Expected use inside the container:
+
+```bash
+collect-training-diagnostics.sh
+```
+
+The script writes a `.tar.gz` archive under:
+
+```text
+/workspace/logs/diagnostics
+```
+
+Local script validation:
+
+- Ran successfully against a temporary workspace under `/tmp`.
+- Produced a diagnostics archive.
+- Archive included:
+  - `metadata.env`
+  - `nvidia-smi.txt`
+  - `python-torch-cuda.txt`
+  - `pip-freeze.txt`
+  - `workspace-tree.txt`
+  - `workspace-snapshots/`
+  - `recent-logs/`
+
+This local validation does not replace RunPod GPU validation.
+
+Dockerfile check note:
+
+- `docker build --check` was able to load the Dockerfile and base image metadata.
+- On the local Mac/OrbStack environment it reported `InvalidBaseImagePlatform` because the host is `linux/arm64` and the pinned RunPod base image is `linux/amd64`.
+- This warning is expected for the local host architecture and does not contradict the prior successful `linux/amd64` build.
+
 ## Phase 3 Local Validation
 
 Host:

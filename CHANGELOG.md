@@ -1,5 +1,45 @@
 # Changelog
 
+## Headless Gaussian Splatting Pivot — Phase 4
+
+Added headless training diagnostics.
+
+### Added
+
+- `scripts/collect-training-diagnostics.sh`
+- `/usr/local/bin/collect-training-diagnostics.sh` inside the image
+
+### Diagnostics Coverage
+
+The diagnostics collector captures:
+
+- metadata and workspace paths
+- OS/kernel information
+- `/workspace` disk usage and tree
+- process list and environment
+- `nvidia-smi` when available
+- GPU memory/utilization query when available
+- Python/PyTorch/CUDA versions
+- `pip freeze`
+- snapshots of datasets, scenes, outputs, logs, and checkpoints
+- recent training log tails
+
+### Constraints
+
+- No `gsplat` installation.
+- No training implementation.
+- No Nerfstudio installation.
+- No COLMAP installation.
+- No desktop packages.
+- `CMD ["/bin/bash"]` retained.
+
+### Local Validation
+
+- `collect-training-diagnostics.sh` passed shell syntax validation.
+- It ran successfully against a temporary local workspace.
+- It produced a `.tar.gz` diagnostics archive with metadata, Python/PyTorch/CUDA report, workspace snapshots, and recent logs.
+- `docker build --check` loaded the Dockerfile and base metadata, but reported the expected local host platform warning: RunPod base is `linux/amd64`, local Mac/OrbStack host is `linux/arm64`.
+
 ## Headless Gaussian Splatting Pivot — Phase 3
 
 Added minimal headless base tooling for future GPU training work.

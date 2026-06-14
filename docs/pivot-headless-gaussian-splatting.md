@@ -18,6 +18,12 @@ Phase 3 adds minimal headless base tools and `scripts/validate-gpu.sh`.
 
 Phase 3 still does not install `gsplat`, implement training, install Nerfstudio, install COLMAP, or add benchmark dependencies.
 
+## Phase 4 Status
+
+Phase 4 adds diagnostics for the headless training environment.
+
+Phase 4 still does not install `gsplat`, implement training, install Nerfstudio, install COLMAP, or add benchmark dependencies.
+
 ## New Objective
 
 Build a reproducible headless training image for Gaussian Splatting.

@@ -87,6 +87,20 @@ validate-gpu.sh
 
 This validates `nvidia-smi`, PyTorch import, CUDA availability, GPU name, and a simple CUDA operation.
 
+## Training Diagnostics
+
+To collect environment, GPU, PyTorch/CUDA, workspace, logs, outputs, and checkpoint diagnostics:
+
+```bash
+collect-training-diagnostics.sh
+```
+
+The script writes a compressed archive under:
+
+```text
+/workspace/logs/diagnostics
+```
+
 ## Repository Structure
 
 ```text
