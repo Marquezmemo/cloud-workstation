@@ -6,6 +6,12 @@ This document is the Phase 1 audit for reorienting the project from a remote int
 
 Phase 1 is intentionally documentation-first. It does not aggressively modify the Dockerfile or runtime.
 
+## Phase 2 Status
+
+Phase 2 removes the active desktop/workstation objective and prepares the headless persistent workspace layout.
+
+Phase 2 still does not install `gsplat`, implement training, install Nerfstudio, or add benchmark dependencies.
+
 ## New Objective
 
 Build a reproducible headless training image for Gaussian Splatting.
@@ -206,9 +212,9 @@ Paused / legacy:
 
 Desktop Integration must not repair GDM, Xorg, XFCE, VNC, NoMachine, or streaming unless explicitly reactivated.
 
-## Phase Gate
+## Phase Gate Status
 
-Do not advance to Phase 2 until this Phase 1 report is reviewed.
+Phase 1 gate was satisfied before Phase 2 cleanup began.
 
 Phase 1 completion criteria:
 
@@ -219,8 +225,32 @@ Phase 1 completion criteria:
 - COLMAP optional policy is documented
 - agent state is documented
 - `CHANGELOG.md` records the pivot start
-- Dockerfile/runtime is not aggressively changed
+- Dockerfile/runtime was not aggressively changed in Phase 1
+
+Phase 2 completion criteria:
+
+- active Dockerfile has no desktop dependencies
+- persistent `/workspace` directories are prepared
+- `WORKDIR /workspace` is set
+- active docs no longer present the project as a remote desktop workstation
+- `CHANGELOG.md` records the cleanup
 
 ## Next Phase Preview
 
-Phase 2 should remove or avoid desktop artifacts and prepare the repo for a clean headless Dockerfile. It should not install Nerfstudio or benchmark dependencies.
+Phase 3 should add headless CUDA/PyTorch system dependencies required for later Gaussian Splatting work. It should not install Nerfstudio or benchmark dependencies.
+
+## Phase 2 Cleanup Record
+
+Desktop packages were not present in this branch because the pivot starts from `main` / `workstation-v0.1`, not from `workstation-v0.2-dev`.
+
+Explicitly not present in the active Dockerfile after Phase 2:
+
+- `ubuntu-desktop-minimal`
+- `gdm` / `gdm3`
+- `xorg`
+- `dbus-x11`
+- `mesa-utils`
+- `glxinfo`
+- `supervisor`
+
+The active Dockerfile now only prepares the headless persistent `/workspace` directory layout and starts `/bin/bash`.

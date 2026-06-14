@@ -26,15 +26,17 @@ Before any version is treated as a frozen baseline, it must include:
 - GPU validation record
 - Changelog entry
 
-## Next Version
+## Current Development Direction
 
-The next official development version is `Workstation_v0.2-dev`.
+The active development direction is `headless-gsplat-v0.1-dev`.
 
-Its first goal is to validate a minimal accelerated desktop layer:
+Its first goal is to create a headless CUDA/PyTorch image for Gaussian Splatting training:
 
-- X11
-- XFCE
-- OpenGL
-- Functional graphical session
+- no desktop
+- no display manager
+- no Xorg/X11
+- no VNC or NoMachine
+- no interactive streaming
+- persistent `/workspace` datasets, logs, outputs, and checkpoints
 
-Do not install Blender, Houdini, or complex DCC tooling in the first desktop validation pass.
+Do not install Nerfstudio or benchmark dependencies until a future benchmark branch explicitly requires them.

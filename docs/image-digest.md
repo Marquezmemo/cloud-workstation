@@ -6,10 +6,26 @@
 
 - Mutable tag originally validated:
   `runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04`
-- Frozen digest:
-  `sha256:6878d595cd929b97acb8cce666c3db7e6709971547d46b2d94362460695f5b29`
+- Frozen manifest digest:
+  `sha256:61a4aafb0094cd773f11eefa378929d5a687bd775febeb78eac62fc824141fb5`
 - Exact Dockerfile reference:
-  `runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:6878d595cd929b97acb8cce666c3db7e6709971547d46b2d94362460695f5b29`
+  `runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd773f11eefa378929d5a687bd775febeb78eac62fc824141fb5`
+
+## Correction Note
+
+The original freeze finalization recorded an image index digest by mistake. The active Dockerfile must use the platform manifest digest above.
+
+Incorrect index digest previously recorded:
+
+```text
+sha256:6878d595cd929b97acb8cce666c3db7e6709971547d46b2d94362460695f5b29
+```
+
+Correct manifest digest:
+
+```text
+sha256:61a4aafb0094cd773f11eefa378929d5a687bd775febeb78eac62fc824141fb5
+```
 
 ## Project Image
 

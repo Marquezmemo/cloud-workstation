@@ -1,31 +1,36 @@
 # Architecture
 
-`cloud-workstation` esta disenado como una workstation GPU cloud-first, construida por capas y congelada por versiones.
+`cloud-workstation` is now oriented toward headless Gaussian Splatting training on NVIDIA GPUs in RunPod.
 
-## Arquitectura conceptual
+## Conceptual Architecture
 
 ```text
-Workstation GPU cloud-first
+Headless Gaussian Splatting training image
 ↓
-Ubuntu 22.04
+Ubuntu 22.04 / RunPod PyTorch base
 ↓
-NVIDIA runtime
+NVIDIA runtime + CUDA
 ↓
-Future desktop layer
+PyTorch
 ↓
-Future streaming layer
+Backend-configurable training wrapper
 ↓
-Future DCC applications
+/workspace persistent datasets, logs, outputs, checkpoints
 ```
 
-## Principios
+## Principles
 
-- La imagen base validada es el punto de partida unico.
-- Cada capa futura debe agregarse de forma incremental y documentada.
-- Cada version debe poder restaurarse y compararse con versiones anteriores.
-- Las decisiones tecnicas deben registrarse dentro del repositorio.
-- La facilidad de debugging tiene prioridad sobre la compactacion u optimizacion temprana.
+- Keep the container headless.
+- Keep CUDA/GPU validation explicit.
+- Keep datasets and outputs outside ephemeral container paths.
+- Keep training logs easy to collect.
+- Avoid desktop, display manager, viewer, VNC, NoMachine, streaming, and Blender GUI dependencies.
+- Add training capabilities incrementally and document each phase.
 
-## Estado de v0.1
+## Backend Strategy
 
-`v0.1` contiene solo la baseline reproducible. No modifica todavia el entorno grafico ni instala herramientas DCC.
+`gsplat` is the initial technical baseline.
+
+Training scripts should be designed so the backend can be wrapped or replaced later without rewriting the whole project.
+
+Nerfstudio/Splatfacto is reserved for a future benchmark branch, not for the first headless image.

@@ -1,6 +1,25 @@
-FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:6878d595cd929b97acb8cce666c3db7e6709971547d46b2d94362460695f5b29
+FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd773f11eefa378929d5a687bd775febeb78eac62fc824141fb5
 
 LABEL org.opencontainers.image.title="cloud-workstation"
-LABEL org.opencontainers.image.version="v0.1"
-LABEL org.opencontainers.image.description="Frozen baseline for a Runpod GPU interactive workstation."
-LABEL org.opencontainers.image.base.name="runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:6878d595cd929b97acb8cce666c3db7e6709971547d46b2d94362460695f5b29"
+LABEL org.opencontainers.image.version="headless-gsplat-v0.1-dev"
+LABEL org.opencontainers.image.description="Headless CUDA/PyTorch base image for Gaussian Splatting training on RunPod."
+LABEL org.opencontainers.image.base.name="runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd773f11eefa378929d5a687bd775febeb78eac62fc824141fb5"
+
+ENV TRAINING_IMAGE_VERSION=headless-gsplat-v0.1-dev
+ENV WORKSPACE_ROOT=/workspace
+ENV DATASETS_DIR=/workspace/datasets
+ENV SCENES_DIR=/workspace/scenes
+ENV OUTPUTS_DIR=/workspace/outputs
+ENV LOGS_DIR=/workspace/logs
+ENV CHECKPOINTS_DIR=/workspace/checkpoints
+
+RUN mkdir -p \
+    /workspace/datasets \
+    /workspace/scenes \
+    /workspace/outputs \
+    /workspace/logs \
+    /workspace/checkpoints
+
+WORKDIR /workspace
+
+CMD ["/bin/bash"]

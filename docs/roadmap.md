@@ -1,15 +1,23 @@
 # Roadmap
 
-Roadmap inicial para evolucionar la workstation sin introducir complejidad prematura.
+Roadmap for the headless Gaussian Splatting training pivot.
 
-1. Freeze baseline
-2. Add desktop layer
-3. Add streaming layer
-4. Add startup orchestration
-5. Add observability
-6. Add Blender
-7. Future Houdini support
+1. Audit pivot from remote workstation to headless training
+2. Clean active image target and create persistent workspace layout
+3. Add headless CUDA/PyTorch system dependencies
+4. Add GPU validation and training diagnostics
+5. Add backend-configurable `gsplat` training workflow
+6. Validate a minimal training run with persistent logs and outputs
+7. Freeze a reproducible headless baseline
+8. Optionally create a future Nerfstudio/Splatfacto benchmark branch
 
-## Criterio general
+## Current Status
 
-Cada etapa debe quedar documentada, versionada y validada antes de avanzar a la siguiente. El objetivo es mantener una base reproducible y facil de depurar.
+- Phase 1 complete: pivot audit documented.
+- Phase 2 in progress: headless cleanup and persistent `/workspace` structure.
+
+## Criteria
+
+Each phase must remain reviewable as a logical commit.
+
+Do not install desktop, viewer, streaming, or benchmark dependencies while the headless training baseline is still being established.

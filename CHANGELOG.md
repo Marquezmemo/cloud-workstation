@@ -1,5 +1,40 @@
 # Changelog
 
+## Headless Gaussian Splatting Pivot — Phase 2
+
+Prepared the active branch for a headless training image.
+
+### Changed
+
+- Updated `Dockerfile` identity to `headless-gsplat-v0.1-dev`.
+- Corrected active base image references to the platform manifest digest:
+  `sha256:61a4aafb0094cd773f11eefa378929d5a687bd775febeb78eac62fc824141fb5`
+- Replaced active remote-workstation description with headless Gaussian Splatting training image description.
+- Created persistent workspace directories:
+  - `/workspace/datasets`
+  - `/workspace/scenes`
+  - `/workspace/outputs`
+  - `/workspace/logs`
+  - `/workspace/checkpoints`
+- Set `WORKDIR /workspace`.
+- Updated active documentation to remove the desktop/workstation objective.
+
+### Confirmed Removed / Not Present
+
+- No `ubuntu-desktop-minimal`
+- No GDM/GDM3
+- No Xorg/X11
+- No `dbus-x11`
+- No `mesa-utils` / `glxinfo`
+- No supervisor for graphical services
+- No VNC, NoMachine, streaming, Blender GUI, Nerfstudio, or `gsplat` installation
+
+### Deferred
+
+- `gsplat` installation and training scripts remain for a later phase.
+- COLMAP remains optional and was not added in this phase.
+- Nerfstudio remains a future benchmark placeholder only.
+
 ## Headless Gaussian Splatting Pivot — Phase 1
 
 Started the pivot from remote interactive workstation to headless Gaussian Splatting training image.

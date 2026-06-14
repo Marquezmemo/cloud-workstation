@@ -1,79 +1,83 @@
 # cloud-workstation
 
-Baseline reproducible y versionada para una workstation GPU interactiva en Runpod.
+Headless Docker image for Gaussian Splatting training on NVIDIA GPUs in RunPod, primarily RTX 4090.
 
-## Objetivo del proyecto
+This repository is no longer targeting a remote desktop workstation. The active goal is a reproducible CUDA/PyTorch training image with persistent datasets, outputs, logs, and checkpoints.
 
-Crear una base tecnica estable para una workstation cloud-first con GPU, baja latencia, escritorio remoto acelerado por GPU y soporte futuro para aplicaciones DCC como Blender y Houdini.
+## Priorities
 
-La version inicial `Workstation_v0.1` funciona como punto congelado de restauracion y como fuente de verdad para iteraciones posteriores.
+1. Stable Gaussian Splatting training
+2. Correct CUDA/GPU usage
+3. Clear logs
+4. Persistent datasets and outputs
+5. Zero graphical desktop environment
 
-## Filosofia de diseno
+## Current Phase
 
-La prioridad absoluta del proyecto es:
-
-- estabilidad
-- experiencia interactiva
-- reproducibilidad
-- observabilidad
-- facilidad de debugging
-
-Este proyecto no busca optimizar recursos en esta etapa. No se introducen optimizaciones prematuras, orquestacion avanzada, multi-container, microservicios ni capas adicionales antes de validar cada bloque.
-
-## Imagen base utilizada
-
-La unica imagen base permitida para `v0.1` es:
+The active branch is:
 
 ```text
-runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
+headless-gsplat-v0.1-dev
 ```
 
-No debe cambiarse, sustituirse ni reemplazarse por alternativas.
+Phase 2 prepares a clean headless base. It does not install `gsplat`, implement training, install Nerfstudio, or add benchmark dependencies.
 
-## Validaciones ya realizadas
+## Base Image
 
-La imagen base fue validada manualmente para:
+The current headless development image derives from the validated RunPod PyTorch CUDA image:
 
-- CUDA funcional
-- GPU NVIDIA funcional
-- NVENC funcional
-- SSH funcional
-- networking funcional en Runpod
-- compatibilidad general con Runpod
+```text
+runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd773f11eefa378929d5a687bd775febeb78eac62fc824141fb5
+```
 
-## Estado actual del proyecto
+Do not use `latest`.
 
-`Workstation_v0.1` es una baseline minima.
+## Persistent Workspace Layout
 
-Incluye:
+The container prepares:
 
-- Dockerfile reproducible
-- documentacion inicial
-- estructura de carpetas para futuras iteraciones
-- workflow de GitHub Actions para publicar la imagen al crear el tag `v0.1`
+```text
+/workspace/datasets
+/workspace/scenes
+/workspace/outputs
+/workspace/logs
+/workspace/checkpoints
+```
 
-No incluye todavia:
+Important data must live in mounted volumes or persistent RunPod storage. Do not rely on ephemeral container paths for datasets, outputs, logs, or checkpoints.
 
-- XFCE u otro entorno grafico
-- Blender
-- Houdini
-- Parsec
-- Sunshine
-- audio stack
-- X11 o sesion de escritorio
-- capa de streaming
+## Explicit Non-Goals
 
-## Roadmap inicial
+Do not add or repair:
 
-1. Freeze baseline
-2. Add desktop layer
-3. Add streaming layer
-4. Add startup orchestration
-5. Add observability
-6. Add Blender
-7. Future Houdini support
+- remote desktop
+- GDM/GDM3
+- XFCE
+- Xorg/X11
+- VNC
+- NoMachine
+- interactive streaming
+- Blender GUI
+- desktop GLX probes
+- virtual monitor/viewer workflows
 
-## Estructura del repositorio
+The previous desktop integration branch remains legacy only.
+
+## Gaussian Splatting Backend
+
+`gsplat` is the initial technical baseline, but the training workflow must remain backend-configurable.
+
+Future scripts should keep scene path, output path, log path, checkpoint path, and backend entrypoint explicit. The design should not be hardcoded to a single repo or command.
+
+Nerfstudio/Splatfacto is a future benchmark placeholder only. It is not installed in this phase.
+
+## COLMAP Policy
+
+COLMAP is optional for the first image.
+
+It should be added only if it does not introduce heavy desktop dependencies or build complexity. If it complicates the image, move it to a later phase and document the decision.
+
+## Repository Structure
 
 ```text
 cloud-workstation/
@@ -81,9 +85,6 @@ cloud-workstation/
 ├── README.md
 ├── CHANGELOG.md
 ├── docs/
-│   ├── architecture.md
-│   ├── validation.md
-│   └── roadmap.md
 ├── scripts/
 ├── startup/
 ├── healthchecks/
@@ -91,19 +92,4 @@ cloud-workstation/
 └── .gitignore
 ```
 
-## Publicacion de imagen
-
-La imagen esperada para `v0.1` es:
-
-```text
-docker.io/${DOCKERHUB_USERNAME}/cloud-workstation:v0.1
-```
-
-El workflow publica la imagen solo cuando se empuja el tag Git `v0.1`.
-
-Secretos requeridos en GitHub:
-
-- `DOCKERHUB_USERNAME`
-- `DOCKERHUB_TOKEN`
-
-No se publica `latest` en esta version para preservar el baseline congelado.
+Current empty folders remain as placeholders until the headless training scripts are introduced in later phases.
