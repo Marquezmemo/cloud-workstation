@@ -8,6 +8,7 @@ Added the first minimal `gsplat` installation for import and CUDA compatibility 
 
 - Pinned `gsplat==1.5.3` from PyPI.
 - Added `requirements-gsplat.txt` for the pinned minimal `gsplat` install set.
+- Added GitHub Actions workflow to publish the dev image as `cloud-workstation:headless-gsplat-v0.1-dev`.
 - `GSPLAT_VERSION=1.5.3` image environment variable.
 - Docker image labels recording the `gsplat` version and source.
 - `scripts/validate-gpu.sh` now checks:
