@@ -1,5 +1,31 @@
 # Changelog
 
+## Headless Gaussian Splatting Pivot — Phase 1
+
+Started the pivot from remote interactive workstation to headless Gaussian Splatting training image.
+
+### Added
+
+- Phase 1 audit report: `docs/pivot-headless-gaussian-splatting.md`
+- Minimal active-agent state for the headless pivot: `docs/agents/README.md`
+
+### Decisions
+
+- New objective is headless Gaussian Splatting training on NVIDIA GPUs, primarily RTX 4090 on RunPod.
+- `gsplat` is the initial technical baseline.
+- Training backend design must remain configurable and not hardcoded to one repository or command.
+- Nerfstudio/Splatfacto remains a future benchmark placeholder only.
+- COLMAP is optional for the first image and should be moved to a later phase if it introduces heavy desktop dependencies or build complexity.
+- Desktop Integration / Deky is paused and legacy.
+
+### Not Changed In This Phase
+
+- No aggressive Dockerfile/runtime rewrite.
+- No desktop removal yet.
+- No Nerfstudio installation.
+- No benchmark dependencies.
+- No GDM/Xorg/XFCE/VNC/streaming repair.
+
 ## Workstation_v0.1 Frozen Baseline
 
 Baseline officially frozen and marked immutable.
