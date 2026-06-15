@@ -20,10 +20,43 @@ runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd77
 
 ## Estado actual pendiente
 
+- RunPod keepalive startup validation pending on RunPod
 - Headless CUDA validation with `scripts/validate-gpu.sh` pending on RunPod
 - PyTorch CUDA operation validation with `scripts/validate-gpu.sh` pending on RunPod
 - `gsplat` import validation pending on RunPod
 - Training log/output persistence validation pending
+
+## RunPod Keepalive Startup
+
+RunPod may start a container without an interactive shell. In that mode, `CMD ["/bin/bash"]` can exit immediately, causing RunPod to report:
+
+```text
+Container ... is not running
+```
+
+This is not evidence of a CUDA or `gsplat` failure by itself.
+
+The image now uses:
+
+```text
+CMD ["runpod-keepalive.sh"]
+```
+
+The keepalive script:
+
+- creates `/workspace/logs`
+- prints startup context
+- prints the validation commands:
+  - `validate-gpu.sh`
+  - `collect-training-diagnostics.sh`
+- remains alive with `sleep infinity`
+
+Expected validation on RunPod:
+
+- pod remains running after startup
+- SSH/manual shell access is possible
+- `validate-gpu.sh` can be run manually on the RTX 4090 pod
+- `collect-training-diagnostics.sh` can collect logs under `/workspace/logs`
 
 ## Phase 3 Validation Script
 

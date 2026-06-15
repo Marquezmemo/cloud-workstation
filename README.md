@@ -22,6 +22,8 @@ headless-gsplat-v0.1-dev
 
 Phase 4 installs the minimal pinned `gsplat` baseline and validates import/CUDA compatibility. It does not implement training, install Nerfstudio, install COLMAP, add a viewer, or add benchmark dependencies.
 
+The image starts with a minimal RunPod keepalive command so non-interactive pods remain running for SSH and manual validation.
+
 ## Base Image
 
 The current headless development image derives from the validated RunPod PyTorch CUDA image:
@@ -100,6 +102,18 @@ validate-gpu.sh
 This validates `nvidia-smi`, PyTorch import, CUDA availability, GPU name, and a simple CUDA operation.
 
 It also validates that `gsplat` imports successfully and reports the installed package version.
+
+## RunPod Startup
+
+The default command is:
+
+```text
+runpod-keepalive.sh
+```
+
+This keeps a foreground process alive in non-interactive RunPod pods. It creates `/workspace/logs`, prints the main validation commands, and then sleeps indefinitely.
+
+This replaces `CMD ["/bin/bash"]`, which can exit immediately when RunPod starts the container without an interactive shell.
 
 ## Training Diagnostics
 

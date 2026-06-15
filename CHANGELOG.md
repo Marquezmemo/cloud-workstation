@@ -1,5 +1,35 @@
 # Changelog
 
+## Headless Gaussian Splatting Pivot — RunPod Keepalive
+
+Fixed RunPod startup behavior for non-interactive pods.
+
+### Changed
+
+- Added `scripts/runpod-keepalive.sh`.
+- Copied it into the image as `/usr/local/bin/runpod-keepalive.sh`.
+- Changed default command from `CMD ["/bin/bash"]` to `CMD ["runpod-keepalive.sh"]`.
+
+### Behavior
+
+- Creates `/workspace/logs` on startup.
+- Prints the main manual validation commands:
+  - `validate-gpu.sh`
+  - `collect-training-diagnostics.sh`
+- Keeps the foreground container process alive with `sleep infinity`.
+
+### Reason
+
+RunPod can start containers without an interactive shell. In that mode, `bash` may exit immediately, causing the pod to stop even when CUDA and `gsplat` are not the failing layer.
+
+### Constraints
+
+- No desktop.
+- No Nerfstudio.
+- No COLMAP.
+- No viewer.
+- No `latest` publication.
+
 ## Headless Gaussian Splatting Pivot — Phase 4 gsplat Import Baseline
 
 Added the first minimal `gsplat` installation for import and CUDA compatibility validation.

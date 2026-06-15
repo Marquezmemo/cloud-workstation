@@ -42,6 +42,7 @@ RUN python -m pip install --no-cache-dir --upgrade-strategy only-if-needed -r /t
 
 COPY scripts/validate-gpu.sh /usr/local/bin/validate-gpu.sh
 COPY scripts/collect-training-diagnostics.sh /usr/local/bin/collect-training-diagnostics.sh
+COPY scripts/runpod-keepalive.sh /usr/local/bin/runpod-keepalive.sh
 
 RUN mkdir -p \
     /workspace/datasets \
@@ -52,8 +53,9 @@ RUN mkdir -p \
 
 RUN chmod +x \
     /usr/local/bin/validate-gpu.sh \
-    /usr/local/bin/collect-training-diagnostics.sh
+    /usr/local/bin/collect-training-diagnostics.sh \
+    /usr/local/bin/runpod-keepalive.sh
 
 WORKDIR /workspace
 
-CMD ["/bin/bash"]
+CMD ["runpod-keepalive.sh"]
