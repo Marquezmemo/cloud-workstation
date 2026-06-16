@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [[ -f /usr/local/bin/generate-ply.py ]]; then
+  exec python /usr/local/bin/generate-ply.py "$@"
+fi
+
+exec python "${SCRIPT_DIR}/generate-ply.py" "$@"

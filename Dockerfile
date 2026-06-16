@@ -65,6 +65,11 @@ COPY scripts/runpod-keepalive.sh /usr/local/bin/runpod-keepalive.sh
 COPY scripts/prepare-dataset.sh /usr/local/bin/prepare-dataset.sh
 COPY scripts/train-scene.sh /usr/local/bin/train-scene.sh
 COPY scripts/patch-gsplat-simple-trainer-headless.sh /usr/local/bin/patch-gsplat-simple-trainer-headless.sh
+COPY scripts/generate-ply.py /usr/local/bin/generate-ply.py
+COPY scripts/Generar /usr/local/bin/Generar
+COPY scripts/Generar /usr/local/bin/generar
+COPY scripts/PrepararDescarga /usr/local/bin/PrepararDescarga
+COPY scripts/descarga /usr/local/bin/descarga
 
 RUN mkdir -p \
     /workspace/datasets \
@@ -79,7 +84,12 @@ RUN chmod +x \
     /usr/local/bin/runpod-keepalive.sh \
     /usr/local/bin/prepare-dataset.sh \
     /usr/local/bin/train-scene.sh \
-    /usr/local/bin/patch-gsplat-simple-trainer-headless.sh
+    /usr/local/bin/patch-gsplat-simple-trainer-headless.sh \
+    /usr/local/bin/generate-ply.py \
+    /usr/local/bin/Generar \
+    /usr/local/bin/generar \
+    /usr/local/bin/PrepararDescarga \
+    /usr/local/bin/descarga
 
 WORKDIR /workspace
 

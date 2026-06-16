@@ -58,6 +58,9 @@ Observed evidence from RunPod:
 ```text
 /workspace/logs/diagnostics/training-diagnostics-20260616T023550Z.tar.gz
 ```
+- A real `gsplat` training run reached 30,000 iterations on RunPod RTX 4090.
+- Training generated checkpoints/tensors successfully.
+- The missing `.ply` was caused by not invoking PLY export, not by a training or checkpoint failure.
 
 Interpretation:
 
@@ -68,10 +71,45 @@ Interpretation:
 
 Not validated in this phase:
 
-- no training pipeline
-- no first training run
-- no dataset workflow
-- no checkpoint/output persistence from training
+- no automatic PLY export during training
+- no upload pipeline
+
+## PLY Export From Checkpoints
+
+Manual PLY export is handled by:
+
+```text
+Generar
+generar
+```
+
+The command uses native `gsplat.export_splats`, loads checkpoints on CPU by default, writes logs to `/workspace/logs/<scene>/generate-ply.log`, and writes outputs to `/workspace/outputs/<scene>/exports`.
+
+Expected outputs when supported:
+
+```text
+<scene>.ply
+<scene>.compressed.ply
+```
+
+Download preparation is handled manually by:
+
+```text
+PrepararDescarga
+descarga
+```
+
+This packages exports and prints an `scp -O` template. It does not transfer files automatically.
+
+Local validation completed:
+
+- Docker build completed successfully.
+- `/usr/local/bin/Generar` exists and is executable.
+- `/usr/local/bin/generar` exists and is executable.
+- `/usr/local/bin/PrepararDescarga` exists and is executable.
+- `/usr/local/bin/descarga` exists and is executable.
+
+PLY generation from the real checkpoint should be validated directly in the RunPod RTX 4090 pod.
 
 ## Phase 5A Official gsplat Trainer Adoption
 

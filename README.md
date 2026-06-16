@@ -133,6 +133,10 @@ Latest RunPod validation result:
 - `cuda_available=True`
 - `cuda_operation=success`
 - diagnostics archive generated under `/workspace/logs/diagnostics`
+- real `gsplat` training reached 30,000 iterations
+- checkpoints/tensors were generated successfully
+
+The missing `.ply` in the 30,000-step run was an export invocation issue, not a training failure.
 
 ## RunPod Startup
 
@@ -195,6 +199,42 @@ Logs and outputs are written under:
 This phase does not promise final quality. It only establishes the first official training backend path.
 
 Phase 5A local smoke validation passed for image build, trainer help, absence of viewer dependencies, and `train-scene.sh --check`. A real COLMAP-prepared training run on RunPod remains pending.
+
+## PLY Export
+
+Generate PLY files from existing checkpoints with:
+
+```bash
+Generar
+```
+
+If more than one scene exists, pass the scene explicitly:
+
+```bash
+Generar --scene truck
+```
+
+Advanced explicit checkpoint:
+
+```bash
+Generar --checkpoint /workspace/outputs/truck/ckpts/ckpt_30000.pt
+```
+
+Exports are written under:
+
+```text
+/workspace/outputs/<scene>/exports
+```
+
+`Generar` uses the native `gsplat.export_splats` exporter and writes both standard PLY and compressed PLY when supported. It does not upload files or run a complete pipeline.
+
+Prepare generated PLY files for manual download:
+
+```bash
+PrepararDescarga truck
+```
+
+See `docs/ply-export.md`.
 
 ## Repository Structure
 

@@ -1,5 +1,49 @@
 # Changelog
 
+## Headless Gaussian Splatting Pivot — Manual PLY Export
+
+Added manual PLY generation from existing `gsplat` checkpoints.
+
+### Confirmed
+
+- `headless-gsplat-v0.1-dev` starts successfully on RunPod.
+- RTX 4090 validation passed.
+- PyTorch CUDA validation passed.
+- `gsplat==1.5.3` import validation passed.
+- A real `gsplat` training run reached 30,000 iterations.
+- Checkpoints/tensors were generated successfully.
+- The missing `.ply` was caused by not invoking PLY export during training.
+
+### Added
+
+- `scripts/generate-ply.py`
+- `scripts/Generar`
+- `scripts/generar`
+- `scripts/PrepararDescarga`
+- `scripts/descarga`
+- `docs/ply-export.md`
+
+### Behavior
+
+- `Generar` uses native `gsplat.export_splats`.
+- Default export format is both standard PLY and compressed PLY.
+- Checkpoints are loaded on CPU by default.
+- Logs are written to `/workspace/logs/<scene>/generate-ply.log`.
+- Outputs are written to `/workspace/outputs/<scene>/exports`.
+- `PrepararDescarga` packages existing PLY exports, writes a checksum, and prints an `scp -O` template.
+
+### Not Included
+
+- No upload automation.
+- No HTTP server.
+- No tunnel to the Mac.
+- No supervisor.
+- No fire-and-forget pipeline.
+- No Nerfstudio.
+- No COLMAP.
+- No viewer.
+- No desktop.
+
 ## Headless Gaussian Splatting Pivot — Phase 5A Official Trainer Baseline
 
 Adopted the official `nerfstudio-project/gsplat` `examples/simple_trainer.py` as the first training backend baseline.

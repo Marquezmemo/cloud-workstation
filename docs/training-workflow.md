@@ -83,6 +83,29 @@ Each run writes:
 
 `error.tail` is written only when the trainer exits with an error.
 
+## PLY Export After Training
+
+The official trainer can save checkpoints without writing a `.ply` unless PLY export is requested during training. For existing checkpoints, use:
+
+```bash
+Generar --scene <scene>
+```
+
+Default outputs:
+
+```text
+/workspace/outputs/<scene>/exports/<scene>.ply
+/workspace/outputs/<scene>/exports/<scene>.compressed.ply
+```
+
+The export command uses `gsplat.export_splats` and runs on CPU by default. It does not upload files or start a pipeline.
+
+Prepare exports for manual download from the Mac:
+
+```bash
+PrepararDescarga <scene>
+```
+
 ## Headless Mode
 
 The wrapper always passes:

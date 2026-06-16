@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+PrepararDescarga <scene>
+
+Packages generated PLY exports for manual download from your Mac.
+This command does not transfer files.
+EOF
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  usage
+  exit 0
+fi
+
+SCENE="${1:-}"
+if [[ -z "${SCENE}" ]]; then
+  usage >&2
+  exit 2
+fi
+
+EXPORT_DIR="/workspace/outputs/${SCENE}/exports"
+LOG_DIR="/workspace/logs/${SCENE}"
+ARCHIVE="/workspace/outputs/${SCENE}/exports/${SCENE}-ply-exports.tar.gz"
+SHA_FILE="${ARCHIVE}.sha256"
+
+if [[ ! -d "${EXPORT_DIR}" ]]; then
+  echo "ERROR: export directory does not exist: ${EXPORT_DIR}" >&2
+  exit 1
+fi
+
+shopt -s nullglob
+PLY_FILES=("${EXPORT_DIR}"/*.ply)
+shopt -u nullglob
+
+if [[ "${#PLY_FILES[@]}" -eq 0 ]]; then
+  echo "ERROR: no .ply files found in ${EXPORT_DIR}" >&2
+  exit 1
+fi
+
+mkdir -p "${LOG_DIR}"
+
+PLY_NAMES=()
+for path in "${PLY_FILES[@]}"; do
+  PLY_NAMES+=("$(basename "${path}")")
+done
+
+tar -C "${EXPORT_DIR}" -czf "${ARCHIVE}" -- "${PLY_NAMES[@]}"
+sha256sum "${ARCHIVE}" > "${SHA_FILE}"
+
+cat <<EOF
+Archive ready:
+  ${ARCHIVE}
+
+Checksum:
+  ${SHA_FILE}
+
+From your Mac, run a command like:
+
+scp -O -i ~/.ssh/id_ed25519 \\
+  <RUNPOD_USER>@ssh.runpod.io:${ARCHIVE} \\
+  ~/Downloads/
+
+RunPod may require scp -O when using its SSH proxy.
+EOF
