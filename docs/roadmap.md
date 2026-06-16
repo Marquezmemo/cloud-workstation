@@ -16,7 +16,7 @@ Roadmap for the headless Gaussian Splatting training pivot.
 - Phase 1 complete: pivot audit documented.
 - Phase 2 complete: headless cleanup and persistent `/workspace` structure.
 - Phase 3 complete: minimal headless tooling and GPU validation script.
-- Phase 4 in progress: minimal pinned `gsplat` install/import validation.
+- Phase 4 complete: minimal pinned `gsplat` install/import validation passed on RunPod RTX 4090.
 
 ## Criteria
 

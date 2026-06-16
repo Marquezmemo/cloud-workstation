@@ -20,7 +20,7 @@ The active branch is:
 headless-gsplat-v0.1-dev
 ```
 
-Phase 4 installs the minimal pinned `gsplat` baseline and validates import/CUDA compatibility. It does not implement training, install Nerfstudio, install COLMAP, add a viewer, or add benchmark dependencies.
+Phase 4 installs the minimal pinned `gsplat` baseline and validates import/CUDA compatibility. RunPod GPU validation has passed on an NVIDIA GeForce RTX 4090. It does not implement training, install Nerfstudio, install COLMAP, add a viewer, or add benchmark dependencies.
 
 The image starts with a minimal RunPod keepalive command so non-interactive pods remain running for SSH and manual validation.
 
@@ -102,6 +102,20 @@ validate-gpu.sh
 This validates `nvidia-smi`, PyTorch import, CUDA availability, GPU name, and a simple CUDA operation.
 
 It also validates that `gsplat` imports successfully and reports the installed package version.
+
+Latest RunPod validation result:
+
+- GPU: `NVIDIA GeForce RTX 4090`
+- NVIDIA-SMI: `550.127.05`
+- CUDA visible through `nvidia-smi`: `12.4`
+- Python: `3.11.10`
+- `torch`: `2.4.1+cu124`
+- `torch.version.cuda`: `12.4`
+- `gsplat`: `1.5.3`
+- `gsplat_import=success`
+- `cuda_available=True`
+- `cuda_operation=success`
+- diagnostics archive generated under `/workspace/logs/diagnostics`
 
 ## RunPod Startup
 

@@ -24,6 +24,8 @@ Phase 3.6 added diagnostics for the headless training environment.
 
 Phase 4 adds a minimal pinned `gsplat` installation and import validation.
 
+Phase 4 RunPod GPU validation passed on an NVIDIA GeForce RTX 4090. The image starts headless on RunPod, keeps the container alive, detects the GPU, imports `gsplat==1.5.3`, reports PyTorch CUDA availability, executes a CUDA smoke operation, and generates a diagnostics archive.
+
 Phase 4 still does not implement training, install Nerfstudio, install COLMAP, add a viewer, or add benchmark dependencies.
 
 ## New Objective

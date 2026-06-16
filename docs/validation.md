@@ -13,6 +13,10 @@ runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd77
 - `nvidia-smi` exitoso
 - CUDA funcional
 - GPU NVIDIA detectada correctamente
+- RunPod headless keepalive startup validado
+- PyTorch CUDA smoke operation validada en RunPod
+- `gsplat` import validado en RunPod
+- diagnostics archive generado correctamente en RunPod
 - NVENC previamente validado
 - SSH funcional
 - networking funcional en Runpod
@@ -20,11 +24,54 @@ runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd77
 
 ## Estado actual pendiente
 
-- RunPod keepalive startup validation pending on RunPod
-- Headless CUDA validation with `scripts/validate-gpu.sh` pending on RunPod
-- PyTorch CUDA operation validation with `scripts/validate-gpu.sh` pending on RunPod
-- `gsplat` import validation pending on RunPod
+- First training command validation pending
 - Training log/output persistence validation pending
+
+## Phase 4 RunPod GPU Validation
+
+Conclusion:
+
+```text
+Phase 4 RunPod GPU validation passed.
+```
+
+The headless image can start on RunPod, keep the container alive, detect an RTX 4090, import `gsplat`, use PyTorch CUDA, execute a CUDA smoke operation, and generate diagnostics.
+
+Observed evidence from RunPod:
+
+- `validate-gpu.sh` executed successfully inside the pod.
+- GPU detected: `NVIDIA GeForce RTX 4090`
+- NVIDIA-SMI: `550.127.05`
+- CUDA visible through `nvidia-smi`: `12.4`
+- Python: `3.11.10`
+- `torch`: `2.4.1+cu124`
+- `torch.version.cuda`: `12.4`
+- `gsplat`: `1.5.3`
+- `gsplat_import=success`
+- `cuda_available=True`
+- `cuda_device_index=0`
+- `cuda_device_name=NVIDIA GeForce RTX 4090`
+- `cuda_operation=success`
+- `collect-training-diagnostics.sh` executed successfully.
+- Diagnostics archive generated:
+
+```text
+/workspace/logs/diagnostics/training-diagnostics-20260616T023550Z.tar.gz
+```
+
+Interpretation:
+
+- CUDA is visible to Python/PyTorch inside RunPod.
+- The pinned `gsplat` package imports successfully in the GPU environment.
+- The CUDA smoke operation succeeds on the RTX 4090.
+- Diagnostics collection works and writes under persistent workspace logs.
+
+Not validated in this phase:
+
+- no training pipeline
+- no first training run
+- no dataset workflow
+- no checkpoint/output persistence from training
 
 ## RunPod Keepalive Startup
 
@@ -53,10 +100,10 @@ The keepalive script:
 
 Expected validation on RunPod:
 
-- pod remains running after startup
-- SSH/manual shell access is possible
-- `validate-gpu.sh` can be run manually on the RTX 4090 pod
-- `collect-training-diagnostics.sh` can collect logs under `/workspace/logs`
+- pod remains running after startup: passed
+- SSH/manual shell access is possible: passed
+- `validate-gpu.sh` can be run manually on the RTX 4090 pod: passed
+- `collect-training-diagnostics.sh` can collect logs under `/workspace/logs`: passed
 
 ## Phase 3 Validation Script
 
@@ -179,7 +226,7 @@ Explicitly not included:
 - PyTorch CUDA availability
 - simple CUDA operation
 
-RunPod validation remains required because the local Mac host cannot expose an NVIDIA GPU to the container.
+RunPod validation passed on an RTX 4090 pod.
 
 Local build validation:
 

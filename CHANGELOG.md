@@ -1,5 +1,41 @@
 # Changelog
 
+## Headless Gaussian Splatting Pivot — Phase 4 RunPod GPU Validation
+
+Registered successful RunPod GPU validation for the headless `gsplat` image.
+
+### Validated
+
+- `validate-gpu.sh` executed successfully inside RunPod.
+- Headless container startup/keepalive works in RunPod.
+- GPU detected: `NVIDIA GeForce RTX 4090`
+- NVIDIA-SMI: `550.127.05`
+- CUDA visible through `nvidia-smi`: `12.4`
+- Python: `3.11.10`
+- `torch`: `2.4.1+cu124`
+- `torch.version.cuda`: `12.4`
+- `gsplat`: `1.5.3`
+- `gsplat_import=success`
+- `cuda_available=True`
+- `cuda_device_index=0`
+- `cuda_device_name=NVIDIA GeForce RTX 4090`
+- `cuda_operation=success`
+- `collect-training-diagnostics.sh` executed successfully.
+- Diagnostics archive generated:
+  `/workspace/logs/diagnostics/training-diagnostics-20260616T023550Z.tar.gz`
+
+### Conclusion
+
+Phase 4 RunPod GPU validation passed. The headless image can start on RunPod, detect RTX 4090, import `gsplat`, use PyTorch CUDA, execute a CUDA smoke operation, and generate diagnostics.
+
+### Not Included
+
+- No training implementation.
+- No Nerfstudio.
+- No COLMAP.
+- No viewer.
+- No desktop.
+
 ## Headless Gaussian Splatting Pivot — RunPod Keepalive
 
 Fixed RunPod startup behavior for non-interactive pods.
@@ -177,7 +213,7 @@ Added minimal headless base tooling for future GPU training work.
   - `torch.version.cuda` is `12.4`
 - `torch.cuda.is_available()` returned `False` locally because the Mac host does not expose an NVIDIA GPU.
 - Local `--gpus all` validation could not run because Docker reported no known GPU vendor from CDI.
-- Full GPU validation remains pending on RunPod.
+- Full GPU validation was pending at this phase and later passed in Phase 4.
 
 ## Headless Gaussian Splatting Pivot — Phase 2
 
