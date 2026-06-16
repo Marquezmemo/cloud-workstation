@@ -28,6 +28,21 @@ Phase 4 RunPod GPU validation passed on an NVIDIA GeForce RTX 4090. The image st
 
 Phase 4 still does not implement training, install Nerfstudio, install COLMAP, add a viewer, or add benchmark dependencies.
 
+## Phase 5A Status
+
+Phase 5A adopts the official `nerfstudio-project/gsplat` `examples/simple_trainer.py` as the first training backend baseline.
+
+Decision:
+
+- install the official repo at `/opt/gsplat`
+- pin the source to tag `v1.5.3` / commit `937e29912570c372bed6747a5c9bf85fed877bae`
+- run `/opt/gsplat/examples/simple_trainer.py`
+- apply a minimal headless patch that removes top-level viewer imports
+- wrap it with `scripts/train-scene.sh`
+- always pass `--disable_viewer`
+
+Phase 5A still does not install Nerfstudio, install COLMAP, add a viewer workflow, add viewer dependencies, add desktop, or validate long training.
+
 ## New Objective
 
 Build a reproducible headless training image for Gaussian Splatting.

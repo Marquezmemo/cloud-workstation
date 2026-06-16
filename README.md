@@ -24,6 +24,8 @@ Phase 4 installs the minimal pinned `gsplat` baseline and validates import/CUDA 
 
 The image starts with a minimal RunPod keepalive command so non-interactive pods remain running for SSH and manual validation.
 
+Phase 5A adopts the official `nerfstudio-project/gsplat` `examples/simple_trainer.py` as the first training backend baseline. It remains headless and uses `--disable_viewer`.
+
 ## Base Image
 
 The current headless development image derives from the validated RunPod PyTorch CUDA image:
@@ -73,15 +75,30 @@ Current pinned baseline:
 
 ```text
 gsplat==1.5.3 from PyPI
+official examples tag v1.5.3
 ```
 
 The pinned install set is recorded in:
 
 ```text
 requirements-gsplat.txt
+requirements-gsplat-trainer.txt
 ```
 
 Future scripts should keep scene path, output path, log path, checkpoint path, and backend entrypoint explicit. The design should not be hardcoded to a single repo or command.
+
+Official trainer source:
+
+```text
+https://github.com/nerfstudio-project/gsplat
+tag v1.5.3
+commit 937e29912570c372bed6747a5c9bf85fed877bae
+/opt/gsplat/examples/simple_trainer.py
+```
+
+The official examples are pinned to the same release line as the validated `gsplat==1.5.3` wheel to avoid API drift between the trainer and installed runtime.
+
+Because this image is strictly headless, a small build-time patch removes the official example's top-level viewer imports. No `nerfview`, `viser`, `splines`, desktop, or virtual monitor dependency is installed.
 
 Nerfstudio/Splatfacto is a future benchmark placeholder only. It is not installed in this phase.
 
@@ -142,6 +159,42 @@ The script writes a compressed archive under:
 ```text
 /workspace/logs/diagnostics
 ```
+
+## Training Workflow
+
+The initial training wrapper expects a COLMAP-prepared dataset. COLMAP is not installed in this image yet.
+
+Prepare the scene skeleton:
+
+```bash
+prepare-dataset.sh <scene-name>
+```
+
+Validate paths without starting training:
+
+```bash
+train-scene.sh --check <scene-name>
+```
+
+Launch the official `gsplat` simple trainer in headless mode:
+
+```bash
+MAX_STEPS=100 train-scene.sh <scene-name>
+```
+
+Logs and outputs are written under:
+
+```text
+/workspace/logs/<scene>/train.log
+/workspace/logs/<scene>/run.env
+/workspace/logs/<scene>/run.summary
+/workspace/outputs/<scene>
+/workspace/checkpoints/<scene>
+```
+
+This phase does not promise final quality. It only establishes the first official training backend path.
+
+Phase 5A local smoke validation passed for image build, trainer help, absence of viewer dependencies, and `train-scene.sh --check`. A real COLMAP-prepared training run on RunPod remains pending.
 
 ## Repository Structure
 

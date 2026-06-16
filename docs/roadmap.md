@@ -6,7 +6,7 @@ Roadmap for the headless Gaussian Splatting training pivot.
 2. Clean active image target and create persistent workspace layout
 3. Add headless CUDA/PyTorch system dependencies
 4. Add GPU validation, training diagnostics, and minimal pinned `gsplat` import validation
-5. Add backend-configurable `gsplat` training workflow
+5. Add backend-configurable `gsplat` training workflow using the official simple trainer
 6. Validate a minimal training run with persistent logs and outputs
 7. Freeze a reproducible headless baseline
 8. Optionally create a future Nerfstudio/Splatfacto benchmark branch
@@ -17,6 +17,7 @@ Roadmap for the headless Gaussian Splatting training pivot.
 - Phase 2 complete: headless cleanup and persistent `/workspace` structure.
 - Phase 3 complete: minimal headless tooling and GPU validation script.
 - Phase 4 complete: minimal pinned `gsplat` install/import validation passed on RunPod RTX 4090.
+- Phase 5A local implementation complete: official `gsplat` `examples/simple_trainer.py` adopted as the first backend, with viewer imports removed by a build-time headless patch.
 
 ## Criteria
 
