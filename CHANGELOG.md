@@ -1,5 +1,17 @@
 # Changelog
 
+## Headless Gaussian Splatting Pivot — Package Transfer Messaging
+
+Adjusted the PLY export packaging command after validating that the previous `scp -O` template through `ssh.runpod.io` did not work for this RunPod transfer.
+
+### Changed
+
+- Renamed `PrepararDescarga` to `empaquetar`.
+- Renamed `descarga` to `comprimir`.
+- Kept PLY localization, `.tar.gz` packaging, checksum generation, and final path output.
+- Removed the unvalidated `scp -O` / `ssh.runpod.io` transfer template.
+- The command now states that the package is ready for manual transfer and that no transfer method is configured or validated yet.
+
 ## Headless Gaussian Splatting Pivot — Manual PLY Export
 
 Added manual PLY generation from existing `gsplat` checkpoints.
@@ -19,8 +31,8 @@ Added manual PLY generation from existing `gsplat` checkpoints.
 - `scripts/generate-ply.py`
 - `scripts/Generar`
 - `scripts/generar`
-- `scripts/PrepararDescarga`
-- `scripts/descarga`
+- `scripts/empaquetar`
+- `scripts/comprimir`
 - `docs/ply-export.md`
 
 ### Behavior
@@ -30,7 +42,7 @@ Added manual PLY generation from existing `gsplat` checkpoints.
 - Checkpoints are loaded on CPU by default.
 - Logs are written to `/workspace/logs/<scene>/generate-ply.log`.
 - Outputs are written to `/workspace/outputs/<scene>/exports`.
-- `PrepararDescarga` packages existing PLY exports, writes a checksum, and prints an `scp -O` template.
+- `empaquetar` packages existing PLY exports, writes a checksum, and prints final paths without suggesting an unvalidated transfer method.
 
 ### Not Included
 

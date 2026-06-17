@@ -68,8 +68,8 @@ COPY scripts/patch-gsplat-simple-trainer-headless.sh /usr/local/bin/patch-gsplat
 COPY scripts/generate-ply.py /usr/local/bin/generate-ply.py
 COPY scripts/Generar /usr/local/bin/Generar
 COPY scripts/Generar /usr/local/bin/generar
-COPY scripts/PrepararDescarga /usr/local/bin/PrepararDescarga
-COPY scripts/descarga /usr/local/bin/descarga
+COPY scripts/empaquetar /usr/local/bin/empaquetar
+COPY scripts/comprimir /usr/local/bin/comprimir
 
 RUN mkdir -p \
     /workspace/datasets \
@@ -88,8 +88,8 @@ RUN chmod +x \
     /usr/local/bin/generate-ply.py \
     /usr/local/bin/Generar \
     /usr/local/bin/generar \
-    /usr/local/bin/PrepararDescarga \
-    /usr/local/bin/descarga
+    /usr/local/bin/empaquetar \
+    /usr/local/bin/comprimir
 
 WORKDIR /workspace
 

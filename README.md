@@ -228,10 +228,10 @@ Exports are written under:
 
 `Generar` uses the native `gsplat.export_splats` exporter and writes both standard PLY and compressed PLY when supported. It does not upload files or run a complete pipeline.
 
-Prepare generated PLY files for manual download:
+Package generated PLY files for manual transfer:
 
 ```bash
-PrepararDescarga truck
+empaquetar truck
 ```
 
 See `docs/ply-export.md`.

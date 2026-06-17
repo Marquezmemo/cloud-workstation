@@ -43,25 +43,23 @@ Export logs are written to:
 
 The log records the checkpoint, detected step, checkpoint keys, tensor shapes, native export format, generated files, and validation results.
 
-## Manual Download Prep
+## Manual Transfer Prep
 
-The pod does not push files to the Mac. Prepare exports for manual download:
-
-```bash
-PrepararDescarga truck
-```
-
-This creates a `.tar.gz`, writes a `.sha256`, and prints an `scp -O` template to run from the Mac.
-
-Example:
+The pod does not push files to the Mac. Package exports for manual transfer:
 
 ```bash
-scp -O -i ~/.ssh/id_ed25519 \
-  <RUNPOD_USER>@ssh.runpod.io:/workspace/outputs/truck/exports/truck-ply-exports.tar.gz \
-  ~/Downloads/
+empaquetar truck
 ```
 
-RunPod may require `scp -O` when using its SSH proxy.
+This creates a `.tar.gz`, writes a `.sha256`, and prints the final paths.
+
+Alias:
+
+```bash
+comprimir truck
+```
+
+No transfer method is configured or validated yet. Download or transfer the package manually using a method validated for the active RunPod instance.
 
 ## Not Included
 

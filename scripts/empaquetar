@@ -3,9 +3,9 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-PrepararDescarga <scene>
+empaquetar <scene>
 
-Packages generated PLY exports for manual download from your Mac.
+Packages generated PLY exports for manual transfer.
 This command does not transfer files.
 EOF
 }
@@ -51,17 +51,14 @@ tar -C "${EXPORT_DIR}" -czf "${ARCHIVE}" -- "${PLY_NAMES[@]}"
 sha256sum "${ARCHIVE}" > "${SHA_FILE}"
 
 cat <<EOF
-Archive ready:
+Package ready for manual transfer.
+
+Archive:
   ${ARCHIVE}
 
 Checksum:
   ${SHA_FILE}
 
-From your Mac, run a command like:
-
-scp -O -i ~/.ssh/id_ed25519 \\
-  <RUNPOD_USER>@ssh.runpod.io:${ARCHIVE} \\
-  ~/Downloads/
-
-RunPod may require scp -O when using its SSH proxy.
+No transfer method is configured or validated yet.
+Download or transfer this package manually using a method validated for the active RunPod instance.
 EOF

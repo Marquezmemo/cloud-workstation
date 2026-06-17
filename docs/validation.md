@@ -92,22 +92,24 @@ Expected outputs when supported:
 <scene>.compressed.ply
 ```
 
-Download preparation is handled manually by:
+Packaging for manual transfer is handled by:
 
 ```text
-PrepararDescarga
-descarga
+empaquetar
+comprimir
 ```
 
-This packages exports and prints an `scp -O` template. It does not transfer files automatically.
+This packages exports and prints final archive/checksum paths. It does not transfer files automatically, and no transfer method is configured or validated yet.
 
 Local validation completed:
 
 - Docker build completed successfully.
 - `/usr/local/bin/Generar` exists and is executable.
 - `/usr/local/bin/generar` exists and is executable.
-- `/usr/local/bin/PrepararDescarga` exists and is executable.
-- `/usr/local/bin/descarga` exists and is executable.
+- `/usr/local/bin/empaquetar` exists and is executable.
+- `/usr/local/bin/comprimir` exists and is executable.
+- `/usr/local/bin/PrepararDescarga` is no longer installed.
+- `/usr/local/bin/descarga` is no longer installed.
 
 PLY generation from the real checkpoint should be validated directly in the RunPod RTX 4090 pod.
 

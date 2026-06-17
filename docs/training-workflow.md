@@ -100,11 +100,13 @@ Default outputs:
 
 The export command uses `gsplat.export_splats` and runs on CPU by default. It does not upload files or start a pipeline.
 
-Prepare exports for manual download from the Mac:
+Package exports for manual transfer:
 
 ```bash
-PrepararDescarga <scene>
+empaquetar <scene>
 ```
+
+`empaquetar` creates a `.tar.gz` and `.sha256` under `/workspace/outputs/<scene>/exports`. No transfer method is configured or validated yet.
 
 ## Headless Mode
 
