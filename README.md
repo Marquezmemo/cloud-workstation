@@ -22,14 +22,14 @@ The first contract is a COLMAP sparse reconstruction under:
 
 ```text
 /workspace/scenes/<scene>/
-├── images/
-├── database.db
-├── sparse/
-│   └── 0/
-│       ├── cameras.bin
-│       ├── images.bin
-│       └── points3D.bin
-└── surveyor-manifest.json
++-- images/
++-- database.db
++-- sparse/
+    +-- 0/
+        +-- cameras.bin
+        +-- images.bin
+        +-- points3D.bin
++-- surveyor-manifest.json
 ```
 
 The Trainer should be able to validate the generated scene with:
@@ -61,6 +61,10 @@ Expected output:
 ```
 
 ## Commands
+
+Full command reference:
+
+[docs/command-reference.md](docs/command-reference.md)
 
 Validate the image:
 
@@ -102,6 +106,25 @@ docker run --rm --platform linux/amd64 \
   cloud-workstation:headless-surveyor-v0.1-dev \
   validate-surveyor.sh
 ```
+
+## Validation Status
+
+Validated locally:
+
+- `docker build --platform linux/amd64`
+- `validate-surveyor.sh`
+- `survey-scene.sh --help`
+- `package-surveyor-scene.sh --help`
+- synthetic scene packaging with checksum
+- default `CMD ["runpod-keepalive.sh"]`
+
+Pending real validation:
+
+- RunPod smoke test with real images
+- COLMAP GPU visibility on RunPod
+- real sparse reconstruction under `/workspace/scenes/<scene>/sparse/0`
+- package and checksum for a real scene
+- Trainer acceptance with `train-scene.sh --check <scene>`
 
 ## Boundaries
 

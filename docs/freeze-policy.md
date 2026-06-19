@@ -28,15 +28,15 @@ Before any version is treated as a frozen baseline, it must include:
 
 ## Current Development Direction
 
-The active development direction is `headless-gsplat-v0.1-dev`.
+One active development direction is `headless-surveyor-v0.1-dev`.
 
-Its first goal is to create a headless CUDA/PyTorch image for Gaussian Splatting training:
+Its goal is to create a headless COLMAP image for pre-training reconstruction:
 
 - no desktop
 - no display manager
 - no Xorg/X11
 - no VNC or NoMachine
 - no interactive streaming
-- persistent `/workspace` datasets, logs, outputs, and checkpoints
+- persistent `/workspace` incoming images, scenes, logs, archives, and temp data
 
-Do not install Nerfstudio or benchmark dependencies until a future benchmark branch explicitly requires them.
+Do not add Trainer, `gsplat`, Nerfstudio, or benchmark dependencies to the Surveyor image.

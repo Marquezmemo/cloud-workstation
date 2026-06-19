@@ -1,26 +1,39 @@
 # Roadmap
 
-Roadmap for the headless Gaussian Splatting training pivot.
-
-1. Audit pivot from remote workstation to headless training
-2. Clean active image target and create persistent workspace layout
-3. Add headless CUDA/PyTorch system dependencies
-4. Add GPU validation, training diagnostics, and minimal pinned `gsplat` import validation
-5. Add backend-configurable `gsplat` training workflow using the official simple trainer
-6. Validate a minimal training run with persistent logs and outputs
-7. Freeze a reproducible headless baseline
-8. Optionally create a future Nerfstudio/Splatfacto benchmark branch
+Roadmap for the headless Surveyor COLMAP image.
 
 ## Current Status
 
-- Phase 1 complete: pivot audit documented.
-- Phase 2 complete: headless cleanup and persistent `/workspace` structure.
-- Phase 3 complete: minimal headless tooling and GPU validation script.
-- Phase 4 complete: minimal pinned `gsplat` install/import validation passed on RunPod RTX 4090.
-- Phase 5A local implementation complete: official `gsplat` `examples/simple_trainer.py` adopted as the first backend, with viewer imports removed by a build-time headless patch.
+- Surveyor branch created: `headless-surveyor-v0.1-dev`.
+- Dockerfile uses pinned `colmap/colmap` image digest.
+- `validate-surveyor.sh`, `survey-scene.sh`, and `package-surveyor-scene.sh` exist.
+- Docker Hub publish workflow exists for `headless-surveyor-v0.1-dev`.
+- Trainer and `gsplat` runtime scripts were removed from this branch.
+- Local build and local script smoke checks passed according to the Surveyor handoff.
+
+## Immediate Next Steps
+
+1. Run the Surveyor image on RunPod.
+2. Execute `validate-surveyor.sh` in the pod.
+3. Confirm COLMAP GPU visibility and behavior.
+4. Run `survey-scene.sh <scene>` on a real image set.
+5. Package the generated scene with `package-surveyor-scene.sh <scene>`.
+6. Move the generated scene package to the Trainer workflow.
+7. Confirm `train-scene.sh --check <scene>` passes in the Trainer image.
+8. Record real RunPod logs, model analyzer output, package path, and checksum.
+
+## Later Work
+
+- Decide whether additional capture guidance is needed after real dataset tests.
+- Evaluate when `MATCHER=sequential` should become the recommended path.
+- Decide if dense reconstruction belongs in a future Surveyor phase.
+- Create the future Full image only after Surveyor and Trainer handoff contracts are stable.
 
 ## Criteria
 
-Each phase must remain reviewable as a logical commit.
+Surveyor progress must be evidence-based:
 
-Do not install desktop, viewer, streaming, or benchmark dependencies while the headless training baseline is still being established.
+- no desktop, viewer, VNC, Blender, or streaming work
+- no `gsplat` or Trainer runtime added back to this branch
+- no dense reconstruction as default v0.1 behavior
+- every real scene smoke test records logs, manifest, package, checksum, and Trainer handoff result

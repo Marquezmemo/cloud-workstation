@@ -1,6 +1,8 @@
 # Surveyor v0.1 Technical Proposal
 
-Status: proposal for The Eye review, not official project documentation.
+Status: reviewed by The Eye; official project documentation has been updated separately.
+
+This proposal remains a technical handoff record. Use `README.md`, `docs/architecture.md`, `docs/validation.md`, `docs/dataset-format.md`, and `docs/command-reference.md` as the active documentation.
 
 ## Summary
 

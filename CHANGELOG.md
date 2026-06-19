@@ -1,5 +1,25 @@
 # Changelog
 
+## The Eye Documentation Review
+
+Aligned active documentation with the Surveyor COLMAP branch.
+
+### Updated
+
+- Rewrote architecture, validation, roadmap, and dataset-format docs for Surveyor.
+- Added `docs/command-reference.md` for Surveyor commands and evidence collection.
+- Reclassified Trainer workflow and PLY export docs as handoff/non-Surveyor responsibilities.
+- Updated agent ownership docs to include Surveyor.
+- Added README links and validation status for local vs pending RunPod checks.
+
+### Recorded Pending Evidence
+
+- RunPod smoke test with real images.
+- COLMAP GPU visibility in RunPod.
+- Real sparse reconstruction under `/workspace/scenes/<scene>/sparse/0`.
+- Package and checksum from a real scene.
+- Trainer acceptance with `train-scene.sh --check <scene>`.
+
 ## headless-surveyor-v0.1-dev
 
 Initial Surveyor branch implementation.

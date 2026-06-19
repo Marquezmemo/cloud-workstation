@@ -1,4 +1,4 @@
-# Agent Ownership For Headless Training Pivot
+# Agent Ownership For Headless Pipeline
 
 Agents reduce active context. They do not hold global project coherence.
 
@@ -7,6 +7,7 @@ Project-level coherence is handled by the project coordinator with Codex support
 Active agents:
 
 - Core Infrastructure
+- Surveyor
 - Observability / The Eye
 - Release Governance
 
@@ -17,7 +18,7 @@ Paused agents:
 
 ## Current Rule
 
-The project is pivoting to a headless Gaussian Splatting training image.
+The project is split into headless image roles. This branch is the Surveyor COLMAP image line.
 
 No active agent should repair or extend desktop, display-manager, VNC, NoMachine, streaming, or Blender GUI workflows.
 
@@ -26,14 +27,21 @@ No active agent should repair or extend desktop, display-manager, VNC, NoMachine
 Core Infrastructure owns:
 
 - Dockerfile
-- CUDA/PyTorch runtime
+- base runtime
 - system dependencies
-- RTX 4090 compatibility
+- image compatibility
+
+Surveyor owns:
+
+- COLMAP image/frame intake
+- sparse reconstruction commands
+- Surveyor scene packaging
+- Surveyor-to-Trainer handoff artifacts
 
 Observability / The Eye owns:
 
-- GPU validation scripts
-- training diagnostics
+- validation scripts
+- diagnostic clarity
 - log collection
 - minimum validation criteria
 

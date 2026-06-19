@@ -1,63 +1,82 @@
 # Dataset Format
 
-The Phase 5A training path expects a dataset that has already been prepared with COLMAP outside this image.
+Surveyor converts input images into a COLMAP sparse scene that the Trainer can validate.
 
-COLMAP is intentionally not installed in this image yet.
+## Input Layout
 
-## Expected Scene Layout
+Place images under:
+
+```text
+/workspace/incoming/<scene>/images
+```
+
+Supported image extensions in `survey-scene.sh`:
+
+```text
+.jpg
+.jpeg
+.png
+.tif
+.tiff
+```
+
+The script only reads files directly under `images/`; nested image folders are not part of v0.1.
+
+## Output Layout
+
+Surveyor writes:
 
 ```text
 /workspace/scenes/<scene>/
-├── images/
-└── sparse/
-    └── 0/
-        ├── cameras.bin or cameras.txt
-        ├── images.bin or images.txt
-        └── points3D.bin or points3D.txt
++-- images/
++-- database.db
++-- sparse/
+    +-- 0/
+        +-- cameras.bin
+        +-- images.bin
+        +-- points3D.bin
++-- surveyor-manifest.json
 ```
 
-The official `gsplat` COLMAP parser also accepts `sparse/` directly when `sparse/0/` is absent.
+This output is the handoff contract for the Trainer.
 
-## Prepare Skeleton
+## Logs
 
-```bash
-prepare-dataset.sh <scene-name>
-```
-
-This creates:
+Surveyor writes reconstruction evidence under:
 
 ```text
-/workspace/scenes/<scene>/images
-/workspace/scenes/<scene>/sparse/0
+/workspace/logs/<scene>/
++-- surveyor.env
++-- colmap-feature.log
++-- colmap-match.log
++-- colmap-mapper.log
++-- model-analyzer.txt
++-- surveyor.summary
 ```
 
-It does not run COLMAP, copy images, extract frames, or generate reconstruction files.
+## Packaging
 
-## Validation
+`package-surveyor-scene.sh <scene>` writes:
+
+```text
+/workspace/archives/<scene>/<scene>-surveyor-scene.tar.gz
+/workspace/archives/<scene>/<scene>-surveyor-scene.tar.gz.sha256
+```
+
+## Trainer Handoff
+
+After moving or unpacking the scene into the Trainer workspace, the expected handoff check is:
 
 ```bash
-train-scene.sh --check <scene-name>
+train-scene.sh --check <scene>
 ```
 
-The check verifies that:
+That command is not available in the Surveyor image.
 
-- the scene directory exists
-- `images/` exists
-- `sparse/0/` or `sparse/` exists
-- COLMAP `cameras`, `images`, and `points3D` files exist as `.bin` or `.txt`
+## Current Limits
 
-## Current Scope
-
-Validated for the first training wrapper:
-
-- COLMAP-prepared datasets
-- official `gsplat` `examples/simple_trainer.py`
-- headless execution with `--disable_viewer`
-
-Not included yet:
-
-- COLMAP installation
-- frame extraction workflow
-- dataset conversion pipeline
-- quality benchmark
-- Nerfstudio comparison
+- Surveyor v0.1 accepts only the first sparse component at `sparse/0`.
+- Dense reconstruction is not part of the default v0.1 output.
+- Frame extraction from video is not implemented.
+- Automatic ZIP unpacking is not implemented.
+- Capture quality rules are pending real dataset validation.

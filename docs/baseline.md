@@ -67,4 +67,4 @@ See `docs/gpu-validation.md`, `docs/nvidia-smi.txt`, and `docs/evidence/nvidia-s
 
 The freeze record was corrected to use the platform manifest digest. The previously recorded index digest was not usable for the active build path.
 
-Future functional changes now continue in the headless training line, starting with `headless-gsplat-v0.1-dev`.
+Future functional changes now continue in separate headless image lines, including Trainer and Surveyor. This branch is `headless-surveyor-v0.1-dev`.
