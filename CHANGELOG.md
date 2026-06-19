@@ -1,5 +1,72 @@
 # Changelog
 
+## Headless Gaussian Splatting Pivot - Command Reference
+
+Added a single operator command guide for the current headless Trainer workflow.
+
+### Added
+
+- `docs/command-reference.md`
+- README link to the full command reference
+
+### Documented
+
+- dataset preparation and scene validation commands
+- short training commands and trainer passthrough arguments
+- current `generar` syntax for scene, checkpoint, checkpoint directory, format, and device selection
+- `empaquetar` / `comprimir` packaging commands
+- checksum verification commands
+- `runpodctl send` / `runpodctl receive` transfer command shape
+
+### Not Changed
+
+- No Dockerfile changes in this documentation pass.
+- No script changes in this documentation pass.
+- No command behavior changes.
+
+## Headless Gaussian Splatting Pivot — runpodctl and Trainer Usability
+
+Implemented the small Trainer usability pass for the current headless image.
+
+### Changed
+
+- Installed fixed-version `runpodctl v2.5.0` during image build.
+- Verified the Linux amd64 `runpodctl` binary checksum during build.
+- Added standard workspace directories `incoming`, `archives`, and `temp`.
+- Added Python binary fallback support for trainer/export/diagnostic wrappers.
+- Added `generar --list` for checkpoint discovery without export.
+- Improved `generar` error messages for common invalid scene/path forms.
+- Updated `empaquetar` to write portable checksum files and print `runpodctl` transfer commands.
+
+### Not Changed
+
+- No `gsplat` version change.
+- No COLMAP installation.
+- No desktop, viewer, VNC, GDM, XFCE, or streaming work.
+
+## Headless Gaussian Splatting Pivot — Documentation Alignment
+
+Updated documentation and validation records for the current headless operating flow.
+
+### Documented
+
+- At that point, `runpodctl` was selected as the transfer tool before fixed-version image implementation and smoke test.
+- SCP through `ssh.runpod.io` remains discarded for the PLY/package transfer workflow.
+- `generar` already supports the required explicit syntax and should not be changed before the next smoke test.
+- Official export syntax is `generar --scene <scene>`, `generar --checkpoint <path>`, or `generar --ckpt-dir <path>`.
+- `generar <scene>` is only a possible future ergonomic shortcut.
+- `empaquetar <scene>` and `comprimir <scene>` package exports and checksums; they do not transfer files.
+- Standard workspace directories `incoming`, `archives`, `scenes`, `outputs`, `logs`, and `temp` are recorded as pending implementation targets.
+
+### Not Changed
+
+- No Dockerfile changes.
+- No script changes.
+- No `runpodctl` installation.
+- No `gsplat` update.
+- No COLMAP or Full image implementation.
+- No desktop, viewer, VNC, GDM, XFCE, or streaming work.
+
 ## Headless Gaussian Splatting Pivot — Package Transfer Messaging
 
 Adjusted the PLY export packaging command after validating that the previous `scp -O` template through `ssh.runpod.io` did not work for this RunPod transfer.

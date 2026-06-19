@@ -46,6 +46,8 @@ LOG_PATH=/workspace/logs/<scene>/train.log
 
 ## Commands
 
+Complete command syntax is maintained in [command-reference.md](command-reference.md).
+
 Create a dataset skeleton:
 
 ```bash
@@ -62,6 +64,23 @@ Run a short training command:
 
 ```bash
 MAX_STEPS=100 train-scene.sh <scene-name>
+```
+
+Current smoke depths:
+
+```bash
+MAX_STEPS=100 train-scene.sh room
+MAX_STEPS=1000 train-scene.sh room
+MAX_STEPS=10000 train-scene.sh room
+MAX_STEPS=30000 train-scene.sh room
+```
+
+Scenes are trained individually. The wrapper does not train every scene automatically:
+
+```bash
+MAX_STEPS=100 train-scene.sh bonsai
+MAX_STEPS=1000 train-scene.sh room
+MAX_STEPS=10000 train-scene.sh truck
 ```
 
 Pass additional official trainer flags after `--`:
@@ -88,7 +107,14 @@ Each run writes:
 The official trainer can save checkpoints without writing a `.ply` unless PLY export is requested during training. For existing checkpoints, use:
 
 ```bash
-Generar --scene <scene>
+generar --scene <scene>
+```
+
+List checkpoints without exporting:
+
+```bash
+generar --list
+generar --list --scene <scene>
 ```
 
 Default outputs:
@@ -106,7 +132,31 @@ Package exports for manual transfer:
 empaquetar <scene>
 ```
 
-`empaquetar` creates a `.tar.gz` and `.sha256` under `/workspace/outputs/<scene>/exports`. No transfer method is configured or validated yet.
+Alias:
+
+```bash
+comprimir <scene>
+```
+
+`empaquetar` creates a `.tar.gz` and `.sha256` under `/workspace/outputs/<scene>/exports`. It does not transfer files.
+
+## Transfer After Packaging
+
+`runpodctl v2.5.0` is installed in the image from the official GitHub release with checksum verification during build. The transfer path still needs end-to-end smoke testing against the active RunPod pod and the receiving Mac.
+
+Pod-to-Mac command shape:
+
+```bash
+runpodctl send /workspace/outputs/room/exports/room-ply-exports.tar.gz
+runpodctl send /workspace/outputs/room/exports/room-ply-exports.tar.gz.sha256
+runpodctl receive <transfer-code>
+```
+
+After download, verify the checksum on the Mac against the `.sha256` produced in the pod.
+
+## Full Manual Flow
+
+Use [command-reference.md](command-reference.md) for the complete one-scene and multi-scene command sequences.
 
 ## Headless Mode
 

@@ -1,15 +1,15 @@
 # cloud-workstation
 
-Headless Docker image for Gaussian Splatting training on NVIDIA GPUs in RunPod, primarily RTX 4090.
+Headless Docker images for a Gaussian Splatting pipeline on NVIDIA GPUs in RunPod, primarily RTX 4090.
 
-This repository is no longer targeting a remote desktop workstation. The active goal is a reproducible CUDA/PyTorch training image with persistent datasets, outputs, logs, and checkpoints.
+This repository is no longer targeting a remote desktop workstation. The active goal is a reproducible headless pipeline with persistent inputs, outputs, logs, checkpoints, PLY exports, and transfer records.
 
 ## Priorities
 
 1. Stable Gaussian Splatting training
 2. Correct CUDA/GPU usage
-3. Clear logs
-4. Persistent datasets and outputs
+3. Clear logs and evidence
+4. Persistent datasets, outputs, and transfer packages
 5. Zero graphical desktop environment
 
 ## Current Phase
@@ -20,11 +20,19 @@ The active branch is:
 headless-gsplat-v0.1-dev
 ```
 
-Phase 4 installs the minimal pinned `gsplat` baseline and validates import/CUDA compatibility. RunPod GPU validation has passed on an NVIDIA GeForce RTX 4090. It does not implement training, install Nerfstudio, install COLMAP, add a viewer, or add benchmark dependencies.
+The current validated work is the headless `gsplat` Trainer image line. RunPod GPU validation has passed on an NVIDIA GeForce RTX 4090, and a real training run reached 30,000 iterations with checkpoints/tensors generated successfully.
 
 The image starts with a minimal RunPod keepalive command so non-interactive pods remain running for SSH and manual validation.
 
 Phase 5A adopts the official `nerfstudio-project/gsplat` `examples/simple_trainer.py` as the first training backend baseline. It remains headless and uses `--disable_viewer`.
+
+The broader target is three headless image roles:
+
+- `COLMAP`: prepare image datasets and generate reconstruction data.
+- `Trainer`: train Gaussian Splatting with `gsplat`, then export and package PLY files.
+- `Full`: combine COLMAP and Trainer in one heavier image for a complete single-image pipeline.
+
+Only the Trainer path has the validated `gsplat` work described below. COLMAP and Full remain documentation targets until their own branches/images are created.
 
 ## Base Image
 
@@ -38,7 +46,7 @@ Do not use `latest`.
 
 ## Persistent Workspace Layout
 
-The container prepares:
+The current Trainer image prepares:
 
 ```text
 /workspace/datasets
@@ -49,6 +57,19 @@ The container prepares:
 ```
 
 Important data must live in mounted volumes or persistent RunPod storage. Do not rely on ephemeral container paths for datasets, outputs, logs, or checkpoints.
+
+The next standard workspace layout is accepted as a documentation target, pending implementation:
+
+```text
+/workspace/incoming
+/workspace/archives
+/workspace/scenes
+/workspace/outputs
+/workspace/logs
+/workspace/temp
+```
+
+`/workspace/checkpoints` remains a current Trainer path because `train-scene.sh` exposes checkpoints there.
 
 ## Explicit Non-Goals
 
@@ -104,9 +125,9 @@ Nerfstudio/Splatfacto is a future benchmark placeholder only. It is not installe
 
 ## COLMAP Policy
 
-COLMAP is optional for the first image.
+COLMAP is not installed in the current Trainer image.
 
-It should be added only if it does not introduce heavy desktop dependencies or build complexity. If it complicates the image, move it to a later phase and document the decision.
+The current direction is to create a separate COLMAP image/branch first, then a Full image that combines COLMAP and Trainer. Do not add COLMAP to the Trainer image in this documentation-only update.
 
 ## GPU Validation
 
@@ -168,23 +189,7 @@ The script writes a compressed archive under:
 
 The initial training wrapper expects a COLMAP-prepared dataset. COLMAP is not installed in this image yet.
 
-Prepare the scene skeleton:
-
-```bash
-prepare-dataset.sh <scene-name>
-```
-
-Validate paths without starting training:
-
-```bash
-train-scene.sh --check <scene-name>
-```
-
-Launch the official `gsplat` simple trainer in headless mode:
-
-```bash
-MAX_STEPS=100 train-scene.sh <scene-name>
-```
+Use [docs/command-reference.md](docs/command-reference.md) for exact commands to prepare datasets, validate scenes, run smoke training, pass trainer arguments, export PLY, package results, verify checksums, and transfer packages.
 
 Logs and outputs are written under:
 
@@ -202,39 +207,67 @@ Phase 5A local smoke validation passed for image build, trainer help, absence of
 
 ## PLY Export
 
-Generate PLY files from existing checkpoints with:
-
-```bash
-Generar
-```
-
-If more than one scene exists, pass the scene explicitly:
-
-```bash
-Generar --scene truck
-```
-
-Advanced explicit checkpoint:
-
-```bash
-Generar --checkpoint /workspace/outputs/truck/ckpts/ckpt_30000.pt
-```
-
-Exports are written under:
+PLY exports are generated from existing checkpoints with `generar`. Exports are written under:
 
 ```text
 /workspace/outputs/<scene>/exports
 ```
 
-`Generar` uses the native `gsplat.export_splats` exporter and writes both standard PLY and compressed PLY when supported. It does not upload files or run a complete pipeline.
+`generar` uses the native `gsplat.export_splats` exporter and writes both standard PLY and compressed PLY when supported. It does not upload files or run a complete pipeline. The default export device is CPU.
 
-Package generated PLY files for manual transfer:
+See [docs/ply-export.md](docs/ply-export.md) for export behavior and [docs/command-reference.md](docs/command-reference.md) for exact command syntax.
 
-```bash
-empaquetar truck
+## Transfer
+
+`runpodctl v2.5.0` is installed in the image from the official GitHub release with checksum verification during build.
+
+Selected flow:
+
+```text
+Mac -> runpodctl -> pod
+pod -> runpodctl -> Mac
 ```
 
-See `docs/ply-export.md`.
+The previous SCP path through `ssh.runpod.io` is discarded for this workflow.
+
+Use [docs/command-reference.md](docs/command-reference.md) for current `runpodctl send` / `runpodctl receive` command shape. Mac-to-pod syntax and large-file behavior still need smoke testing and exact command capture.
+
+## Current Command Reference
+
+See the full operator guide:
+
+[docs/command-reference.md](docs/command-reference.md)
+
+```bash
+validate-gpu.sh
+train-scene.sh --check room
+MAX_STEPS=100 train-scene.sh room
+generar --scene room
+empaquetar room
+runpodctl send /workspace/outputs/room/exports/room-ply-exports.tar.gz
+```
+
+## Known Errors
+
+- Multiple scenes contain checkpoints: pass `generar --scene <scene>` or `generar --checkpoint <path>`.
+- Scene does not exist: check `ls -lah /workspace/scenes`.
+- COLMAP layout is incomplete: run `train-scene.sh --check <scene>`.
+- Checkpoint is missing: run `find /workspace/outputs -type f -name 'ckpt*.pt'`.
+- Exports are missing: run `generar --scene <scene>` before `empaquetar <scene>`.
+- File is on external Mac storage: move it to local storage such as `~/Downloads/` before using `runpodctl`.
+
+## Pending Smoke Tests
+
+- Run new GPU smoke test when GPU is available.
+- Confirm `MAX_STEPS=100 train-scene.sh room`.
+- Confirm `generar --scene room`.
+- Confirm `empaquetar room`.
+- Transfer package with `runpodctl`.
+- Verify checksum on the Mac.
+- Test a file larger than 1 GB.
+- Measure transfer speed.
+- Test interruption and whether resume is supported.
+- Record exact working `runpodctl` syntax.
 
 ## Repository Structure
 
@@ -251,4 +284,4 @@ cloud-workstation/
 └── .gitignore
 ```
 
-Current empty folders remain as placeholders until the headless training scripts are introduced in later phases.
+Legacy placeholder folders remain only for repository continuity. Active headless operation is documented above.

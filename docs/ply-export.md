@@ -6,25 +6,58 @@ The missing `.ply` was not a pipeline failure. The official `simple_trainer.py` 
 
 ## Generate Exports
 
+Complete command syntax is maintained in [command-reference.md](command-reference.md).
+
+Use the lowercase command. The uppercase `Generar` alias exists, but `generar` is the documented operator command.
+
 Use the default automatic command when there is only one clear checkpoint scene:
 
 ```bash
-Generar
+generar
+```
+
+List detected checkpoints without exporting:
+
+```bash
+generar --list
+generar --list --scene truck
 ```
 
 Use an explicit scene when multiple scenes exist:
 
 ```bash
-Generar --scene truck
+generar --scene truck
 ```
 
 Use an explicit checkpoint when needed:
 
 ```bash
-Generar --checkpoint /workspace/outputs/truck/ckpts/ckpt_30000.pt
+generar --checkpoint /workspace/outputs/truck/ckpts/ckpt_30000.pt
 ```
 
-By default, `Generar` writes both native formats supported by `gsplat.export_splats`:
+Use an explicit checkpoint directory when needed:
+
+```bash
+generar --ckpt-dir /workspace/outputs/truck/ckpts
+```
+
+Choose export format:
+
+```bash
+generar --scene room --format both
+generar --scene room --format ply
+generar --scene room --format ply_compressed
+```
+
+Choose export device:
+
+```bash
+generar --scene room --device cpu
+generar --scene room --device cuda
+generar --scene room --device cuda --fallback-cpu
+```
+
+By default, `generar` writes both native formats supported by `gsplat.export_splats`:
 
 ```text
 /workspace/outputs/<scene>/exports/<scene>.ply
@@ -32,6 +65,18 @@ By default, `Generar` writes both native formats supported by `gsplat.export_spl
 ```
 
 The standard `.ply` is binary little endian and validates that vertex count matches the checkpoint splat count. The compressed PLY can contain fewer vertices because the native exporter may filter very low-opacity splats.
+
+The current default export device is CPU.
+
+Do not use these forms:
+
+```bash
+generar --room
+generar /room
+generar --/workspace/checkpoints/room
+```
+
+They are not declared arguments. The positional form `generar room` is only a possible future ergonomic improvement and is not needed for current pipeline validation.
 
 ## Logs
 
@@ -59,7 +104,17 @@ Alias:
 comprimir truck
 ```
 
-No transfer method is configured or validated yet. Download or transfer the package manually using a method validated for the active RunPod instance.
+The selected transfer method is `runpodctl`. The image installs `runpodctl v2.5.0` from the official GitHub release and verifies the Linux amd64 binary checksum during build. SCP through `ssh.runpod.io` is discarded for this workflow.
+
+Pod-to-Mac pattern:
+
+```bash
+runpodctl send /workspace/outputs/bonsai/exports/bonsai-ply-exports.tar.gz
+runpodctl send /workspace/outputs/bonsai/exports/bonsai-ply-exports.tar.gz.sha256
+runpodctl receive <transfer-code>
+```
+
+The exact Mac-to-pod syntax, large-file behavior, interruption behavior, and checksum verification flow remain pending smoke test.
 
 ## Not Included
 

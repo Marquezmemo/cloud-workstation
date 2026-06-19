@@ -24,8 +24,95 @@ runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd77
 
 ## Estado actual pendiente
 
-- First training command with a real COLMAP-prepared dataset pending
-- Training log/output persistence validation pending
+- Nuevo smoke test con GPU cuando vuelva a estar disponible.
+- Confirmar `MAX_STEPS=100 train-scene.sh room`.
+- Confirmar `generar --scene room`.
+- Confirmar `empaquetar room`.
+- Descargar paquete mediante `runpodctl`.
+- Verificar checksum en la Mac.
+- Probar transferencia de archivo superior a 1 GB.
+- Medir velocidad de transferencia.
+- Probar interrupcion y confirmar si puede reanudarse.
+- Documentar la sintaxis exacta de `runpodctl` que haya funcionado.
+
+## Current Operational Decisions
+
+`runpodctl v2.5.0` is installed in the image from the official GitHub release with checksum verification during build. End-to-end transfer still needs smoke testing against the active RunPod pod and receiving Mac.
+
+Expected use cases:
+
+- upload compressed datasets from the Mac
+- download result packages from the pod
+- avoid SCP through `ssh.runpod.io`
+- handle PLY packages and archives that may exceed 1 GB
+
+Implementation evidence:
+
+- exact `runpodctl` version: `v2.5.0`
+- official download URL: `https://github.com/runpod/runpodctl/releases/download/v2.5.0/runpodctl-linux-amd64`
+- binary checksum: `f484ce7d790ddc6b4a63363f3c975c70fa87bf3be1bcbad019812f6e3f4ba54e`
+- image build command check: `runpodctl version`
+
+Transfer evidence still required:
+
+- successful Mac-to-pod transfer
+- successful pod-to-Mac transfer
+- checksum verification after transfer
+
+## Current Command Smoke Matrix
+
+The canonical operator syntax is maintained in [command-reference.md](command-reference.md). The matrix below lists the smoke-test surfaces that must keep producing evidence.
+
+GPU/runtime:
+
+```bash
+validate-gpu.sh
+```
+
+Scene validation:
+
+```bash
+train-scene.sh --check room
+```
+
+Training:
+
+```bash
+MAX_STEPS=100 train-scene.sh room
+MAX_STEPS=1000 train-scene.sh room
+MAX_STEPS=10000 train-scene.sh room
+MAX_STEPS=30000 train-scene.sh room
+```
+
+PLY export:
+
+```bash
+generar
+generar --list
+generar --scene room
+generar --checkpoint /workspace/outputs/room/ckpts/ckpt_999_rank0.pt
+generar --ckpt-dir /workspace/outputs/room/ckpts
+generar --scene room --format both
+generar --scene room --device cuda --fallback-cpu
+```
+
+Packaging and checksum:
+
+```bash
+empaquetar room
+comprimir room
+cd /workspace/outputs/room/exports
+sha256sum -c room-ply-exports.tar.gz.sha256
+```
+
+## Known Operator Errors
+
+- `generar --room` is invalid; use `generar --scene room`.
+- `generar /room` is invalid; use `generar --scene room` or an explicit checkpoint argument.
+- `generar --/workspace/checkpoints/room` is invalid; use `generar --ckpt-dir /workspace/outputs/room/ckpts`.
+- Multiple scenes with checkpoints require `generar --scene <scene>` or `generar --checkpoint <path>`.
+- Missing exports require running `generar --scene <scene>` before `empaquetar <scene>`.
+- Files on external Mac storage should be moved to local storage such as `~/Downloads/` before using `runpodctl`.
 
 ## Phase 4 RunPod GPU Validation
 
@@ -99,7 +186,9 @@ empaquetar
 comprimir
 ```
 
-This packages exports and prints final archive/checksum paths. It does not transfer files automatically, and no transfer method is configured or validated yet.
+This packages exports and prints final archive/checksum paths. It does not transfer files automatically.
+
+The accepted transfer method is `runpodctl`; end-to-end commands remain pending smoke test.
 
 Local validation completed:
 

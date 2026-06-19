@@ -1,0 +1,256 @@
+# Command Reference
+
+Guia operativa de comandos disponibles para el flujo headless de Gaussian Splatting.
+
+Esta guia documenta uso manual. No implica automatizacion de pipeline completo.
+
+## Validar GPU Y Runtime
+
+Comprobar GPU NVIDIA, CUDA, PyTorch, importacion de `gsplat` y operacion CUDA simple:
+
+```bash
+validate-gpu.sh
+```
+
+## Preparar Dataset
+
+Crear el esqueleto esperado para una escena:
+
+```bash
+prepare-dataset.sh <scene>
+```
+
+La escena debe quedar bajo:
+
+```text
+/workspace/scenes/<scene>
+```
+
+El layout minimo esperado para entrenamiento es:
+
+```text
+/workspace/scenes/<scene>/
++-- images/
++-- sparse/
+    +-- 0/
+        +-- cameras.bin
+        +-- images.bin
+        +-- points3D.bin
+```
+
+Tambien pueden existir archivos COLMAP en formato `.txt`.
+
+## Validar Escena
+
+Validar una escena sin iniciar entrenamiento:
+
+```bash
+train-scene.sh --check <scene>
+```
+
+Ejemplo:
+
+```bash
+train-scene.sh --check room
+```
+
+Este comando comprueba directorio de escena, `images/`, `sparse/` y archivos COLMAP.
+
+## Entrenar
+
+Smoke test de 100 pasos:
+
+```bash
+MAX_STEPS=100 train-scene.sh <scene>
+```
+
+Ejemplo:
+
+```bash
+MAX_STEPS=100 train-scene.sh room
+```
+
+Pasar argumentos adicionales al trainer oficial despues de `--`:
+
+```bash
+MAX_STEPS=100 train-scene.sh <scene> -- --data_factor 2 --test_every 12
+```
+
+Ejemplo:
+
+```bash
+MAX_STEPS=100 train-scene.sh room -- --data_factor 2 --test_every 12
+```
+
+Las escenas se entrenan individualmente. El script no entrena todas las escenas automaticamente.
+
+## Generar PLY
+
+Cuando existe una sola opcion clara de checkpoint:
+
+```bash
+generar
+```
+
+Seleccionar una escena explicitamente:
+
+```bash
+generar --scene room
+```
+
+Seleccionar un checkpoint explicitamente:
+
+```bash
+generar --checkpoint /workspace/outputs/room/ckpts/ckpt_30000.pt
+```
+
+Seleccionar un directorio de checkpoints:
+
+```bash
+generar --ckpt-dir /workspace/outputs/room/ckpts
+```
+
+Elegir formato de exportacion:
+
+```bash
+generar --scene room --format both
+generar --scene room --format ply
+generar --scene room --format ply_compressed
+```
+
+Elegir dispositivo de exportacion con fallback:
+
+```bash
+generar --scene room --device cuda --fallback-cpu
+```
+
+Comandos utiles adicionales:
+
+```bash
+generar --list
+generar --list --scene room
+```
+
+No usar:
+
+```bash
+generar --room
+generar /room
+generar --/workspace/checkpoints/room
+```
+
+La sintaxis oficial actual es `generar --scene <scene>`. La forma `generar <scene>` queda registrada solo como posible mejora futura.
+
+## Empaquetar
+
+Empaquetar exports PLY de una escena:
+
+```bash
+empaquetar room
+```
+
+Alias:
+
+```bash
+comprimir room
+```
+
+Resultado esperado:
+
+```text
+/workspace/outputs/room/exports/room-ply-exports.tar.gz
+/workspace/outputs/room/exports/room-ply-exports.tar.gz.sha256
+```
+
+## Verificar Checksum En El Pod
+
+Entrar al directorio de exports:
+
+```bash
+cd /workspace/outputs/room/exports
+```
+
+Calcular checksum:
+
+```bash
+sha256sum room-ply-exports.tar.gz
+```
+
+Comparar con el archivo generado:
+
+```bash
+cat room-ply-exports.tar.gz.sha256
+```
+
+Validacion directa cuando el archivo `.sha256` esta en formato compatible:
+
+```bash
+sha256sum -c room-ply-exports.tar.gz.sha256
+```
+
+## Transferir Con runpodctl
+
+Enviar el paquete desde el pod:
+
+```bash
+runpodctl send /workspace/outputs/room/exports/room-ply-exports.tar.gz
+```
+
+El comando imprime un codigo de transferencia. En la maquina receptora:
+
+```bash
+runpodctl receive <transfer-code>
+```
+
+Si tambien se transfiere el checksum:
+
+```bash
+runpodctl send /workspace/outputs/room/exports/room-ply-exports.tar.gz.sha256
+runpodctl receive <transfer-code>
+```
+
+El smoke test end-to-end de transferencia debe registrar los codigos y comandos reales utilizados.
+
+## Flujo Completo De Una Escena
+
+```bash
+train-scene.sh --check room
+MAX_STEPS=100 train-scene.sh room
+generar --scene room
+empaquetar room
+cd /workspace/outputs/room/exports
+sha256sum room-ply-exports.tar.gz
+cat room-ply-exports.tar.gz.sha256
+runpodctl send /workspace/outputs/room/exports/room-ply-exports.tar.gz
+```
+
+En la Mac:
+
+```bash
+runpodctl receive <transfer-code>
+```
+
+## Flujo Con Varias Escenas
+
+Entrenar individualmente:
+
+```bash
+MAX_STEPS=100 train-scene.sh bonsai
+MAX_STEPS=100 train-scene.sh room
+```
+
+Generar individualmente:
+
+```bash
+generar --scene bonsai
+generar --scene room
+```
+
+Empaquetar individualmente:
+
+```bash
+empaquetar bonsai
+empaquetar room
+```
+
+Descargar cada paquete con `runpodctl`.
