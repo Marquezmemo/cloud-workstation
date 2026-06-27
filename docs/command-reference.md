@@ -101,7 +101,7 @@ generar --scene room
 Seleccionar un checkpoint explicitamente:
 
 ```bash
-generar --checkpoint /workspace/outputs/room/ckpts/ckpt_30000.pt
+generar --checkpoint /workspace/outputs/room/ckpts/ckpt_100.pt
 ```
 
 Seleccionar un directorio de checkpoints:
@@ -122,13 +122,6 @@ Elegir dispositivo de exportacion con fallback:
 
 ```bash
 generar --scene room --device cuda --fallback-cpu
-```
-
-Comandos utiles adicionales:
-
-```bash
-generar --list
-generar --list --scene room
 ```
 
 No usar:
@@ -162,6 +155,21 @@ Resultado esperado:
 /workspace/outputs/room/exports/room-ply-exports.tar.gz.sha256
 ```
 
+Empaquetar logs existentes de entrenamiento, exportacion y telemetria opcional:
+
+```bash
+empaquetar-logs room
+```
+
+Resultado esperado:
+
+```text
+/workspace/outputs/room/exports/room-training-logs.tar.gz
+/workspace/outputs/room/exports/room-training-logs.tar.gz.sha256
+```
+
+`empaquetar-logs` no genera telemetria. Solamente incluye archivos compatibles que ya existan bajo `/workspace/logs/room`.
+
 ## Verificar Checksum En El Pod
 
 Entrar al directorio de exports:
@@ -182,11 +190,13 @@ Comparar con el archivo generado:
 cat room-ply-exports.tar.gz.sha256
 ```
 
-Validacion directa cuando el archivo `.sha256` esta en formato compatible:
+El checksum producido por `empaquetar` contiene actualmente la ruta absoluta del pod. Puede validarse directamente mientras esa ruta exista:
 
 ```bash
 sha256sum -c room-ply-exports.tar.gz.sha256
 ```
+
+Despues de transferir a la Mac, calcular el SHA-256 del archivo recibido y comparar manualmente el valor. El checksum generado por `empaquetar-logs` si usa un nombre relativo portable.
 
 ## Transferir Con runpodctl
 
@@ -209,7 +219,7 @@ runpodctl send /workspace/outputs/room/exports/room-ply-exports.tar.gz.sha256
 runpodctl receive <transfer-code>
 ```
 
-El smoke test end-to-end de transferencia debe registrar los codigos y comandos reales utilizados.
+La instalacion de `runpodctl` esta implementada. El smoke test end-to-end debe registrar comandos reales, tamanos, hashes antes y despues, duracion y resultado. Los codigos efimeros de transferencia no se guardan en Git.
 
 ## Flujo Completo De Una Escena
 

@@ -1,6 +1,6 @@
 # PLY Export
 
-`headless-gsplat-v0.1-dev` can train `gsplat` headlessly and save checkpoints. A real RunPod RTX 4090 run reached 30,000 iterations and generated checkpoint tensors successfully.
+`headless-gsplat-v0.1-dev` implements headless `gsplat` training and checkpoint output. A 30,000-iteration RunPod execution was reported historically, but its logs and artifacts were not preserved; it does not validate the current image.
 
 The missing `.ply` was not a pipeline failure. The official `simple_trainer.py` only writes PLY during training when PLY export is requested. This image now includes a manual export command for existing checkpoints.
 
@@ -16,13 +16,6 @@ Use the default automatic command when there is only one clear checkpoint scene:
 generar
 ```
 
-List detected checkpoints without exporting:
-
-```bash
-generar --list
-generar --list --scene truck
-```
-
 Use an explicit scene when multiple scenes exist:
 
 ```bash
@@ -32,7 +25,7 @@ generar --scene truck
 Use an explicit checkpoint when needed:
 
 ```bash
-generar --checkpoint /workspace/outputs/truck/ckpts/ckpt_30000.pt
+generar --checkpoint /workspace/outputs/truck/ckpts/ckpt_100.pt
 ```
 
 Use an explicit checkpoint directory when needed:
@@ -98,6 +91,8 @@ empaquetar truck
 
 This creates a `.tar.gz`, writes a `.sha256`, and prints the final paths.
 
+The current checksum record contains the absolute pod path. Verify it in place on the pod; after transfer, calculate the received file hash and compare the digest manually.
+
 Alias:
 
 ```bash
@@ -115,6 +110,14 @@ runpodctl receive <transfer-code>
 ```
 
 The exact Mac-to-pod syntax, large-file behavior, interruption behavior, and checksum verification flow remain pending smoke test.
+
+Package scene-scoped logs separately with:
+
+```bash
+empaquetar-logs truck
+```
+
+That command creates a portable checksum and packages existing logs only. It does not generate GPU telemetry.
 
 ## Not Included
 

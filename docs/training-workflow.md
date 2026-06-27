@@ -66,14 +66,15 @@ Run a short training command:
 MAX_STEPS=100 train-scene.sh <scene-name>
 ```
 
-Current smoke depths:
+Supported run depths include:
 
 ```bash
 MAX_STEPS=100 train-scene.sh room
 MAX_STEPS=1000 train-scene.sh room
 MAX_STEPS=10000 train-scene.sh room
-MAX_STEPS=30000 train-scene.sh room
 ```
+
+Only the 100-step run is part of the next evidence-backed smoke test. Longer runs must not be described as validated without their logs and artifacts.
 
 Scenes are trained individually. The wrapper does not train every scene automatically:
 
@@ -110,13 +111,6 @@ The official trainer can save checkpoints without writing a `.ply` unless PLY ex
 generar --scene <scene>
 ```
 
-List checkpoints without exporting:
-
-```bash
-generar --list
-generar --list --scene <scene>
-```
-
 Default outputs:
 
 ```text
@@ -140,6 +134,14 @@ comprimir <scene>
 
 `empaquetar` creates a `.tar.gz` and `.sha256` under `/workspace/outputs/<scene>/exports`. It does not transfer files.
 
+Package existing scene logs for review:
+
+```bash
+empaquetar-logs <scene>
+```
+
+The log package excludes datasets, checkpoints, and PLY files. It can include optional scene-scoped GPU telemetry only when that telemetry already exists.
+
 ## Transfer After Packaging
 
 `runpodctl v2.5.0` is installed in the image from the official GitHub release with checksum verification during build. The transfer path still needs end-to-end smoke testing against the active RunPod pod and the receiving Mac.
@@ -152,7 +154,7 @@ runpodctl send /workspace/outputs/room/exports/room-ply-exports.tar.gz.sha256
 runpodctl receive <transfer-code>
 ```
 
-After download, verify the checksum on the Mac against the `.sha256` produced in the pod.
+The checksum written by `empaquetar` currently contains an absolute pod path. After download, calculate the received archive hash and compare the digest manually. `empaquetar-logs` writes a portable relative checksum.
 
 ## Full Manual Flow
 

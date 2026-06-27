@@ -23,8 +23,8 @@ Full image target for single-image operation
 `COLMAP` image:
 
 - prepares input image datasets
-- generates sparse/dense/reconstruction evidence according to the selected pipeline
-- remains a future branch/image until implemented and validated
+- is implemented separately as `headless-surveyor-v0.1-dev`
+- generates sparse reconstruction and handoff evidence for Trainer
 
 `Trainer` image:
 
@@ -61,17 +61,6 @@ Current Trainer paths:
 /workspace/checkpoints
 ```
 
-Accepted future standard paths, pending implementation:
-
-```text
-/workspace/incoming
-/workspace/archives
-/workspace/scenes
-/workspace/outputs
-/workspace/logs
-/workspace/temp
-```
-
 Do not delete, overwrite, move, or unpack user data automatically without explicit validation.
 
 ## Transfer Contract
@@ -83,7 +72,9 @@ Mac -> runpodctl -> pod
 pod -> runpodctl -> Mac
 ```
 
-It is intended for compressed datasets, PLY packages, and files that may exceed 1 GB. End-to-end Mac-to-pod and pod-to-Mac transfer still require smoke testing. SCP through `ssh.runpod.io` is not the selected transfer path.
+Installation is implemented. It is intended for compressed datasets, PLY packages, and files that may exceed 1 GB. End-to-end Mac-to-pod and pod-to-Mac transfer still require evidence-backed smoke testing. SCP through `ssh.runpod.io` is not the selected transfer path.
+
+Trainer evidence is scene-scoped under `/workspace/logs/<scene>`. `empaquetar-logs <scene>` packages existing training, export, and optional GPU logs with a portable checksum; it does not create telemetry.
 
 ## Backend Strategy
 

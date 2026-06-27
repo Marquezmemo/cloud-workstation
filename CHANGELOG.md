@@ -1,5 +1,16 @@
 # Changelog
 
+## Documentation Correction And Evidence Policy
+
+- Corrected current Trainer documentation to match the implemented workspace and command surface.
+- Removed `generar --list`; it is not implemented or planned for the current phase.
+- Removed Trainer references to `/workspace/incoming`, `/workspace/archives`, and `/workspace/temp`.
+- Recorded `runpodctl v2.5.0` as installed while keeping transfer validation pending.
+- Documented `empaquetar-logs` as scene-scoped evidence packaging.
+- Reclassified the reported 30,000-iteration run as a historical operator report because its original evidence was not preserved.
+
+Correction to the earlier "runpodctl and Trainer Usability" entry: the current image does not implement Python binary fallback, `generar --list`, the three removed workspace paths, portable checksums in `empaquetar`, or automatic transfer messaging. The current Dockerfile does install pinned `runpodctl v2.5.0`.
+
 ## Headless Gaussian Splatting Pivot - Command Reference
 
 Added a single operator command guide for the current headless Trainer workflow.

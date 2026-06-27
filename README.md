@@ -20,7 +20,7 @@ The active branch is:
 headless-gsplat-v0.1-dev
 ```
 
-The current validated work is the headless `gsplat` Trainer image line. RunPod GPU validation has passed on an NVIDIA GeForce RTX 4090, and a real training run reached 30,000 iterations with checkpoints/tensors generated successfully.
+The current implemented work is the headless `gsplat` Trainer image line. Earlier RunPod GPU checks and a 30,000-iteration training run were reported by the operator, but their original logs and artifacts were not preserved. They are historical observations, not evidence-backed validation of the current image.
 
 The image starts with a minimal RunPod keepalive command so non-interactive pods remain running for SSH and manual validation.
 
@@ -32,7 +32,7 @@ The broader target is three headless image roles:
 - `Trainer`: train Gaussian Splatting with `gsplat`, then export and package PLY files.
 - `Full`: combine COLMAP and Trainer in one heavier image for a complete single-image pipeline.
 
-Only the Trainer path has the validated `gsplat` work described below. COLMAP and Full remain documentation targets until their own branches/images are created.
+Trainer owns the `gsplat` workflow described below. COLMAP processing now belongs to the separate `headless-surveyor-v0.1-dev` image. Full remains a future combined-image target.
 
 ## Base Image
 
@@ -57,17 +57,6 @@ The current Trainer image prepares:
 ```
 
 Important data must live in mounted volumes or persistent RunPod storage. Do not rely on ephemeral container paths for datasets, outputs, logs, or checkpoints.
-
-The next standard workspace layout is accepted as a documentation target, pending implementation:
-
-```text
-/workspace/incoming
-/workspace/archives
-/workspace/scenes
-/workspace/outputs
-/workspace/logs
-/workspace/temp
-```
 
 `/workspace/checkpoints` remains a current Trainer path because `train-scene.sh` exposes checkpoints there.
 
@@ -141,7 +130,7 @@ This validates `nvidia-smi`, PyTorch import, CUDA availability, GPU name, and a 
 
 It also validates that `gsplat` imports successfully and reports the installed package version.
 
-Latest RunPod validation result:
+Historical operator report from an earlier RunPod execution:
 
 - GPU: `NVIDIA GeForce RTX 4090`
 - NVIDIA-SMI: `550.127.05`
@@ -154,10 +143,10 @@ Latest RunPod validation result:
 - `cuda_available=True`
 - `cuda_operation=success`
 - diagnostics archive generated under `/workspace/logs/diagnostics`
-- real `gsplat` training reached 30,000 iterations
-- checkpoints/tensors were generated successfully
+- a `gsplat` training run reportedly reached 30,000 iterations
+- checkpoints/tensors were reportedly generated
 
-The missing `.ply` in the 30,000-step run was an export invocation issue, not a training failure.
+The original logs, run metadata, checkpoints, and diagnostics archive were not preserved. These observations must not be used to validate the current image. The operator reported that the missing `.ply` resulted from the export not being invoked.
 
 ## RunPod Startup
 
@@ -185,6 +174,14 @@ The script writes a compressed archive under:
 /workspace/logs/diagnostics
 ```
 
+Package scene-scoped training and export logs for review with:
+
+```bash
+empaquetar-logs <scene>
+```
+
+This command packages existing evidence; it does not generate GPU telemetry. Optional telemetry must already exist under `/workspace/logs/<scene>`.
+
 ## Training Workflow
 
 The initial training wrapper expects a COLMAP-prepared dataset. COLMAP is not installed in this image yet.
@@ -203,7 +200,7 @@ Logs and outputs are written under:
 
 This phase does not promise final quality. It only establishes the first official training backend path.
 
-Phase 5A local smoke validation passed for image build, trainer help, absence of viewer dependencies, and `train-scene.sh --check`. A real COLMAP-prepared training run on RunPod remains pending.
+Phase 5A local checks for image build, trainer help, absence of viewer dependencies, and `train-scene.sh --check` were reported as successful, but their original logs were not preserved. A current evidence-backed COLMAP training run on RunPod remains pending.
 
 ## PLY Export
 
@@ -230,7 +227,7 @@ pod -> runpodctl -> Mac
 
 The previous SCP path through `ssh.runpod.io` is discarded for this workflow.
 
-Use [docs/command-reference.md](docs/command-reference.md) for current `runpodctl send` / `runpodctl receive` command shape. Mac-to-pod syntax and large-file behavior still need smoke testing and exact command capture.
+Installation is implemented; successful end-to-end transfer is not yet evidence-backed. Use [docs/command-reference.md](docs/command-reference.md) for the intended `runpodctl send` / `runpodctl receive` command shape. Mac-to-pod syntax and large-file behavior still need smoke testing and exact command capture.
 
 ## Current Command Reference
 
@@ -244,6 +241,7 @@ train-scene.sh --check room
 MAX_STEPS=100 train-scene.sh room
 generar --scene room
 empaquetar room
+empaquetar-logs room
 runpodctl send /workspace/outputs/room/exports/room-ply-exports.tar.gz
 ```
 

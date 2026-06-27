@@ -2,13 +2,49 @@
 
 Registro inicial de validaciones manuales realizadas sobre la imagen base oficial.
 
+## Evidence Status
+
+Use these states consistently:
+
+- `implemented`: directly verifiable in the current repository
+- `locally verified`: command executed locally with date and command recorded
+- `operator reported`: manual result without sufficient preserved evidence
+- `validated with evidence`: operator questionnaire, logs, versions, commands, outputs, and hashes agree
+- `pending`: not executed or insufficient evidence
+
+Dates in validation questionnaires use Aguascalientes local time by convention.
+
+The historical 30,000-iteration training result below is `operator reported`. Its original logs, checkpoints, run metadata, and diagnostics archive were not preserved, so it does not validate the current image.
+
+## Manual Validation Protocol
+
+The Eye interviews the operator after each manual RunPod test and checks the answers against preserved evidence. Record:
+
+1. local date in Aguascalientes and test purpose
+2. branch, commit, image tag, and image digest when available
+3. pod/GPU, NVIDIA driver, CUDA, Python, PyTorch, and `gsplat` versions
+4. scene name, source, and image count
+5. exact commands in execution order and relevant environment variables
+6. exit status, observed result, retries, errors, and manual interventions
+7. paths and sizes for logs, summaries, checkpoints, PLY files, and packages
+8. SHA-256 values before and after transfer, transfer direction, and duration
+9. capabilities that passed, failed, or remain inconclusive
+
+Run `empaquetar-logs <scene>` after the test. Large evidence archives stay outside Git; a validation record stores their location, size, SHA-256, and the small sanitized evidence needed to support the conclusion. Do not commit credentials or ephemeral transfer codes.
+
+Store each accepted report under:
+
+```text
+docs/validation-runs/YYYY-MM-DD-<scene>-<purpose>.md
+```
+
 ## Imagen base
 
 ```text
 runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd773f11eefa378929d5a687bd775febeb78eac62fc824141fb5
 ```
 
-## Resultados validados
+## Historical Operator-Reported Results
 
 - `nvidia-smi` exitoso
 - CUDA funcional
@@ -81,14 +117,12 @@ Training:
 MAX_STEPS=100 train-scene.sh room
 MAX_STEPS=1000 train-scene.sh room
 MAX_STEPS=10000 train-scene.sh room
-MAX_STEPS=30000 train-scene.sh room
 ```
 
 PLY export:
 
 ```bash
 generar
-generar --list
 generar --scene room
 generar --checkpoint /workspace/outputs/room/ckpts/ckpt_999_rank0.pt
 generar --ckpt-dir /workspace/outputs/room/ckpts
@@ -103,6 +137,7 @@ empaquetar room
 comprimir room
 cd /workspace/outputs/room/exports
 sha256sum -c room-ply-exports.tar.gz.sha256
+empaquetar-logs room
 ```
 
 ## Known Operator Errors
@@ -124,7 +159,7 @@ Phase 4 RunPod GPU validation passed.
 
 The headless image can start on RunPod, keep the container alive, detect an RTX 4090, import `gsplat`, use PyTorch CUDA, execute a CUDA smoke operation, and generate diagnostics.
 
-Observed evidence from RunPod:
+Operator-reported observations from RunPod; original evidence was not preserved:
 
 - `validate-gpu.sh` executed successfully inside the pod.
 - GPU detected: `NVIDIA GeForce RTX 4090`
@@ -145,9 +180,10 @@ Observed evidence from RunPod:
 ```text
 /workspace/logs/diagnostics/training-diagnostics-20260616T023550Z.tar.gz
 ```
-- A real `gsplat` training run reached 30,000 iterations on RunPod RTX 4090.
-- Training generated checkpoints/tensors successfully.
-- The missing `.ply` was caused by not invoking PLY export, not by a training or checkpoint failure.
+- The operator reported that a `gsplat` training run reached 30,000 iterations on RunPod RTX 4090.
+- The operator reported that training generated checkpoints/tensors successfully.
+- The operator reported that the missing `.ply` was caused by not invoking PLY export.
+- The original evidence was not preserved; these statements are historical context rather than validation of the current image.
 
 Interpretation:
 

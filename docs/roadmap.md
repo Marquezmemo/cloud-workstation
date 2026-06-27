@@ -10,7 +10,7 @@ Roadmap for the headless Gaussian Splatting pipeline.
 6. Validate a minimal training run with persistent logs and outputs
 7. Validate PLY generation, packaging, checksum, and transfer
 8. Freeze a reproducible Trainer baseline
-9. Create the COLMAP branch/image
+9. Stabilize the handoff with the existing Surveyor branch/image
 10. Create the Full image after COLMAP and Trainer contracts are stable
 11. Optionally create a future Nerfstudio/Splatfacto benchmark branch
 
@@ -21,8 +21,9 @@ Roadmap for the headless Gaussian Splatting pipeline.
 - Phase 3 complete: minimal headless tooling and GPU validation script.
 - Phase 4 complete: minimal pinned `gsplat` install/import validation passed on RunPod RTX 4090.
 - Phase 5A local implementation complete: official `gsplat` `examples/simple_trainer.py` adopted as the first backend, with viewer imports removed by a build-time headless patch.
-- Real RunPod training reached 30,000 iterations and generated checkpoints/tensors.
+- A 30,000-iteration RunPod training run was reported historically, but its evidence was not preserved and does not validate the current image.
 - Manual PLY export and packaging commands exist; new GPU smoke test is pending.
+- Scene-scoped log packaging exists through `empaquetar-logs`; its real RunPod use is pending.
 
 ## Immediate Priorities
 
@@ -36,12 +37,12 @@ Roadmap for the headless Gaussian Splatting pipeline.
 8. Test a file larger than 1 GB.
 9. Record exact working `runpodctl` commands.
 10. Define the Trainer baseline.
-11. Create the COLMAP branch.
+11. Validate the Surveyor-to-Trainer handoff.
 
 ## Recently Implemented
 
 - Included fixed-version `runpodctl v2.5.0` in the Trainer image build.
-- Created standard workspace directories for `incoming`, `archives`, `scenes`, `outputs`, `logs`, and `temp`.
+- Added scene-scoped evidence packaging with `empaquetar-logs`.
 
 ## Accepted But Pending
 
