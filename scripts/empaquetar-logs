@@ -1,0 +1,198 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Purpose:
+#   Package scene-scoped training logs and GPU evidence with a portable checksum.
+# Input:
+#   empaquetar-logs <scene>
+# Output:
+#   /workspace/outputs/<scene>/exports/<scene>-training-logs.tar.gz{,.sha256}
+
+usage() {
+  cat <<'EOF'
+empaquetar-logs <scene>
+
+Packages existing logs and scene-scoped diagnostics without including datasets,
+checkpoints, PLY files, or logs from other scenes.
+
+The command refuses to overwrite an existing package or checksum.
+EOF
+}
+
+fail() {
+  echo "ERROR: $*" >&2
+  exit 1
+}
+
+contains_sensitive_data() {
+  local path="$1"
+  LC_ALL=C grep -Eiq \
+    '(^|[^A-Za-z0-9_])(token|password|passwd|secret|api[_-]?key|authorization)[[:space:]]*[:=]|Bearer[[:space:]]+[A-Za-z0-9._-]+|gh[pousr]_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9]{20,}' \
+    "${path}"
+}
+
+file_size() {
+  local path="$1"
+  wc -c < "${path}" | tr -d '[:space:]'
+}
+
+write_checksum() {
+  local directory="$1"
+  local archive_name="$2"
+  local checksum_path="$3"
+
+  if command -v sha256sum >/dev/null 2>&1; then
+    (cd "${directory}" && sha256sum "${archive_name}") > "${checksum_path}"
+  elif command -v shasum >/dev/null 2>&1; then
+    (cd "${directory}" && shasum -a 256 "${archive_name}") > "${checksum_path}"
+  else
+    fail "neither sha256sum nor shasum is available"
+  fi
+}
+
+verify_checksum() {
+  local directory="$1"
+  local checksum_name="$2"
+
+  if command -v sha256sum >/dev/null 2>&1; then
+    (cd "${directory}" && sha256sum -c "${checksum_name}")
+  else
+    (cd "${directory}" && shasum -a 256 -c "${checksum_name}")
+  fi
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  usage
+  exit 0
+fi
+
+SCENE="${1:-}"
+[[ -n "${SCENE}" ]] || {
+  usage >&2
+  exit 2
+}
+[[ "${SCENE}" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]] || \
+  fail "scene must match [A-Za-z0-9][A-Za-z0-9._-]*"
+
+WORKSPACE_ROOT="${WORKSPACE_ROOT:-/workspace}"
+LOGS_DIR="${LOGS_DIR:-${WORKSPACE_ROOT}/logs}"
+OUTPUTS_DIR="${OUTPUTS_DIR:-${WORKSPACE_ROOT}/outputs}"
+SCENE_LOG_DIR="${LOGS_DIR}/${SCENE}"
+EXPORT_DIR="${OUTPUTS_DIR}/${SCENE}/exports"
+PACKAGE_ROOT="${SCENE}-training-logs"
+ARCHIVE_NAME="${PACKAGE_ROOT}.tar.gz"
+CHECKSUM_NAME="${ARCHIVE_NAME}.sha256"
+ARCHIVE_PATH="${EXPORT_DIR}/${ARCHIVE_NAME}"
+CHECKSUM_PATH="${EXPORT_DIR}/${CHECKSUM_NAME}"
+
+[[ ! -L "${SCENE_LOG_DIR}" ]] || fail "refusing symlink scene log directory: ${SCENE_LOG_DIR}"
+[[ ! -L "${SCENE_LOG_DIR}/diagnostics" ]] || \
+  fail "refusing symlink diagnostics directory: ${SCENE_LOG_DIR}/diagnostics"
+[[ ! -e "${ARCHIVE_PATH}" ]] || fail "package already exists: ${ARCHIVE_PATH}"
+[[ ! -e "${CHECKSUM_PATH}" ]] || fail "checksum already exists: ${CHECKSUM_PATH}"
+
+TEMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/empaquetar-logs.XXXXXX")"
+trap 'rm -rf "${TEMP_ROOT}"' EXIT
+
+PACKAGE_DIR="${TEMP_ROOT}/${PACKAGE_ROOT}"
+TEMP_ARCHIVE="${TEMP_ROOT}/${ARCHIVE_NAME}"
+TEMP_CHECKSUM="${TEMP_ROOT}/${CHECKSUM_NAME}"
+MANIFEST="${PACKAGE_DIR}/manifest.txt"
+mkdir -p "${PACKAGE_DIR}/logs" "${PACKAGE_DIR}/diagnostics"
+
+INCLUDED_FILES=()
+INCLUDED_SIZES=()
+ABSENT_FILES=()
+
+add_optional_file() {
+  local source_relative="$1"
+  local archive_relative="$2"
+  local source_path="${SCENE_LOG_DIR}/${source_relative}"
+  local destination_path="${PACKAGE_DIR}/${archive_relative}"
+
+  if [[ -L "${source_path}" ]]; then
+    fail "refusing symlink input: ${source_path}"
+  fi
+  if [[ ! -e "${source_path}" ]]; then
+    ABSENT_FILES+=("${source_relative}")
+    return
+  fi
+  [[ -f "${source_path}" ]] || fail "expected a regular file: ${source_path}"
+  if contains_sensitive_data "${source_path}"; then
+    fail "possible credential detected in ${source_path}; package was not created"
+  fi
+
+  mkdir -p "$(dirname "${destination_path}")"
+  cp "${source_path}" "${destination_path}"
+  INCLUDED_FILES+=("${archive_relative}")
+  INCLUDED_SIZES+=("$(file_size "${source_path}")")
+}
+
+# Training and export logs produced by the current scene wrappers.
+add_optional_file "run.env" "logs/run.env"
+add_optional_file "run.summary" "logs/run.summary"
+add_optional_file "train.log" "logs/train.log"
+add_optional_file "error.tail" "logs/error.tail"
+add_optional_file "generate-ply.log" "logs/generate-ply.log"
+
+# Optional scene-scoped GPU telemetry. This command packages but does not create it.
+add_optional_file "gpu-usage.csv" "logs/gpu-usage.csv"
+add_optional_file "gpu-usage.log" "logs/gpu-usage.log"
+add_optional_file "nvidia-smi.csv" "logs/nvidia-smi.csv"
+add_optional_file "nvidia-smi.log" "logs/nvidia-smi.log"
+add_optional_file "diagnostics/nvidia-smi.txt" "diagnostics/nvidia-smi.txt"
+add_optional_file "diagnostics/nvidia-smi-query.txt" "diagnostics/nvidia-smi-query.txt"
+add_optional_file "diagnostics/python-torch-cuda.txt" "diagnostics/python-torch-cuda.txt"
+add_optional_file "diagnostics/gpu-usage.csv" "diagnostics/gpu-usage.csv"
+add_optional_file "diagnostics/gpu-usage.log" "diagnostics/gpu-usage.log"
+
+[[ "${#INCLUDED_FILES[@]}" -gt 0 ]] || \
+  fail "no eligible scene logs found under ${SCENE_LOG_DIR}"
+
+WORKSPACE_GIT_COMMIT="unknown"
+if command -v git >/dev/null 2>&1 \
+  && git -C "${WORKSPACE_ROOT}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  WORKSPACE_GIT_COMMIT="$(git -C "${WORKSPACE_ROOT}" rev-parse HEAD 2>/dev/null || echo unknown)"
+fi
+
+{
+  echo "manifest_version=1"
+  echo "scene=${SCENE}"
+  echo "packaged_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  echo "training_image_version=${TRAINING_IMAGE_VERSION:-unknown}"
+  echo "image_git_commit=${IMAGE_GIT_COMMIT:-unknown}"
+  echo "workspace_git_commit=${WORKSPACE_GIT_COMMIT}"
+  echo "gsplat_examples_ref=${GSPLAT_EXAMPLES_REF:-unknown}"
+  echo "global_diagnostics_policy=excluded_not_scene_scoped"
+  echo
+  echo "[included_files]"
+  for index in "${!INCLUDED_FILES[@]}"; do
+    printf '%s\t%s bytes\n' "${INCLUDED_FILES[$index]}" "${INCLUDED_SIZES[$index]}"
+  done
+  echo
+  echo "[absent_optional_files]"
+  printf '%s\n' "${ABSENT_FILES[@]}"
+} > "${MANIFEST}"
+
+tar -C "${TEMP_ROOT}" -czf "${TEMP_ARCHIVE}" "${PACKAGE_ROOT}"
+tar -tzf "${TEMP_ARCHIVE}" >/dev/null
+
+if tar -tzf "${TEMP_ARCHIVE}" | grep -Eq '\.(pt|ply)(/|$)'; then
+  fail "package verification found a forbidden checkpoint or PLY file"
+fi
+
+write_checksum "${TEMP_ROOT}" "${ARCHIVE_NAME}" "${TEMP_CHECKSUM}"
+verify_checksum "${TEMP_ROOT}" "${CHECKSUM_NAME}" >/dev/null
+
+mkdir -p "${EXPORT_DIR}"
+[[ ! -e "${ARCHIVE_PATH}" && ! -e "${CHECKSUM_PATH}" ]] || \
+  fail "output appeared while packaging; refusing to overwrite"
+mv "${TEMP_ARCHIVE}" "${ARCHIVE_PATH}"
+mv "${TEMP_CHECKSUM}" "${CHECKSUM_PATH}"
+
+tar -tzf "${ARCHIVE_PATH}" >/dev/null
+verify_checksum "${EXPORT_DIR}" "${CHECKSUM_NAME}" >/dev/null
+
+echo "Training log package created and verified:"
+echo "  ${ARCHIVE_PATH}"
+echo "  ${CHECKSUM_PATH}"

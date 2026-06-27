@@ -78,6 +78,7 @@ COPY scripts/generate-ply.py /usr/local/bin/generate-ply.py
 COPY scripts/Generar /usr/local/bin/Generar
 COPY scripts/Generar /usr/local/bin/generar
 COPY scripts/empaquetar /usr/local/bin/empaquetar
+COPY scripts/empaquetar-logs /usr/local/bin/empaquetar-logs
 COPY scripts/comprimir /usr/local/bin/comprimir
 
 RUN mkdir -p \
@@ -98,6 +99,7 @@ RUN chmod +x \
     /usr/local/bin/Generar \
     /usr/local/bin/generar \
     /usr/local/bin/empaquetar \
+    /usr/local/bin/empaquetar-logs \
     /usr/local/bin/comprimir
 
 WORKDIR /workspace
