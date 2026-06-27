@@ -64,21 +64,9 @@ fixtures = {
     },
 }
 
-entries = list(fixtures[fixture_type].items())
 with zipfile.ZipFile(archive_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-    for name, content in entries:
-        print(f"fixture_entry={name!r} size={len(content)}")
+    for name, content in fixtures[fixture_type].items():
         archive.writestr(name, content)
-
-supported = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
-with zipfile.ZipFile(archive_path) as archive:
-    for info in archive.infolist():
-        extension = info.filename.rsplit(".", 1)[-1].casefold()
-        is_supported = f".{extension}" in supported
-        print(
-            f"zip_entry={info.filename!r} size={info.file_size} "
-            f"supported_image={str(is_supported).lower()}"
-        )
 PY
 }
 
@@ -113,20 +101,6 @@ assert_no_preparation_residue() {
   fi
 }
 
-print_incoming_tree() {
-  local incoming_path="$1"
-
-  echo "incoming_tree_begin"
-  if [[ ! -e "${incoming_path}" ]]; then
-    echo "missing_incoming_path=${incoming_path}"
-  elif find "${incoming_path}" -maxdepth 0 -printf '' >/dev/null 2>&1; then
-    find "${incoming_path}" -maxdepth 6 -printf '%y %p\n' | sort
-  else
-    find "${incoming_path}" -maxdepth 6 -print | sort
-  fi
-  echo "incoming_tree_end"
-}
-
 TEST_ROOT="$(mktemp -d /tmp/preparar-escena-test.XXXXXX)"
 trap cleanup EXIT
 PREPARER="$(resolve_command preparar-escena)"
@@ -141,7 +115,6 @@ EXPECTED_FIRST_IMAGE="${MACOS_ROOT}/incoming/prueba/images/IMG_001.JPG"
 EXPECTED_SECOND_IMAGE="${MACOS_ROOT}/incoming/prueba/images/IMG_002.png"
 
 create_zip "${ZIP_PATH}" macos
-unzip -l "${ZIP_PATH}"
 
 if run_preparer "${MACOS_ROOT}" >"${STDOUT_FILE}" 2>"${STDERR_FILE}"; then
   PREPARE_EXIT_CODE=0
@@ -149,22 +122,11 @@ else
   PREPARE_EXIT_CODE=$?
 fi
 
-echo "prepare_exit_code=${PREPARE_EXIT_CODE}"
-echo "prepare_stdout_begin"
-cat "${STDOUT_FILE}"
-echo "prepare_stdout_end"
-echo "prepare_stderr_begin"
-cat "${STDERR_FILE}"
-echo "prepare_stderr_end"
-
-printf 'expected_image=%q\n' "${EXPECTED_FIRST_IMAGE}"
-printf 'expected_image=%q\n' "${EXPECTED_SECOND_IMAGE}"
-if [[ -d "$(dirname -- "${EXPECTED_FIRST_IMAGE}")" ]]; then
-  ls -lb "$(dirname -- "${EXPECTED_FIRST_IMAGE}")"
-else
-  echo "missing_expected_directory=$(dirname -- "${EXPECTED_FIRST_IMAGE}")"
+if [[ "${PREPARE_EXIT_CODE}" -ne 0 ]]; then
+  echo "prepare_exit_code=${PREPARE_EXIT_CODE}" >&2
+  cat "${STDOUT_FILE}" >&2
+  cat "${STDERR_FILE}" >&2
 fi
-print_incoming_tree "${MACOS_ROOT}/incoming"
 
 test "${PREPARE_EXIT_CODE}" -eq 0 || fail "preparar-escena exited with ${PREPARE_EXIT_CODE}"
 grep -Fqx \
