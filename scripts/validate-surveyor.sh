@@ -19,12 +19,14 @@ required_commands=(
   ffmpeg
   gdown
   jq
+  preparar-escena
   python3
   rsync
   runpodctl
   sha256sum
   sqlite3
   tar
+  unzip
 )
 
 # Required tools
@@ -41,6 +43,9 @@ for command_name in "${required_commands[@]}"; do
 done
 
 echo
+preparar-escena --help >/dev/null
+echo "preparar_escena_help=success"
+
 COLMAP_HELP="$(colmap -h 2>&1)"
 COLMAP_HEADER="$(grep -m1 -E '^COLMAP [0-9]' <<< "${COLMAP_HELP}" || true)"
 EXPECTED_COLMAP_VERSION="${SURVEYOR_COLMAP_VERSION:-3.10}"

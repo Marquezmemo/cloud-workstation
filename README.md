@@ -52,6 +52,7 @@ Expected input:
 
 ```text
 /workspace/incoming/<scene>/images
+/workspace/incoming/<scene>/source/<archive.zip>
 ```
 
 Expected output:
@@ -74,15 +75,18 @@ validate-surveyor.sh
 
 The image includes pinned `runpodctl v2.5.0` for manual Mac/pod transfers and pinned `gdown 6.1.0` for one-way downloads from temporarily shared Google Drive links. Successful end-to-end transfer still requires preserved evidence.
 
-Download a prepared input archive from Google Drive:
+Download a ZIP from Google Drive and prepare it atomically:
 
 ```bash
-mkdir -p /workspace/incoming/<scene>
 gdown '<shared-drive-url>' \
-  -O /workspace/incoming/<scene>/<scene>-input.tar.gz
+  -O /workspace/<scene>.zip
+sha256sum /workspace/<scene>.zip
+preparar-escena /workspace/<scene>.zip
 ```
 
-Verify its SHA-256 before extracting it. Do not bake Google credentials or cookies into the image.
+With exactly one ZIP directly under `/workspace`, `preparar-escena` can be invoked without an argument. It verifies and extracts into a temporary directory, ignores macOS metadata, requires at least two supported images, rejects name collisions and existing scenes, and only publishes a complete incoming scene. The downloaded ZIP remains in place and an identical copy is preserved under `source/`.
+
+Do not bake Google credentials or cookies into the image.
 
 Run a minimal sparse reconstruction:
 
@@ -133,6 +137,7 @@ Implemented and directly verifiable in the repository:
 
 - COLMAP 3.10/CUDA 12.3.1 base pinned by digest
 - pinned `runpodctl v2.5.0` and hashed `gdown 6.1.0` dependency lock
+- transactional ZIP preparation with `preparar-escena`
 - complete scene validator and validation-before-packaging gate
 - portable scene and evidence packages
 - default `CMD ["runpod-keepalive.sh"]`
@@ -140,6 +145,7 @@ Implemented and directly verifiable in the repository:
 Locally verified on 2026-06-27:
 
 - `bash tests/test-surveyor-contract.sh`
+- `bash tests/test-preparar-escena.sh`
 - valid scene packaging, negative fixtures, and portable checksum verification
 
 Reported by earlier implementation work without preserved logs:

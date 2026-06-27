@@ -49,6 +49,7 @@ RUN apt-get update \
         rsync \
         sqlite3 \
         tar \
+        unzip \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements-gdown.txt /tmp/requirements-gdown.txt
@@ -69,6 +70,7 @@ RUN curl -fsSL \
     && runpodctl version
 
 COPY scripts/runpod-keepalive.sh /usr/local/bin/runpod-keepalive.sh
+COPY scripts/preparar-escena /usr/local/bin/preparar-escena
 COPY scripts/validate-surveyor.sh /usr/local/bin/validate-surveyor.sh
 COPY scripts/validate-surveyor-scene.sh /usr/local/bin/validate-surveyor-scene.sh
 COPY scripts/survey-scene.sh /usr/local/bin/survey-scene.sh
@@ -81,11 +83,12 @@ RUN mkdir -p \
     /workspace/archives \
     /workspace/temp \
     && chmod +x \
-    /usr/local/bin/runpod-keepalive.sh \
-    /usr/local/bin/validate-surveyor.sh \
-    /usr/local/bin/validate-surveyor-scene.sh \
-    /usr/local/bin/survey-scene.sh \
-    /usr/local/bin/package-surveyor-scene.sh
+        /usr/local/bin/runpod-keepalive.sh \
+        /usr/local/bin/preparar-escena \
+        /usr/local/bin/validate-surveyor.sh \
+        /usr/local/bin/validate-surveyor-scene.sh \
+        /usr/local/bin/survey-scene.sh \
+        /usr/local/bin/package-surveyor-scene.sh
 
 WORKDIR /workspace
 

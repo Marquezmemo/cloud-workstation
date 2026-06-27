@@ -33,20 +33,35 @@ mkdir -p /workspace/incoming/room/images
 
 Copy image files into that directory before running Surveyor.
 
-### Download a shared Drive archive
+### Download and prepare a shared Drive ZIP
 
-Create an archive whose top-level entry is `images/`, record its SHA-256 before uploading it to Drive, and temporarily enable link-based read access. In the pod:
+Create a ZIP containing at least two supported images, record its SHA-256 before uploading it to Drive, and temporarily enable link-based read access. Images may be nested inside the ZIP. In the pod:
 
 ```bash
-mkdir -p /workspace/incoming/room
 gdown '<shared-drive-url>' \
-  -O /workspace/incoming/room/room-input.tar.gz
-sha256sum /workspace/incoming/room/room-input.tar.gz
-tar -xzf /workspace/incoming/room/room-input.tar.gz \
-  -C /workspace/incoming/room
+  -O /workspace/room.zip
+sha256sum /workspace/room.zip
+preparar-escena /workspace/room.zip
 ```
 
-Compare the downloaded SHA-256 with the source value before extraction. Do not store Drive URLs, cookies, or credentials in Git. `gdown` does not upload results.
+When exactly one ZIP exists directly under `/workspace`, this is also valid:
+
+```bash
+preparar-escena
+```
+
+The command derives `room` from `room.zip` and creates:
+
+```text
+/workspace/incoming/room/
++-- images/
++-- source/
+    +-- room.zip
+```
+
+It recursively finds supported images and places them directly under `images/`. It ignores `__MACOSX`, `.DS_Store`, and `._*`; rejects corrupt or unsafe ZIPs, fewer than two images, flattened-name collisions, and existing incoming or processed scenes. Failures leave the original ZIP unchanged and do not leave a partial destination. The original downloaded ZIP is also retained after success.
+
+Compare the downloaded SHA-256 with the source value before preparation. Do not store Drive URLs, cookies, or credentials in Git. `gdown` does not upload results.
 
 ## Run Sparse Reconstruction
 
@@ -165,6 +180,7 @@ MAX_STEPS=100 train-scene.sh room
 
 ```bash
 validate-surveyor.sh
+preparar-escena /workspace/room.zip
 COLMAP_USE_GPU=1 survey-scene.sh room
 validate-surveyor-scene.sh room
 package-surveyor-scene.sh room

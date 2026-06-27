@@ -22,6 +22,17 @@ Supported image extensions in `survey-scene.sh`:
 
 The script only reads files directly under `images/`; nested image folders are not part of v0.1.
 
+`preparar-escena [archivo.zip]` bridges nested ZIP input into this flat contract. It derives the scene name from the ZIP filename, recursively selects only the supported extensions, rejects case-insensitive basename collisions, and atomically writes:
+
+```text
+/workspace/incoming/<scene>/
++-- images/
++-- source/
+    +-- <scene>.zip
+```
+
+The input ZIP remains at its original path. Existing incoming or processed scenes are never overwritten.
+
 ## Output Layout
 
 Surveyor writes:

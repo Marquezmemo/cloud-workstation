@@ -1,0 +1,267 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Purpose: Prepare a Surveyor incoming scene from a ZIP without touching COLMAP output.
+# Input:   Zero or one ZIP path. With no argument, exactly one ZIP must exist in /workspace.
+# Output:  /workspace/incoming/<scene>/{images,source} after all validation succeeds.
+
+usage() {
+  cat <<'EOF'
+preparar-escena [archivo.zip]
+
+Prepara una escena de Surveyor a partir de un ZIP. Sin argumento, detecta el
+único archivo .zip ubicado directamente en /workspace.
+
+El nombre de la escena se deriva del nombre del ZIP y el destino es:
+  /workspace/incoming/<escena>/images
+  /workspace/incoming/<escena>/source/<archivo.zip>
+
+El ZIP de entrada se conserva. No ejecuta survey-scene.sh.
+EOF
+}
+
+fail() {
+  echo "ERROR: $*" >&2
+  exit 1
+}
+
+WORKSPACE_ROOT="${WORKSPACE_ROOT:-/workspace}"
+INCOMING_DIR="${INCOMING_DIR:-${WORKSPACE_ROOT}/incoming}"
+SCENES_DIR="${SCENES_DIR:-${WORKSPACE_ROOT}/scenes}"
+TEMP_DIR="${TEMP_DIR:-${WORKSPACE_ROOT}/temp}"
+
+TEMP_ROOT=""
+STAGING_DIR=""
+
+cleanup() {
+  if [[ -n "${STAGING_DIR}" && -e "${STAGING_DIR}" ]]; then
+    rm -rf -- "${STAGING_DIR}"
+  fi
+  if [[ -n "${TEMP_ROOT}" && -e "${TEMP_ROOT}" ]]; then
+    rm -rf -- "${TEMP_ROOT}"
+  fi
+}
+
+trap cleanup EXIT
+trap 'exit 130' HUP INT TERM
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  usage
+  exit 0
+fi
+
+(( $# <= 1 )) || {
+  usage >&2
+  exit 2
+}
+
+ZIP_PATH="${1:-}"
+if [[ -z "${ZIP_PATH}" ]]; then
+  [[ -d "${WORKSPACE_ROOT}" ]] || fail "no existe el workspace: ${WORKSPACE_ROOT}"
+
+  ZIP_MATCHES=()
+  while IFS= read -r -d '' candidate; do
+    ZIP_MATCHES+=("${candidate}")
+  done < <(find "${WORKSPACE_ROOT}" -maxdepth 1 -type f -iname '*.zip' -print0)
+
+  case "${#ZIP_MATCHES[@]}" in
+    0)
+      fail "no se encontró ningún archivo .zip en ${WORKSPACE_ROOT}"
+      ;;
+    1)
+      ZIP_PATH="${ZIP_MATCHES[0]}"
+      ;;
+    *)
+      echo "ERROR: se encontraron varios archivos .zip en ${WORKSPACE_ROOT}:" >&2
+      for candidate in "${ZIP_MATCHES[@]}"; do
+        printf '  %s\n' "${candidate}" >&2
+      done
+      echo "Indique uno explícitamente: preparar-escena /workspace/archivo.zip" >&2
+      exit 1
+      ;;
+  esac
+fi
+
+[[ -f "${ZIP_PATH}" ]] || fail "el archivo ZIP no existe o no es regular: ${ZIP_PATH}"
+
+ZIP_DIRECTORY="$(cd -- "$(dirname -- "${ZIP_PATH}")" && pwd -P)"
+ZIP_FILENAME="$(basename -- "${ZIP_PATH}")"
+ZIP_PATH="${ZIP_DIRECTORY}/${ZIP_FILENAME}"
+ZIP_EXTENSION="$(printf '%s' "${ZIP_FILENAME##*.}" | tr '[:upper:]' '[:lower:]')"
+[[ "${ZIP_EXTENSION}" == "zip" ]] || fail "el archivo debe tener extensión .zip: ${ZIP_PATH}"
+
+SCENE_NAME="${ZIP_FILENAME%.*}"
+[[ "${SCENE_NAME}" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]] || {
+  fail "el nombre derivado de la escena no es válido: ${SCENE_NAME}"
+}
+
+FINAL_DIR="${INCOMING_DIR}/${SCENE_NAME}"
+PROCESSED_SCENE_DIR="${SCENES_DIR}/${SCENE_NAME}"
+[[ ! -e "${FINAL_DIR}" && ! -L "${FINAL_DIR}" ]] || {
+  fail "la escena de entrada ya existe y no será sobrescrita: ${FINAL_DIR}"
+}
+[[ ! -e "${PROCESSED_SCENE_DIR}" && ! -L "${PROCESSED_SCENE_DIR}" ]] || {
+  fail "la escena procesada ya existe y no será modificada: ${PROCESSED_SCENE_DIR}"
+}
+
+# Validate ZIP integrity before any extraction or destination modification.
+if ! unzip -tqq "${ZIP_PATH}" >/dev/null; then
+  fail "la validación de integridad con unzip -t falló: ${ZIP_PATH}"
+fi
+
+# Reject unsafe or ambiguous archive entries before extraction.
+python3 - "${ZIP_PATH}" <<'PY'
+import stat
+import sys
+import zipfile
+from pathlib import PurePosixPath
+
+archive = sys.argv[1]
+seen = {}
+
+try:
+    with zipfile.ZipFile(archive) as zip_file:
+        for entry in zip_file.infolist():
+            if entry.flag_bits & 0x1:
+                raise ValueError(f"el ZIP contiene una entrada cifrada: {entry.filename}")
+
+            normalized = entry.filename.replace("\\", "/")
+            path = PurePosixPath(normalized)
+            if path.is_absolute() or any(part == ".." for part in path.parts):
+                raise ValueError(f"ruta insegura dentro del ZIP: {entry.filename}")
+
+            mode = (entry.external_attr >> 16) & 0o170000
+            if stat.S_ISLNK(mode):
+                raise ValueError(f"enlace simbólico no admitido dentro del ZIP: {entry.filename}")
+
+            clean_parts = [part for part in path.parts if part not in ("", ".")]
+            if not clean_parts:
+                continue
+
+            key = "/".join(clean_parts).casefold()
+            kind = "directory" if entry.is_dir() else "file"
+            previous = seen.get(key)
+            if previous is not None:
+                previous_name, previous_kind = previous
+                if kind == "file" or previous_kind == "file":
+                    raise ValueError(
+                        "entradas en conflicto dentro del ZIP: "
+                        f"{previous_name} <> {entry.filename}"
+                    )
+            else:
+                seen[key] = (entry.filename, kind)
+except (OSError, ValueError, zipfile.BadZipFile) as error:
+    print(f"ERROR: {error}", file=sys.stderr)
+    raise SystemExit(1)
+PY
+
+mkdir -p "${TEMP_DIR}" "${INCOMING_DIR}"
+TEMP_ROOT="$(mktemp -d "${TEMP_DIR%/}/preparar-escena.${SCENE_NAME}.XXXXXX")"
+EXTRACT_DIR="${TEMP_ROOT}/extracted"
+MANIFEST_PATH="${TEMP_ROOT}/images.json"
+mkdir -p "${EXTRACT_DIR}"
+
+if ! unzip -qq "${ZIP_PATH}" -d "${EXTRACT_DIR}"; then
+  fail "no se pudo extraer el ZIP en el directorio temporal"
+fi
+
+python3 - "${EXTRACT_DIR}" "${MANIFEST_PATH}" <<'PY'
+import json
+import os
+import sys
+
+extract_root, manifest_path = sys.argv[1:]
+supported = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
+images = []
+names = {}
+
+for current_root, directories, filenames in os.walk(extract_root):
+    directories[:] = [name for name in directories if name != "__MACOSX"]
+    for filename in filenames:
+        if filename == ".DS_Store" or filename.startswith("._"):
+            continue
+
+        extension = os.path.splitext(filename)[1].casefold()
+        if extension not in supported:
+            continue
+
+        source = os.path.join(current_root, filename)
+        if os.path.islink(source) or not os.path.isfile(source):
+            raise SystemExit(f"ERROR: imagen no regular no admitida: {source}")
+        if os.path.getsize(source) == 0:
+            raise SystemExit(f"ERROR: imagen vacía no admitida: {source}")
+        if any(ord(character) < 32 for character in filename):
+            raise SystemExit(f"ERROR: nombre de imagen con caracteres de control: {source}")
+
+        key = filename.casefold()
+        previous = names.get(key)
+        if previous is not None:
+            raise SystemExit(
+                f"ERROR: colisión al aplanar imágenes: {previous} <> {source}"
+            )
+        names[key] = source
+        images.append({"source": source, "name": filename})
+
+if len(images) < 2:
+    raise SystemExit(
+        f"ERROR: se requieren al menos 2 imágenes admitidas y no vacías; encontradas: {len(images)}"
+    )
+
+images.sort(key=lambda item: item["name"].casefold())
+with open(manifest_path, "w", encoding="utf-8") as manifest_file:
+    json.dump(images, manifest_file, ensure_ascii=False)
+PY
+
+IMAGE_COUNT="$(python3 - "${MANIFEST_PATH}" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as manifest_file:
+    print(len(json.load(manifest_file)))
+PY
+)"
+
+[[ ! -e "${FINAL_DIR}" && ! -L "${FINAL_DIR}" ]] || {
+  fail "la escena de entrada apareció durante la preparación: ${FINAL_DIR}"
+}
+
+STAGING_DIR="$(mktemp -d "${INCOMING_DIR%/}/.${SCENE_NAME}.preparing.XXXXXX")"
+mkdir -p "${STAGING_DIR}/images" "${STAGING_DIR}/source"
+
+python3 - "${MANIFEST_PATH}" "${STAGING_DIR}/images" <<'PY'
+import json
+import os
+import shutil
+import sys
+
+manifest_path, destination = sys.argv[1:]
+with open(manifest_path, encoding="utf-8") as manifest_file:
+    images = json.load(manifest_file)
+
+for image in images:
+    shutil.copy2(image["source"], os.path.join(destination, image["name"]))
+PY
+
+SAVED_ZIP="${STAGING_DIR}/source/${ZIP_FILENAME}"
+cp -p "${ZIP_PATH}" "${SAVED_ZIP}"
+cmp -s "${ZIP_PATH}" "${SAVED_ZIP}" || fail "la copia preservada del ZIP no coincide con el original"
+
+# os.rename publishes the complete staging directory in one filesystem operation.
+python3 - "${STAGING_DIR}" "${FINAL_DIR}" <<'PY'
+import os
+import sys
+
+staging, destination = sys.argv[1:]
+if os.path.lexists(destination):
+    raise SystemExit(f"ERROR: el destino ya existe y no será sobrescrito: {destination}")
+os.rename(staging, destination)
+PY
+STAGING_DIR=""
+
+echo "Escena preparada correctamente."
+echo "Escena: ${SCENE_NAME}"
+echo "Imágenes encontradas: ${IMAGE_COUNT}"
+echo "Ruta de imágenes: ${FINAL_DIR}/images"
+echo "ZIP guardado en: ${FINAL_DIR}/source/${ZIP_FILENAME}"
+echo "Siguiente comando:"
+echo "  survey-scene.sh ${SCENE_NAME}"

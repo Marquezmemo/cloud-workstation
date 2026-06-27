@@ -81,6 +81,18 @@ Validate image tools and workspace paths:
 validate-surveyor.sh
 ```
 
+Prepare a downloaded ZIP without modifying COLMAP output:
+
+```bash
+preparar-escena /workspace/<scene>.zip
+```
+
+The synthetic preparation test covers automatic single-ZIP selection, `__MACOSX` filtering, ZIP preservation, corrupt archives, insufficient images, case-insensitive collisions, existing destinations, unsafe paths, and failure cleanup:
+
+```bash
+tests/test-preparar-escena.sh
+```
+
 Run sparse reconstruction:
 
 ```bash

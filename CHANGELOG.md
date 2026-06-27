@@ -1,5 +1,13 @@
 # Changelog
 
+## Transactional ZIP Scene Preparation
+
+- Added `unzip` and the `preparar-escena [archivo.zip]` operator command.
+- Added exact single-ZIP autodetection under `/workspace` without newest-file selection.
+- Added integrity, archive-path, image-count, metadata-filtering, collision, and existing-scene gates.
+- Added atomic incoming-scene publication with the original download retained and an identical ZIP copy under `source/`.
+- Added synthetic success and failure tests, including a ZIP containing `__MACOSX` metadata.
+
 ## Surveyor CUDA Compatibility And Drive Intake
 
 - Replaced the CUDA 12.9 COLMAP base with pinned COLMAP 3.10/CUDA 12.3.1 on Ubuntu 22.04.

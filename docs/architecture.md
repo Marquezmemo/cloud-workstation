@@ -38,6 +38,7 @@ The image installs `gdown 6.1.0` and all transitive Python dependencies from a h
 
 ```text
 /workspace/incoming/<scene>/images
+/workspace/incoming/<scene>/source/<archive.zip>
 /workspace/scenes/<scene>
 /workspace/logs/<scene>
 /workspace/archives/<scene>
@@ -45,6 +46,8 @@ The image installs `gdown 6.1.0` and all transitive Python dependencies from a h
 ```
 
 `/workspace/incoming/<scene>/images` is the source image directory.
+
+`preparar-escena` validates a ZIP in temporary storage, flattens supported images without collisions, and atomically creates both `images/` and the preserved ZIP under `source/`. It never writes to `/workspace/scenes`.
 
 `/workspace/scenes/<scene>` is the Trainer-ready scene output.
 
