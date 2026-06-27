@@ -51,6 +51,7 @@ Surveyor writes reconstruction evidence under:
 +-- colmap-match.log
 +-- colmap-mapper.log
 +-- model-analyzer.txt
++-- surveyor-gpu.log          # required when COLMAP_USE_GPU=1
 +-- surveyor.summary
 ```
 
@@ -61,7 +62,11 @@ Surveyor writes reconstruction evidence under:
 ```text
 /workspace/archives/<scene>/<scene>-surveyor-scene.tar.gz
 /workspace/archives/<scene>/<scene>-surveyor-scene.tar.gz.sha256
+/workspace/archives/<scene>/<scene>-surveyor-evidence.tar.gz
+/workspace/archives/<scene>/<scene>-surveyor-evidence.tar.gz.sha256
 ```
+
+The scene package contains the full Trainer handoff. The evidence package contains the manifest and reconstruction logs. Checksum records use relative file names so they remain valid after transfer.
 
 ## Trainer Handoff
 
@@ -69,9 +74,10 @@ After moving or unpacking the scene into the Trainer workspace, the expected han
 
 ```bash
 train-scene.sh --check <scene>
+MAX_STEPS=100 train-scene.sh <scene>
 ```
 
-That command is not available in the Surveyor image.
+Those commands are not available in the Surveyor image. The 100-step run is required because the path-only check does not prove that the Trainer can parse and consume the dataset.
 
 ## Current Limits
 

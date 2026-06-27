@@ -8,7 +8,13 @@ Operator command reference for `headless-surveyor-v0.1-dev`.
 validate-surveyor.sh
 ```
 
-This checks required commands, COLMAP help, optional `nvidia-smi`, and writable workspace paths.
+This checks required commands, COLMAP help, pinned `runpodctl`, optional `nvidia-smi`, and writable workspace paths.
+
+Confirm the transfer client directly:
+
+```bash
+runpodctl version
+```
 
 ## Prepare Input Images
 
@@ -31,8 +37,10 @@ Copy image files into that directory before running Surveyor.
 Default exhaustive matching with GPU enabled:
 
 ```bash
-survey-scene.sh room
+COLMAP_USE_GPU=1 survey-scene.sh room
 ```
+
+GPU mode fails before reconstruction when NVIDIA is not visible and writes utilization evidence to `/workspace/logs/room/surveyor-gpu.log`.
 
 CPU fallback:
 
@@ -91,6 +99,12 @@ Key logs:
 
 ## Package Scene
 
+Validate the complete scene first:
+
+```bash
+validate-surveyor-scene.sh room
+```
+
 ```bash
 package-surveyor-scene.sh room
 ```
@@ -100,6 +114,8 @@ Expected outputs:
 ```text
 /workspace/archives/room/room-surveyor-scene.tar.gz
 /workspace/archives/room/room-surveyor-scene.tar.gz.sha256
+/workspace/archives/room/room-surveyor-evidence.tar.gz
+/workspace/archives/room/room-surveyor-evidence.tar.gz.sha256
 ```
 
 ## Verify Package Checksum
@@ -107,7 +123,14 @@ Expected outputs:
 ```bash
 cd /workspace/archives/room
 sha256sum -c room-surveyor-scene.tar.gz.sha256
+sha256sum -c room-surveyor-evidence.tar.gz.sha256
 ```
+
+## Transfer With runpodctl
+
+Mac to pod: run `runpodctl send <input-archive>` on the Mac, then run `runpodctl receive <transfer-code>` from `/workspace/incoming/<scene>` in the Surveyor pod. Record and compare the archive SHA-256 at both ends before extraction.
+
+Pod to Trainer or Mac: send each scene/evidence archive and its `.sha256` file from the Surveyor pod, receive it at the destination, then run `sha256sum -c` beside the received archive.
 
 ## Trainer Handoff
 
@@ -115,6 +138,7 @@ After the packaged scene is transferred and unpacked into the Trainer workspace,
 
 ```bash
 train-scene.sh --check room
+MAX_STEPS=100 train-scene.sh room
 ```
 
 `train-scene.sh` is not included in the Surveyor image.
@@ -123,14 +147,17 @@ train-scene.sh --check room
 
 ```bash
 validate-surveyor.sh
-survey-scene.sh room
+COLMAP_USE_GPU=1 survey-scene.sh room
+validate-surveyor-scene.sh room
 package-surveyor-scene.sh room
 cd /workspace/archives/room
 sha256sum -c room-surveyor-scene.tar.gz.sha256
+sha256sum -c room-surveyor-evidence.tar.gz.sha256
 ```
 
 Run this final command in the Trainer image after handoff:
 
 ```bash
 train-scene.sh --check room
+MAX_STEPS=100 train-scene.sh room
 ```

@@ -8,19 +8,21 @@ Roadmap for the headless Surveyor COLMAP image.
 - Dockerfile uses pinned `colmap/colmap` image digest.
 - `validate-surveyor.sh`, `survey-scene.sh`, and `package-surveyor-scene.sh` exist.
 - Docker Hub publish workflow exists for `headless-surveyor-v0.1-dev`.
+- Pinned `runpodctl v2.5.0` and complete scene/evidence validation are implemented.
 - Trainer and `gsplat` runtime scripts were removed from this branch.
 - Local build and local script smoke checks passed according to the Surveyor handoff.
 
 ## Immediate Next Steps
 
-1. Run the Surveyor image on RunPod.
-2. Execute `validate-surveyor.sh` in the pod.
-3. Confirm COLMAP GPU visibility and behavior.
-4. Run `survey-scene.sh <scene>` on a real image set.
-5. Package the generated scene with `package-surveyor-scene.sh <scene>`.
-6. Move the generated scene package to the Trainer workflow.
-7. Confirm `train-scene.sh --check <scene>` passes in the Trainer image.
-8. Record real RunPod logs, model analyzer output, package path, and checksum.
+1. Publish the validated Surveyor image.
+2. Transfer 20–30 real images to RunPod with `runpodctl`.
+3. Execute `validate-surveyor.sh` and confirm NVIDIA visibility.
+4. Run `COLMAP_USE_GPU=1 survey-scene.sh <scene>`.
+5. Confirm GPU activity and inspect `model-analyzer.txt` without imposing quality thresholds yet.
+6. Validate and package the scene and evidence.
+7. Transfer the scene package to Trainer and verify its checksum.
+8. Complete `train-scene.sh --check <scene>` and a 100-step training run.
+9. Preserve all transfer commands, hashes, logs, manifests, and summaries for The Eye.
 
 ## Later Work
 

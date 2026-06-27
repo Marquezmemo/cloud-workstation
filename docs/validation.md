@@ -25,6 +25,8 @@ The Surveyor implementation report states that these local checks passed:
 - `survey-scene.sh --help` works.
 - `package-surveyor-scene.sh --help` works.
 - `package-surveyor-scene.sh` packaged a synthetic scene and generated a checksum.
+- Contract tests reject missing databases, malformed manifests, empty images, and empty sparse models.
+- Scene and evidence checksums remain valid after transfer to another directory.
 - The default `CMD` starts `runpod-keepalive.sh`, not the inherited COLMAP entrypoint.
 
 ## Current Validation Commands
@@ -81,6 +83,7 @@ A Surveyor scene is minimally valid when all of these exist:
 /workspace/logs/<scene>/colmap-match.log
 /workspace/logs/<scene>/colmap-mapper.log
 /workspace/logs/<scene>/model-analyzer.txt
+/workspace/logs/<scene>/surveyor-gpu.log
 /workspace/logs/<scene>/surveyor.summary
 ```
 
@@ -89,6 +92,8 @@ Packaging evidence:
 ```text
 /workspace/archives/<scene>/<scene>-surveyor-scene.tar.gz
 /workspace/archives/<scene>/<scene>-surveyor-scene.tar.gz.sha256
+/workspace/archives/<scene>/<scene>-surveyor-evidence.tar.gz
+/workspace/archives/<scene>/<scene>-surveyor-evidence.tar.gz.sha256
 ```
 
 ## Pending RunPod Validation
@@ -98,10 +103,10 @@ Packaging evidence:
 - Confirm COLMAP sees expected GPU/runtime state.
 - Run `survey-scene.sh <scene>` against a real image set.
 - Confirm `COLMAP_USE_GPU=1` behavior.
-- If GPU mode fails, confirm `COLMAP_USE_GPU=0` fallback.
-- Confirm `MATCHER=sequential` on a video-like capture set.
+- Confirm `surveyor-gpu.log` records GPU utilization or memory activity during feature extraction or matching.
 - Confirm package archive and checksum on a real scene.
-- Confirm the generated scene passes `train-scene.sh --check <scene>` in the Trainer image.
+- Transfer with `runpodctl` and record exact commands and hashes.
+- Confirm the generated scene passes `train-scene.sh --check <scene>` and a 100-step training run in the Trainer image.
 
 ## Known Risks
 

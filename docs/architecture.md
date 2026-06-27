@@ -28,6 +28,8 @@ colmap/colmap@sha256:187ca5ec98e55ed8fbec5f43f9d8f78b7a322b3b7413356634191f7a43c
 
 The default command is `runpod-keepalive.sh`, not the inherited COLMAP entrypoint.
 
+The image installs pinned `runpodctl v2.5.0` with build-time checksum verification for manual Mac/pod transfers.
+
 ## Workspace Contract
 
 ```text
@@ -45,6 +47,8 @@ The default command is `runpod-keepalive.sh`, not the inherited COLMAP entrypoin
 `/workspace/logs/<scene>` contains Surveyor/COLMAP logs and summaries.
 
 `/workspace/archives/<scene>` contains packaged scene archives and checksums.
+
+`validate-surveyor-scene.sh <scene>` is the shared contract gate used before handoff and packaging.
 
 ## Surveyor To Trainer Contract
 
@@ -83,7 +87,7 @@ colmap model_analyzer
 
 `MATCHER=exhaustive` is the default. `MATCHER=sequential` is available for video-like capture sets.
 
-`COLMAP_USE_GPU=1` is the default. `COLMAP_USE_GPU=0` is the documented fallback when GPU visibility or SIFT GPU behavior fails.
+`COLMAP_USE_GPU=1` is the default and requires a visible NVIDIA GPU before reconstruction starts. Surveyor records one-second GPU utilization and memory samples during feature extraction and matching. `COLMAP_USE_GPU=0` remains available for diagnostics, but it is not accepted for the first real smoke test.
 
 ## Boundaries
 

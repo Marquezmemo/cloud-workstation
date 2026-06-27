@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Purpose: Validate Surveyor image tools and writable workspace paths.
+# Input:   Optional workspace directory overrides through environment variables.
+# Output:  Tool, NVIDIA, and workspace diagnostics on stdout.
+
+# Workspace configuration
 WORKSPACE_ROOT="${WORKSPACE_ROOT:-/workspace}"
 INCOMING_DIR="${INCOMING_DIR:-${WORKSPACE_ROOT}/incoming}"
 SCENES_DIR="${SCENES_DIR:-${WORKSPACE_ROOT}/scenes}"
@@ -15,11 +20,13 @@ required_commands=(
   jq
   python3
   rsync
+  runpodctl
   sha256sum
   sqlite3
   tar
 )
 
+# Required tools
 echo "surveyor_image_version=${SURVEYOR_IMAGE_VERSION:-unknown}"
 echo "timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 echo
@@ -35,7 +42,9 @@ done
 echo
 colmap -h >/dev/null
 echo "colmap_help=success"
+echo "runpodctl_version=$(runpodctl version 2>&1 | tr '\n' ' ')"
 
+# Optional NVIDIA diagnostics
 if command -v nvidia-smi >/dev/null 2>&1; then
   if nvidia-smi >/tmp/surveyor-nvidia-smi.txt 2>&1; then
     echo "nvidia_smi=success"
@@ -47,6 +56,7 @@ else
   echo "nvidia_smi=not_installed"
 fi
 
+# Writable workspace
 echo
 for dir in "${INCOMING_DIR}" "${SCENES_DIR}" "${LOGS_DIR}" "${ARCHIVES_DIR}" "${TEMP_DIR}"; do
   mkdir -p "${dir}"

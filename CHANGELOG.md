@@ -1,5 +1,13 @@
 # Changelog
 
+## Surveyor Contract And Transfer Hardening
+
+- Added pinned `runpodctl v2.5.0` to the Surveyor image.
+- Added complete scene, database, manifest, sparse model, and evidence validation.
+- Added GPU preflight and utilization evidence for GPU reconstruction.
+- Added portable scene and evidence packages with verified relative checksums.
+- Added synthetic contract tests and validation-before-publish workflow gates.
+
 ## The Eye Documentation Review
 
 Aligned active documentation with the Surveyor COLMAP branch.

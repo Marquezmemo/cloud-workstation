@@ -72,10 +72,18 @@ Validate the image:
 validate-surveyor.sh
 ```
 
+The image includes pinned `runpodctl v2.5.0` for manual Mac/pod transfers.
+
 Run a minimal sparse reconstruction:
 
 ```bash
 survey-scene.sh <scene>
+```
+
+Validate a completed scene contract:
+
+```bash
+validate-surveyor-scene.sh <scene>
 ```
 
 Useful overrides:
@@ -91,6 +99,8 @@ Package a reconstructed scene:
 ```bash
 package-surveyor-scene.sh <scene>
 ```
+
+Packaging produces separate scene and evidence archives with portable SHA-256 records.
 
 ## Build
 
@@ -116,6 +126,7 @@ Validated locally:
 - `survey-scene.sh --help`
 - `package-surveyor-scene.sh --help`
 - synthetic scene packaging with checksum
+- complete scene contract tests, negative fixtures, and portable checksums
 - default `CMD ["runpod-keepalive.sh"]`
 
 Pending real validation:
@@ -124,7 +135,8 @@ Pending real validation:
 - COLMAP GPU visibility on RunPod
 - real sparse reconstruction under `/workspace/scenes/<scene>/sparse/0`
 - package and checksum for a real scene
-- Trainer acceptance with `train-scene.sh --check <scene>`
+- proof of GPU activity during COLMAP feature extraction or matching
+- Trainer acceptance plus a real 100-step training run
 
 ## Boundaries
 
