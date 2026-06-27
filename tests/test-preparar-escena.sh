@@ -10,6 +10,10 @@ fail() {
   exit 1
 }
 
+cleanup() {
+  rm -rf "${TEST_ROOT}"
+}
+
 resolve_command() {
   local command_name="$1"
   local repository_root
@@ -60,9 +64,21 @@ fixtures = {
     },
 }
 
+entries = list(fixtures[fixture_type].items())
 with zipfile.ZipFile(archive_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-    for name, content in fixtures[fixture_type].items():
+    for name, content in entries:
+        print(f"fixture_entry={name!r} size={len(content)}")
         archive.writestr(name, content)
+
+supported = {".jpg", ".jpeg", ".png", ".tif", ".tiff"}
+with zipfile.ZipFile(archive_path) as archive:
+    for info in archive.infolist():
+        extension = info.filename.rsplit(".", 1)[-1].casefold()
+        is_supported = f".{extension}" in supported
+        print(
+            f"zip_entry={info.filename!r} size={info.file_size} "
+            f"supported_image={str(is_supported).lower()}"
+        )
 PY
 }
 
@@ -86,18 +102,65 @@ assert_no_preparation_residue() {
   fi
 }
 
+print_incoming_tree() {
+  local incoming_path="$1"
+
+  echo "incoming_tree_begin"
+  if [[ ! -e "${incoming_path}" ]]; then
+    echo "missing_incoming_path=${incoming_path}"
+  elif find "${incoming_path}" -maxdepth 0 -printf '' >/dev/null 2>&1; then
+    find "${incoming_path}" -maxdepth 6 -printf '%y %p\n' | sort
+  else
+    find "${incoming_path}" -maxdepth 6 -print | sort
+  fi
+  echo "incoming_tree_end"
+}
+
 TEST_ROOT="$(mktemp -d /tmp/preparar-escena-test.XXXXXX)"
-trap 'rm -rf "${TEST_ROOT}"' EXIT
+trap cleanup EXIT
 PREPARER="$(resolve_command preparar-escena)"
 
 echo "test=zip_with_macos_metadata"
 MACOS_ROOT="${TEST_ROOT}/macos"
 mkdir -p "${MACOS_ROOT}"
-create_zip "${MACOS_ROOT}/prueba.zip" macos
-MACOS_OUTPUT="$(WORKSPACE_ROOT="${MACOS_ROOT}" "${PREPARER}")"
+ZIP_PATH="${MACOS_ROOT}/prueba.zip"
+STDOUT_FILE="${MACOS_ROOT}/preparar.stdout"
+STDERR_FILE="${MACOS_ROOT}/preparar.stderr"
+EXPECTED_FIRST_IMAGE="${MACOS_ROOT}/incoming/prueba/images/IMG_001.JPG"
+EXPECTED_SECOND_IMAGE="${MACOS_ROOT}/incoming/prueba/images/IMG_002.png"
+
+create_zip "${ZIP_PATH}" macos
+unzip -l "${ZIP_PATH}"
+
+if WORKSPACE_ROOT="${MACOS_ROOT}" "${PREPARER}" \
+    >"${STDOUT_FILE}" 2>"${STDERR_FILE}"; then
+  PREPARE_EXIT_CODE=0
+else
+  PREPARE_EXIT_CODE=$?
+fi
+
+echo "prepare_exit_code=${PREPARE_EXIT_CODE}"
+echo "prepare_stdout_begin"
+cat "${STDOUT_FILE}"
+echo "prepare_stdout_end"
+echo "prepare_stderr_begin"
+cat "${STDERR_FILE}"
+echo "prepare_stderr_end"
+
+printf 'expected_image=%q\n' "${EXPECTED_FIRST_IMAGE}"
+printf 'expected_image=%q\n' "${EXPECTED_SECOND_IMAGE}"
+if [[ -d "$(dirname -- "${EXPECTED_FIRST_IMAGE}")" ]]; then
+  ls -lb "$(dirname -- "${EXPECTED_FIRST_IMAGE}")"
+else
+  echo "missing_expected_directory=$(dirname -- "${EXPECTED_FIRST_IMAGE}")"
+fi
+print_incoming_tree "${MACOS_ROOT}/incoming"
+
+test "${PREPARE_EXIT_CODE}" -eq 0 || fail "preparar-escena exited with ${PREPARE_EXIT_CODE}"
+MACOS_OUTPUT="$(<"${STDOUT_FILE}")"
 [[ -f "${MACOS_ROOT}/prueba.zip" ]] || fail "original ZIP was moved"
-[[ -f "${MACOS_ROOT}/incoming/prueba/images/IMG_001.JPG" ]] || fail "missing first image"
-[[ -f "${MACOS_ROOT}/incoming/prueba/images/IMG_002.png" ]] || fail "missing second image"
+[[ -f "${EXPECTED_FIRST_IMAGE}" ]] || fail "missing first image"
+[[ -f "${EXPECTED_SECOND_IMAGE}" ]] || fail "missing second image"
 [[ "$(find "${MACOS_ROOT}/incoming/prueba/images" -type f | wc -l | tr -d ' ')" == "2" ]] || fail "unexpected image count"
 [[ ! -e "${MACOS_ROOT}/incoming/prueba/images/._IMG_001.JPG" ]] || fail "macOS resource fork was copied"
 [[ ! -e "${MACOS_ROOT}/scenes/prueba" ]] || fail "processed scene was created"
