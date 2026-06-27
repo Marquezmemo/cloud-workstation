@@ -14,6 +14,7 @@ echo "Container is running in headless keepalive mode for RunPod."
 echo
 echo "Useful validation commands:"
 echo "  validate-surveyor.sh"
+echo "  gdown --version"
 echo "  runpodctl version"
 echo "  survey-scene.sh <scene>"
 echo "  validate-surveyor-scene.sh <scene>"

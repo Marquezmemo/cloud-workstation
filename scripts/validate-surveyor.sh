@@ -17,6 +17,7 @@ required_commands=(
   bash
   colmap
   ffmpeg
+  gdown
   jq
   python3
   rsync
@@ -40,8 +41,69 @@ for command_name in "${required_commands[@]}"; do
 done
 
 echo
-colmap -h >/dev/null
-echo "colmap_help=success"
+COLMAP_HELP="$(colmap -h 2>&1)"
+COLMAP_HEADER="$(grep -m1 -E '^COLMAP [0-9]' <<< "${COLMAP_HELP}" || true)"
+EXPECTED_COLMAP_VERSION="${SURVEYOR_COLMAP_VERSION:-3.10}"
+EXPECTED_CUDA_VERSION="${SURVEYOR_CUDA_VERSION:-12.3.1}"
+EXPECTED_UBUNTU_VERSION="${SURVEYOR_UBUNTU_VERSION:-22.04}"
+EXPECTED_GDOWN_VERSION="${SURVEYOR_GDOWN_VERSION:-6.1.0}"
+OS_VERSION="$(. /etc/os-release && printf '%s' "${VERSION_ID:-unknown}")"
+
+[[ "${COLMAP_HEADER}" == *"COLMAP ${EXPECTED_COLMAP_VERSION}"* ]] || {
+  echo "ERROR: expected COLMAP ${EXPECTED_COLMAP_VERSION}, got: ${COLMAP_HEADER}" >&2
+  exit 1
+}
+[[ "${CUDA_VERSION:-unknown}" == "${EXPECTED_CUDA_VERSION}" ]] || {
+  echo "ERROR: expected CUDA_VERSION=${EXPECTED_CUDA_VERSION}, got: ${CUDA_VERSION:-unknown}" >&2
+  exit 1
+}
+[[ "${OS_VERSION}" == "${EXPECTED_UBUNTU_VERSION}" ]] || {
+  echo "ERROR: expected Ubuntu ${EXPECTED_UBUNTU_VERSION}, got: ${OS_VERSION}" >&2
+  exit 1
+}
+[[ "${NVIDIA_REQUIRE_CUDA:-}" == *"cuda>=12.3"* ]] || {
+  echo "ERROR: expected NVIDIA_REQUIRE_CUDA to include cuda>=12.3, got: ${NVIDIA_REQUIRE_CUDA:-unset}" >&2
+  exit 1
+}
+
+for colmap_command in \
+  feature_extractor \
+  exhaustive_matcher \
+  sequential_matcher \
+  mapper \
+  model_analyzer; do
+  colmap "${colmap_command}" -h >/dev/null
+  echo "colmap_command_${colmap_command}=present"
+done
+
+FEATURE_HELP="$(colmap feature_extractor -h 2>&1)"
+MATCH_HELP="$(colmap exhaustive_matcher -h 2>&1)"
+for required_option in \
+  --ImageReader.camera_model \
+  --ImageReader.single_camera \
+  --SiftExtraction.use_gpu; do
+  grep -Fq -- "${required_option}" <<< "${FEATURE_HELP}" || {
+    echo "ERROR: missing COLMAP feature option: ${required_option}" >&2
+    exit 1
+  }
+done
+grep -Fq -- '--SiftMatching.use_gpu' <<< "${MATCH_HELP}" || {
+  echo "ERROR: missing COLMAP matching option: --SiftMatching.use_gpu" >&2
+  exit 1
+}
+
+GDOWN_VERSION_OUTPUT="$(gdown --version 2>&1)"
+[[ "${GDOWN_VERSION_OUTPUT}" == *"${EXPECTED_GDOWN_VERSION}"* ]] || {
+  echo "ERROR: expected gdown ${EXPECTED_GDOWN_VERSION}, got: ${GDOWN_VERSION_OUTPUT}" >&2
+  exit 1
+}
+
+echo "colmap_version=${COLMAP_HEADER}"
+echo "colmap_commit=${SURVEYOR_COLMAP_COMMIT:-unknown}"
+echo "cuda_version=${CUDA_VERSION}"
+echo "ubuntu_version=${OS_VERSION}"
+echo "nvidia_require_cuda=${NVIDIA_REQUIRE_CUDA}"
+echo "gdown_version=${GDOWN_VERSION_OUTPUT}"
 echo "runpodctl_version=$(runpodctl version 2>&1 | tr '\n' ' ')"
 
 # Optional NVIDIA diagnostics

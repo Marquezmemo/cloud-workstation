@@ -188,6 +188,7 @@ MAPPER_ARGS=(
 )
 
 # Environment evidence
+COLMAP_VERSION_OUTPUT="$(colmap -h 2>&1 | grep -m1 -E '^COLMAP [0-9]' || true)"
 {
   echo "scene=${SCENE_NAME}"
   echo "started_at=$(timestamp)"
@@ -199,7 +200,12 @@ MAPPER_ARGS=(
   echo "camera_model=${CAMERA_MODEL}"
   echo "max_image_size=${MAX_IMAGE_SIZE}"
   echo "input_image_count=${INPUT_IMAGE_COUNT}"
-  echo "colmap_version=$(colmap -h 2>&1 | sed -n '1p')"
+  echo "colmap_version=${COLMAP_VERSION_OUTPUT:-unknown}"
+  echo "colmap_commit=${SURVEYOR_COLMAP_COMMIT:-unknown}"
+  echo "cuda_version=${CUDA_VERSION:-unknown}"
+  echo "ubuntu_version=${SURVEYOR_UBUNTU_VERSION:-unknown}"
+  echo "nvidia_require_cuda=${NVIDIA_REQUIRE_CUDA:-unknown}"
+  echo "gdown_version=$(gdown --version 2>&1 | tr '\n' ' ')"
   echo "runpodctl_version=$(runpodctl version 2>&1 | tr '\n' ' ')"
 } > "${LOG_DIR}/surveyor.env"
 

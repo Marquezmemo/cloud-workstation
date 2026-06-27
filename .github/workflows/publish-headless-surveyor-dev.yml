@@ -42,7 +42,12 @@ jobs:
             org.opencontainers.image.title=cloud-workstation
             org.opencontainers.image.version=headless-surveyor-v0.1-dev
             org.opencontainers.image.description=Headless COLMAP image for photogrammetry reconstruction before Gaussian Splatting training.
-            org.opencontainers.image.base.name=colmap/colmap@sha256:187ca5ec98e55ed8fbec5f43f9d8f78b7a322b3b7413356634191f7a43c1efcf
+            org.opencontainers.image.base.name=colmap/colmap:20240723.601@sha256:73003557e3ffa36d801e71b7630c117f9d373c55f24e3afc6791b9b3d1ec01da
+            io.cloud-workstation.colmap.version=3.10
+            io.cloud-workstation.colmap.commit=0bd66d901c7549051e21e8f648777f802eb20a73
+            io.cloud-workstation.cuda.version=12.3.1
+            io.cloud-workstation.ubuntu.version=22.04
+            io.cloud-workstation.gdown.version=6.1.0
 
       - name: Validate image tools without GPU
         run: |

@@ -72,7 +72,17 @@ Validate the image:
 validate-surveyor.sh
 ```
 
-The image includes pinned `runpodctl v2.5.0` for manual Mac/pod transfers. Installation is implemented; successful end-to-end transfer still requires preserved evidence.
+The image includes pinned `runpodctl v2.5.0` for manual Mac/pod transfers and pinned `gdown 6.1.0` for one-way downloads from temporarily shared Google Drive links. Successful end-to-end transfer still requires preserved evidence.
+
+Download a prepared input archive from Google Drive:
+
+```bash
+mkdir -p /workspace/incoming/<scene>
+gdown '<shared-drive-url>' \
+  -O /workspace/incoming/<scene>/<scene>-input.tar.gz
+```
+
+Verify its SHA-256 before extracting it. Do not bake Google credentials or cookies into the image.
 
 Run a minimal sparse reconstruction:
 
@@ -121,7 +131,8 @@ docker run --rm --platform linux/amd64 \
 
 Implemented and directly verifiable in the repository:
 
-- pinned base image and `runpodctl v2.5.0`
+- COLMAP 3.10/CUDA 12.3.1 base pinned by digest
+- pinned `runpodctl v2.5.0` and hashed `gdown 6.1.0` dependency lock
 - complete scene validator and validation-before-packaging gate
 - portable scene and evidence packages
 - default `CMD ["runpod-keepalive.sh"]`
@@ -140,6 +151,8 @@ Reported by earlier implementation work without preserved logs:
 
 Pending real validation:
 
+- RunPod startup compatibility with the COLMAP 3.10/CUDA 12.3.1 image
+- one shared-link `gdown` download with checksum evidence
 - RunPod smoke test with real images
 - COLMAP GPU visibility on RunPod
 - real sparse reconstruction under `/workspace/scenes/<scene>/sparse/0`

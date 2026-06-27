@@ -23,12 +23,16 @@ Trainer validation with train-scene.sh --check <scene>
 The image is based on the pinned official COLMAP image:
 
 ```text
-colmap/colmap@sha256:187ca5ec98e55ed8fbec5f43f9d8f78b7a322b3b7413356634191f7a43c1efcf
+colmap/colmap:20240723.601@sha256:73003557e3ffa36d801e71b7630c117f9d373c55f24e3afc6791b9b3d1ec01da
 ```
+
+This immutable base provides COLMAP 3.10, CUDA 12.3.1, and Ubuntu 22.04. The previous base required CUDA 12.9 and was rejected by the selected RunPod host before container startup.
 
 The default command is `runpod-keepalive.sh`, not the inherited COLMAP entrypoint.
 
 The image installs pinned `runpodctl v2.5.0` with build-time checksum verification for manual Mac/pod transfers.
+
+The image installs `gdown 6.1.0` and all transitive Python dependencies from a hashed lock. `gdown` is limited to one-way downloads from temporarily shared links; it does not replace `runpodctl` for output transfer.
 
 ## Workspace Contract
 

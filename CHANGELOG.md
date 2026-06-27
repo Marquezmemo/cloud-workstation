@@ -1,5 +1,13 @@
 # Changelog
 
+## Surveyor CUDA Compatibility And Drive Intake
+
+- Replaced the CUDA 12.9 COLMAP base with pinned COLMAP 3.10/CUDA 12.3.1 on Ubuntu 22.04.
+- Added runtime fingerprint gates for COLMAP, CUDA, SIFT options, and required commands.
+- Added pinned `gdown 6.1.0` with a fully hashed Linux/Python 3.10 dependency lock.
+- Documented checksum-verified downloads from temporarily shared Google Drive links.
+- Recorded the rejected CUDA 12.9 startup as operator-reported evidence, not a Surveyor smoke test.
+
 ## Manual Validation Evidence Policy
 
 - Separated implemented, locally verified, operator-reported, evidence-backed, and pending states.

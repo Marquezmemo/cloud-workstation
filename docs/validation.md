@@ -22,7 +22,7 @@ The Eye interviews the operator after each manual RunPod test and checks the ans
 
 1. local date and test purpose
 2. branch, commit, image tag, and image digest when available
-3. pod/GPU, NVIDIA driver, CUDA, COLMAP, and `runpodctl` versions
+3. pod/GPU, NVIDIA driver, CUDA, COLMAP, `gdown`, and `runpodctl` versions
 4. scene name, source, image count, and matcher
 5. exact commands in execution order and relevant environment variables
 6. exit status, observed result, retries, errors, and manual interventions
@@ -48,8 +48,10 @@ docker.io/${DOCKERHUB_USERNAME}/cloud-workstation:headless-surveyor-v0.1-dev
 Base image:
 
 ```text
-colmap/colmap@sha256:187ca5ec98e55ed8fbec5f43f9d8f78b7a322b3b7413356634191f7a43c1efcf
+colmap/colmap:20240723.601@sha256:73003557e3ffa36d801e71b7630c117f9d373c55f24e3afc6791b9b3d1ec01da
 ```
+
+Expected runtime fingerprint: COLMAP 3.10, CUDA 12.3.1, Ubuntu 22.04, `gdown 6.1.0`, and `runpodctl 2.5.0`.
 
 ## Local And Reported Validation
 
@@ -66,6 +68,8 @@ Reported by earlier implementation work without preserved logs:
 - `survey-scene.sh --help` works.
 - `package-surveyor-scene.sh --help` works.
 - `package-surveyor-scene.sh` packaged a synthetic scene and generated a checksum.
+
+Operator-reported on 2026-06-27: the prior image downloaded successfully but the NVIDIA runtime rejected it before startup with `unsatisfied condition: cuda>=12.9`. No Surveyor script or COLMAP command executed, so that attempt is not a Surveyor smoke test. See `docs/validation-runs/2026-06-27-surveyor-startup-cuda-compatibility.md`.
 
 Implemented and directly verifiable: the default `CMD` starts `runpod-keepalive.sh`, not the inherited COLMAP entrypoint.
 
@@ -139,7 +143,9 @@ Packaging evidence:
 ## Pending RunPod Validation
 
 - Start `headless-surveyor-v0.1-dev` on RunPod.
+- Confirm the COLMAP 3.10/CUDA 12.3.1 image starts without the previous CUDA requirement error.
 - Confirm `validate-surveyor.sh` passes on RunPod.
+- Download one shared-link input archive with `gdown` and verify its source/destination SHA-256 values.
 - Confirm COLMAP sees expected GPU/runtime state.
 - Run `survey-scene.sh <scene>` against a real image set.
 - Confirm `COLMAP_USE_GPU=1` behavior.
@@ -150,7 +156,7 @@ Packaging evidence:
 
 ## Known Risks
 
-- The official COLMAP image still needs RunPod GPU validation.
+- The replacement COLMAP 3.10/CUDA 12.3.1 image still needs RunPod startup and GPU validation.
 - SIFT GPU extraction or matching may fail without visible NVIDIA runtime.
 - `exhaustive_matcher` scales poorly for larger image sets.
 - COLMAP may produce multiple sparse components; v0.1 expects `sparse/0`.

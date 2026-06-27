@@ -8,12 +8,13 @@ Operator command reference for `headless-surveyor-v0.1-dev`.
 validate-surveyor.sh
 ```
 
-This checks required commands, COLMAP help, pinned `runpodctl`, optional `nvidia-smi`, and writable workspace paths.
+This checks COLMAP 3.10/CUDA 12.3.1, required COLMAP commands and SIFT flags, pinned `gdown` and `runpodctl`, optional `nvidia-smi`, and writable workspace paths.
 
 Confirm the transfer client directly:
 
 ```bash
 runpodctl version
+gdown --version
 ```
 
 ## Prepare Input Images
@@ -31,6 +32,21 @@ mkdir -p /workspace/incoming/room/images
 ```
 
 Copy image files into that directory before running Surveyor.
+
+### Download a shared Drive archive
+
+Create an archive whose top-level entry is `images/`, record its SHA-256 before uploading it to Drive, and temporarily enable link-based read access. In the pod:
+
+```bash
+mkdir -p /workspace/incoming/room
+gdown '<shared-drive-url>' \
+  -O /workspace/incoming/room/room-input.tar.gz
+sha256sum /workspace/incoming/room/room-input.tar.gz
+tar -xzf /workspace/incoming/room/room-input.tar.gz \
+  -C /workspace/incoming/room
+```
+
+Compare the downloaded SHA-256 with the source value before extraction. Do not store Drive URLs, cookies, or credentials in Git. `gdown` does not upload results.
 
 ## Run Sparse Reconstruction
 
