@@ -268,8 +268,11 @@ manifest = {
 
 with open(sys.argv[1], "w", encoding="utf-8") as f:
     json.dump(manifest, f, indent=2)
-    f.write("\\n")
+    f.write("\n")
 PY
+
+jq -e . "${SCENE_PATH}/surveyor-manifest.json" >/dev/null \
+  || fail "generated manifest is not valid JSON: ${SCENE_PATH}/surveyor-manifest.json"
 
 WORKSPACE_ROOT="${WORKSPACE_ROOT}" \
 SCENE_PATH="${SCENE_PATH}" \

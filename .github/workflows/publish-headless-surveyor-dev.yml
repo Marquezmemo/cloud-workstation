@@ -63,6 +63,14 @@ jobs:
             docker.io/${{ secrets.DOCKERHUB_USERNAME }}/cloud-workstation:headless-surveyor-v0.1-dev \
             /tests/test-surveyor-contract.sh
 
+      - name: Test Surveyor manifest generation
+        run: |
+          docker run --rm \
+            --entrypoint bash \
+            -v "${{ github.workspace }}/tests:/tests:ro" \
+            docker.io/${{ secrets.DOCKERHUB_USERNAME }}/cloud-workstation:headless-surveyor-v0.1-dev \
+            /tests/test-survey-scene-manifest.sh
+
       - name: Test ZIP scene preparation
         run: |
           docker run --rm \
