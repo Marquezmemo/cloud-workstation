@@ -18,7 +18,7 @@ docker.io/${DOCKERHUB_USERNAME}/cloud-workstation:headless-surveyor-v0.1-dev
 
 Surveyor prepares datasets for the Trainer. It is not the Trainer image and does not install `gsplat`.
 
-The first contract is a COLMAP sparse reconstruction under:
+The current output shape is a COLMAP sparse reconstruction under:
 
 ```text
 /workspace/scenes/<scene>/
@@ -29,10 +29,11 @@ The first contract is a COLMAP sparse reconstruction under:
         +-- cameras.bin
         +-- images.bin
         +-- points3D.bin
+    +-- possible additional models
 +-- surveyor-manifest.json
 ```
 
-The Trainer should be able to validate the generated scene with:
+The generated scene is a Trainer candidate. Do not treat it as Trainer-ready until the best sparse model has been identified and normalized. The conditional Trainer check is:
 
 ```bash
 train-scene.sh --check <scene>
@@ -58,7 +59,13 @@ Expected input:
 Expected output:
 
 ```text
-/workspace/scenes/<scene>
+/workspace/scenes/<scene>/
+├── images/
+├── database.db
+├── sparse/
+│   ├── 0/
+│   └── possible additional models
+└── surveyor-manifest.json
 ```
 
 ## Commands
@@ -116,6 +123,8 @@ package-surveyor-scene.sh <scene>
 
 Packaging produces separate scene and evidence archives with portable SHA-256 records.
 
+`runpodctl send` can then export the scene archive, evidence archive, and both checksum files. The first real run confirmed sender-side progress, speed, transferred bytes, and percentage. Receiving and destination checksum verification remain separate evidence requirements.
+
 ## Build
 
 ```bash
@@ -130,6 +139,20 @@ docker run --rm --platform linux/amd64 \
   cloud-workstation:headless-surveyor-v0.1-dev \
   validate-surveyor.sh
 ```
+
+## First Real Run
+
+The first real RunPod run is recorded in [docs/validation-runs/2026-06-27-prueba-01-real-run.md](docs/validation-runs/2026-06-27-prueba-01-real-run.md).
+
+Validated with evidence for `prueba-01`:
+
+- 30 prepared input images and 30 images in `database.db`
+- exhaustive matching, GPU enabled, single camera, and `OPENCV`
+- COLMAP `3.10-dev`, CUDA `12.3.1`, Ubuntu `22.04`, `gdown 6.1.0`, and `runpodctl 2.5.0-2fac5fb`
+- successful ZIP preparation, reconstruction execution, package generation, portable checksums, and `runpodctl send`
+- GPU telemetry from an NVIDIA GeForce RTX 4090
+
+Critical limitation: `model-analyzer.txt` reports only 2 registered images in `sparse/0`, while the mapper log later reaches 30 registered images in another reconstruction. The current scripts assume `sparse/0`; therefore the Trainer handoff is not validated.
 
 ## Validation Status
 
@@ -157,14 +180,12 @@ Reported by earlier implementation work without preserved logs:
 
 Pending real validation:
 
-- RunPod startup compatibility with the COLMAP 3.10/CUDA 12.3.1 image
-- one shared-link `gdown` download with checksum evidence
-- RunPod smoke test with real images
-- COLMAP GPU visibility on RunPod
-- real sparse reconstruction under `/workspace/scenes/<scene>/sparse/0`
-- package and checksum for a real scene
-- proof of GPU activity during COLMAP feature extraction or matching
+- identify and normalize the sparse model with the highest registered-image count
+- permanently correct manifest newline generation and repeat a clean run
+- verify `runpodctl` reception and checksums at the destination
 - Trainer acceptance plus a real 100-step training run
+
+Known usability gap: packaging may remain silent while compressing. Stage messages and byte-based progress are proposed but not implemented.
 
 ## Boundaries
 

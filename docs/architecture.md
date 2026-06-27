@@ -13,9 +13,11 @@ raw images
 |
 Surveyor COLMAP sparse reconstruction
 |
-/workspace/scenes/<scene>
+/workspace/scenes/<scene>/sparse/*
 |
-Trainer validation with train-scene.sh --check <scene>
+best sparse model selection and normalization
+|
+conditional Trainer validation with train-scene.sh --check <scene>
 ```
 
 ## Runtime Base
@@ -49,13 +51,13 @@ The image installs `gdown 6.1.0` and all transitive Python dependencies from a h
 
 `preparar-escena` validates a ZIP in temporary storage, flattens supported images without collisions, and atomically creates both `images/` and the preserved ZIP under `source/`. It never writes to `/workspace/scenes`.
 
-`/workspace/scenes/<scene>` is the Trainer-ready scene output.
+`/workspace/scenes/<scene>` is a candidate Trainer input. COLMAP may write multiple sparse models; it is Trainer-ready only after the best model has been identified and the output contract points to it consistently.
 
 `/workspace/logs/<scene>` contains Surveyor/COLMAP logs and summaries.
 
 `/workspace/archives/<scene>` contains packaged scene archives and checksums.
 
-`validate-surveyor-scene.sh <scene>` is the shared contract gate used before handoff and packaging.
+`validate-surveyor-scene.sh <scene>` is the current structural gate used before packaging. It validates `sparse/0` by presence and consistency but does not compare all sparse models or prove that `sparse/0` has the highest registered-image count.
 
 ## Surveyor To Trainer Contract
 
@@ -70,10 +72,13 @@ The generated scene must include:
         +-- cameras.bin
         +-- images.bin
         +-- points3D.bin
+    +-- possible additional models
 +-- surveyor-manifest.json
 ```
 
-The Trainer handoff check is:
+The first real run demonstrated that this contract is incomplete: `sparse/0` contained only 2 registered images, while `colmap-mapper.log` later reached 30. Best-model selection and contract normalization are critical prerequisites for Trainer handoff.
+
+After the sparse-model issue is resolved, the Trainer handoff check is:
 
 ```bash
 train-scene.sh --check <scene>

@@ -53,6 +53,27 @@ colmap/colmap:20240723.601@sha256:73003557e3ffa36d801e71b7630c117f9d373c55f24e3a
 
 Expected runtime fingerprint: COLMAP 3.10, CUDA 12.3.1, Ubuntu 22.04, `gdown 6.1.0`, and `runpodctl 2.5.0`.
 
+## First Real Run: prueba-01
+
+The evidence-backed record is [2026-06-27-prueba-01-real-run.md](validation-runs/2026-06-27-prueba-01-real-run.md).
+
+Validated:
+
+- RunPod startup and Surveyor runtime fingerprint
+- 30 prepared input images and 30 images in `database.db`
+- exhaustive matcher, GPU enabled, single camera, and `OPENCV`
+- feature extraction and matching with RTX 4090 telemetry
+- ZIP preparation, scene/evidence packaging, and portable checksums
+- sender-side export with `runpodctl send`
+
+Not validated:
+
+- Trainer handoff
+- receiving and checksum verification at the transfer destination
+- automatic selection of the best sparse model
+
+Critical evidence conflict: `model-analyzer.txt` reports 2 registered images in `sparse/0`, while `colmap-mapper.log` later reaches 30 registered images. `database_images=30` does not resolve this conflict. The current validator checks `sparse/0` structurally but does not compare sparse models.
+
 ## Local And Reported Validation
 
 Locally verified on 2026-06-27 against commit `12428f2`:
@@ -123,9 +144,9 @@ Package a reconstructed scene:
 package-surveyor-scene.sh <scene>
 ```
 
-## Minimum Successful Scene Evidence
+## Current Structural Validation Gate
 
-A Surveyor scene is minimally valid when all of these exist:
+The current scripts accept a Surveyor scene when all of these exist:
 
 ```text
 /workspace/scenes/<scene>/images
@@ -143,6 +164,8 @@ A Surveyor scene is minimally valid when all of these exist:
 /workspace/logs/<scene>/surveyor.summary
 ```
 
+Passing this gate does not prove that `sparse/0` is the best reconstruction or that it contains every database image. It is sufficient for packaging, not for declaring Trainer handoff validated.
+
 Packaging evidence:
 
 ```text
@@ -152,25 +175,21 @@ Packaging evidence:
 /workspace/archives/<scene>/<scene>-surveyor-evidence.tar.gz.sha256
 ```
 
-## Pending RunPod Validation
+## Pending Validation
 
-- Start `headless-surveyor-v0.1-dev` on RunPod.
-- Confirm the COLMAP 3.10/CUDA 12.3.1 image starts without the previous CUDA requirement error.
-- Confirm `validate-surveyor.sh` passes on RunPod.
-- Download one shared-link input archive with `gdown` and verify its source/destination SHA-256 values.
-- Confirm COLMAP sees expected GPU/runtime state.
-- Run `survey-scene.sh <scene>` against a real image set.
-- Confirm `COLMAP_USE_GPU=1` behavior.
-- Confirm `surveyor-gpu.log` records GPU utilization or memory activity during feature extraction or matching.
-- Confirm package archive and checksum on a real scene.
-- Transfer with `runpodctl` and record exact commands and hashes.
+- Identify every sparse model generated for `prueba-01` and select the one with the highest registered-image count.
+- Normalize the selected model path in the scene contract, manifest, analyzer, and validator.
+- Apply the permanent manifest newline correction; the evidence package contains the manually repaired manifest, not proof of the repository fix.
+- Repeat a clean real run after those corrections.
+- Receive the `runpodctl` exports and verify checksums at the destination.
 - Confirm the generated scene passes `train-scene.sh --check <scene>` and a 100-step training run in the Trainer image.
 
 ## Known Risks
 
-- The replacement COLMAP 3.10/CUDA 12.3.1 image still needs RunPod startup and GPU validation.
 - SIFT GPU extraction or matching may fail without visible NVIDIA runtime.
 - `exhaustive_matcher` scales poorly for larger image sets.
-- COLMAP may produce multiple sparse components; v0.1 expects `sparse/0`.
+- COLMAP can produce multiple sparse components; v0.1 analyzes and validates `sparse/0` without proving it is the best model.
+- The current manifest source can emit literal `\n`; the first run was repaired manually and the permanent correction remains pending.
+- Packaging can remain silent during compression; byte-based progress is not implemented.
 - Dense reconstruction is intentionally excluded from v0.1.
 - Capture quality requirements are not formalized yet.

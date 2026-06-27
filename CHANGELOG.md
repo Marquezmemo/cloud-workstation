@@ -1,5 +1,15 @@
 # Changelog
 
+## First Real Surveyor Run Documentation
+
+- Recorded evidence from `prueba-01`, the first real 30-image RunPod run.
+- Validated the runtime fingerprint, ZIP intake, GPU execution, package/checksum generation, and sender-side `runpodctl send`.
+- Recorded evidence checksums `7c3129ed0c26ce6eee9b2df160cae5af97077dbfe74619085b8dce93086af1cd` and `12b89e5d3c54270c71b2c03b8b81beb547cf1bf16f28331405489c93afd02dbc`.
+- Blocked Trainer handoff because `sparse/0` reports 2 registered images while a later mapper reconstruction reaches 30.
+- Distinguished the manually repaired run manifest from the permanent source correction, which remains pending.
+- Recorded the successful preparation-test isolation in `771107f`, cleanup in `946b732`, and workflow run `28295373995`.
+- Added packaging progress as a pending usability improvement; no progress feature is claimed as implemented.
+
 ## Transactional ZIP Scene Preparation
 
 - Added `unzip` and the `preparar-escena [archivo.zip]` operator command.

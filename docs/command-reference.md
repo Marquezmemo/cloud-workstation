@@ -108,8 +108,11 @@ MAX_IMAGE_SIZE=1600 survey-scene.sh room
         +-- cameras.bin
         +-- images.bin
         +-- points3D.bin
+    +-- possible additional models
 +-- surveyor-manifest.json
 ```
+
+COLMAP may create more than one numeric subdirectory under `sparse/`. The current automation analyzes `sparse/0` only. Before Trainer handoff, inspect every generated model and identify the one with the greatest registered-image count.
 
 ## Inspect Logs
 
@@ -118,6 +121,15 @@ ls -lah /workspace/logs/room
 cat /workspace/logs/room/surveyor.summary
 cat /workspace/logs/room/model-analyzer.txt
 ```
+
+List generated sparse models and inspect each one manually:
+
+```bash
+find /workspace/scenes/room/sparse -mindepth 1 -maxdepth 1 -type d -print
+colmap model_analyzer --path /workspace/scenes/room/sparse/0
+```
+
+Repeat `model_analyzer` for every numeric model directory. Presence of valid files in `sparse/0` is not evidence that it is the best model.
 
 Key logs:
 
@@ -135,6 +147,8 @@ Validate the complete scene first:
 ```bash
 validate-surveyor-scene.sh room
 ```
+
+This is currently a structural check of `sparse/0`, the database, manifest, and logs. It does not compare multiple sparse models or validate the model with the highest registered-image count.
 
 ```bash
 package-surveyor-scene.sh room
@@ -163,11 +177,20 @@ Mac to pod: run `runpodctl send <input-archive>` on the Mac, then run `runpodctl
 
 Pod to Trainer or Mac: send each scene/evidence archive and its `.sha256` file from the Surveyor pod, receive it at the destination, then run `sha256sum -c` beside the received archive.
 
-`runpodctl` installation is implemented, but transfer behavior is pending evidence-backed validation. Record direction, exact command shape, file size, hashes at both ends, duration, result, and any retry. Do not store credentials or ephemeral transfer codes in Git.
+The first real run validated sender-side `runpodctl send`, including real progress, speed, transferred bytes, and percentage. Receiving and destination checksum verification remain pending. Record direction, exact command shape, file size, hashes at both ends, duration, result, and any retry. Do not store credentials or ephemeral transfer codes in Git.
+
+For a completed Surveyor scene:
+
+```bash
+runpodctl send /workspace/archives/room/room-surveyor-scene.tar.gz
+runpodctl send /workspace/archives/room/room-surveyor-scene.tar.gz.sha256
+runpodctl send /workspace/archives/room/room-surveyor-evidence.tar.gz
+runpodctl send /workspace/archives/room/room-surveyor-evidence.tar.gz.sha256
+```
 
 ## Trainer Handoff
 
-After the packaged scene is transferred and unpacked into the Trainer workspace, validate it from the Trainer image:
+Do not hand off a scene merely because `validate-surveyor-scene.sh` and packaging succeed. First identify and normalize the best sparse model. After that correction, transfer and unpack the scene in Trainer and run:
 
 ```bash
 train-scene.sh --check room
@@ -178,20 +201,42 @@ MAX_STEPS=100 train-scene.sh room
 
 ## Full Smoke Sequence
 
+The first real run required manual manifest repair before validation. On commit `946b732`, stop and preserve the error if `validate-surveyor-scene.sh` reports invalid JSON; follow the troubleshooting guidance below rather than claiming an uninterrupted successful flow.
+
 ```bash
+cd /workspace
 validate-surveyor.sh
-preparar-escena /workspace/room.zip
-COLMAP_USE_GPU=1 survey-scene.sh room
-validate-surveyor-scene.sh room
-package-surveyor-scene.sh room
-cd /workspace/archives/room
-sha256sum -c room-surveyor-scene.tar.gz.sha256
-sha256sum -c room-surveyor-evidence.tar.gz.sha256
+gdown 'URL_DE_GOOGLE_DRIVE' -O prueba-01.zip
+preparar-escena /workspace/prueba-01.zip
+survey-scene.sh prueba-01
+validate-surveyor-scene.sh prueba-01
+package-surveyor-scene.sh prueba-01
+cd /workspace/archives/prueba-01
+sha256sum -c prueba-01-surveyor-scene.tar.gz.sha256
+sha256sum -c prueba-01-surveyor-evidence.tar.gz.sha256
+runpodctl send /workspace/archives/prueba-01/prueba-01-surveyor-scene.tar.gz
+runpodctl send /workspace/archives/prueba-01/prueba-01-surveyor-scene.tar.gz.sha256
+runpodctl send /workspace/archives/prueba-01/prueba-01-surveyor-evidence.tar.gz
+runpodctl send /workspace/archives/prueba-01/prueba-01-surveyor-evidence.tar.gz.sha256
 ```
 
-Run this final command in the Trainer image after handoff:
+Run the Trainer commands only after best-model selection is resolved:
 
 ```bash
 train-scene.sh --check room
 MAX_STEPS=100 train-scene.sh room
 ```
+
+## Troubleshooting
+
+### Manifest rejected by jq
+
+The first real run produced a manifest ending in literal `\n`, which made the JSON invalid. The run artifact was repaired manually and then passed `validate-surveyor-scene.sh`. Preserve the original error and repair evidence before retrying. The permanent source correction is still pending in commit `946b732`; do not describe manual repair as a repository fix.
+
+### Mapper reaches more images than model-analyzer
+
+`database_images=30` means the database contains 30 images; it does not mean that the analyzed sparse model registered all 30. In `prueba-01`, the mapper log reached 30 registered images, but `model-analyzer.txt` for `sparse/0` reported only 2. Inspect every `sparse/*` model and block Trainer handoff until the best model is normalized.
+
+### Packaging appears idle
+
+Compression may take seconds or minutes without output. Final files and checksums are still printed when it completes. Stage messages and byte-based progress, preferably using `pv` or equivalent real byte counts, are proposed but not implemented. Do not infer a percentage without measured bytes.
