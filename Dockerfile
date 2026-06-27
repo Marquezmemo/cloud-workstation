@@ -11,6 +11,8 @@ LABEL io.cloud-workstation.gsplat.examples.ref="937e29912570c372bed6747a5c9bf85f
 ARG GSPLAT_VERSION=1.5.3
 ARG GSPLAT_EXAMPLES_REPO=https://github.com/nerfstudio-project/gsplat.git
 ARG GSPLAT_EXAMPLES_REF=937e29912570c372bed6747a5c9bf85fed877bae
+ARG RUNPODCTL_VERSION=2.5.0
+ARG RUNPODCTL_SHA256=f484ce7d790ddc6b4a63363f3c975c70fa87bf3be1bcbad019812f6e3f4ba54e
 
 ENV TRAINING_IMAGE_VERSION=headless-gsplat-v0.1-dev
 ENV GSPLAT_VERSION=${GSPLAT_VERSION}
@@ -42,6 +44,13 @@ RUN apt-get update \
         tmux \
         ca-certificates \
     && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL \
+        "https://github.com/runpod/runpodctl/releases/download/v${RUNPODCTL_VERSION}/runpodctl-linux-amd64" \
+        -o /usr/local/bin/runpodctl \
+    && echo "${RUNPODCTL_SHA256}  /usr/local/bin/runpodctl" | sha256sum -c - \
+    && chmod +x /usr/local/bin/runpodctl \
+    && runpodctl version
 
 COPY requirements-gsplat.txt /tmp/requirements-gsplat.txt
 
