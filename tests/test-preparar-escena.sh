@@ -82,11 +82,22 @@ with zipfile.ZipFile(archive_path) as archive:
 PY
 }
 
+run_preparer() {
+  local workspace="$1"
+  shift
+
+  WORKSPACE_ROOT="${workspace}" \
+  INCOMING_DIR="${workspace}/incoming" \
+  SCENES_DIR="${workspace}/scenes" \
+  TEMP_DIR="${workspace}/temp" \
+    "${PREPARER}" "$@"
+}
+
 expect_failure() {
   local workspace="$1"
   shift
 
-  if WORKSPACE_ROOT="${workspace}" "${PREPARER}" "$@" >"${workspace}/failure.out" 2>&1; then
+  if run_preparer "${workspace}" "$@" >"${workspace}/failure.out" 2>&1; then
     fail "preparation unexpectedly passed: $*"
   fi
 }
@@ -132,8 +143,7 @@ EXPECTED_SECOND_IMAGE="${MACOS_ROOT}/incoming/prueba/images/IMG_002.png"
 create_zip "${ZIP_PATH}" macos
 unzip -l "${ZIP_PATH}"
 
-if WORKSPACE_ROOT="${MACOS_ROOT}" "${PREPARER}" \
-    >"${STDOUT_FILE}" 2>"${STDERR_FILE}"; then
+if run_preparer "${MACOS_ROOT}" >"${STDOUT_FILE}" 2>"${STDERR_FILE}"; then
   PREPARE_EXIT_CODE=0
 else
   PREPARE_EXIT_CODE=$?
@@ -157,6 +167,10 @@ fi
 print_incoming_tree "${MACOS_ROOT}/incoming"
 
 test "${PREPARE_EXIT_CODE}" -eq 0 || fail "preparar-escena exited with ${PREPARE_EXIT_CODE}"
+grep -Fqx \
+  "Ruta de imágenes: ${MACOS_ROOT}/incoming/prueba/images" \
+  "${STDOUT_FILE}" \
+  || fail "preparar-escena used a non-isolated incoming directory"
 MACOS_OUTPUT="$(<"${STDOUT_FILE}")"
 [[ -f "${MACOS_ROOT}/prueba.zip" ]] || fail "original ZIP was moved"
 [[ -f "${EXPECTED_FIRST_IMAGE}" ]] || fail "missing first image"
