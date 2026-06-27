@@ -4,6 +4,41 @@ Validation record for `headless-surveyor-v0.1-dev`.
 
 This branch is the Surveyor COLMAP image line. Trainer and `gsplat` validation records belong to the Trainer branch and are not active validation evidence for this image.
 
+## Evidence Status
+
+Use these states consistently:
+
+- `implemented`: directly verifiable in the current repository
+- `locally verified`: command executed locally with date and command recorded
+- `operator reported`: manual result without sufficient preserved evidence
+- `validated with evidence`: operator questionnaire, logs, versions, commands, outputs, and hashes agree
+- `pending`: not executed or insufficient evidence
+
+Dates in validation questionnaires use Aguascalientes local time by convention.
+
+## Manual Validation Protocol
+
+The Eye interviews the operator after each manual RunPod test and checks the answers against the Surveyor evidence package. Record:
+
+1. local date and test purpose
+2. branch, commit, image tag, and image digest when available
+3. pod/GPU, NVIDIA driver, CUDA, COLMAP, and `runpodctl` versions
+4. scene name, source, image count, and matcher
+5. exact commands in execution order and relevant environment variables
+6. exit status, observed result, retries, errors, and manual interventions
+7. manifest, model analyzer, GPU log, summary, package paths, and sizes
+8. SHA-256 values before and after transfer, transfer direction, and duration
+9. Trainer handoff check and 100-step training outcome
+10. capabilities that passed, failed, or remain inconclusive
+
+Run `package-surveyor-scene.sh <scene>` after reconstruction. Large scene and evidence archives stay outside Git; a validation record stores their location, size, SHA-256, and small sanitized evidence needed to support the conclusion. Do not commit credentials or ephemeral transfer codes.
+
+Store each accepted report under:
+
+```text
+docs/validation-runs/YYYY-MM-DD-<scene>-<purpose>.md
+```
+
 ## Image Under Validation
 
 ```text
@@ -16,18 +51,23 @@ Base image:
 colmap/colmap@sha256:187ca5ec98e55ed8fbec5f43f9d8f78b7a322b3b7413356634191f7a43c1efcf
 ```
 
-## Local Validation Completed
+## Local And Reported Validation
 
-The Surveyor implementation report states that these local checks passed:
+Locally verified on 2026-06-27 against commit `12428f2`:
+
+- `bash tests/test-surveyor-contract.sh` passed.
+- Contract tests accepted a valid scene and rejected missing databases, malformed or missing manifests, empty images, and empty sparse models.
+- Scene and evidence checksums remained valid after moving packages to another directory.
+
+Reported by earlier implementation work without preserved logs:
 
 - `docker build --platform linux/amd64` completed successfully.
 - `validate-surveyor.sh` passed inside the container.
 - `survey-scene.sh --help` works.
 - `package-surveyor-scene.sh --help` works.
 - `package-surveyor-scene.sh` packaged a synthetic scene and generated a checksum.
-- Contract tests reject missing databases, malformed manifests, empty images, and empty sparse models.
-- Scene and evidence checksums remain valid after transfer to another directory.
-- The default `CMD` starts `runpod-keepalive.sh`, not the inherited COLMAP entrypoint.
+
+Implemented and directly verifiable: the default `CMD` starts `runpod-keepalive.sh`, not the inherited COLMAP entrypoint.
 
 ## Current Validation Commands
 

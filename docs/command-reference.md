@@ -132,6 +132,8 @@ Mac to pod: run `runpodctl send <input-archive>` on the Mac, then run `runpodctl
 
 Pod to Trainer or Mac: send each scene/evidence archive and its `.sha256` file from the Surveyor pod, receive it at the destination, then run `sha256sum -c` beside the received archive.
 
+`runpodctl` installation is implemented, but transfer behavior is pending evidence-backed validation. Record direction, exact command shape, file size, hashes at both ends, duration, result, and any retry. Do not store credentials or ephemeral transfer codes in Git.
+
 ## Trainer Handoff
 
 After the packaged scene is transferred and unpacked into the Trainer workspace, validate it from the Trainer image:

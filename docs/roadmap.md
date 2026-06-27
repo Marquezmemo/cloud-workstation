@@ -10,11 +10,11 @@ Roadmap for the headless Surveyor COLMAP image.
 - Docker Hub publish workflow exists for `headless-surveyor-v0.1-dev`.
 - Pinned `runpodctl v2.5.0` and complete scene/evidence validation are implemented.
 - Trainer and `gsplat` runtime scripts were removed from this branch.
-- Local build and local script smoke checks passed according to the Surveyor handoff.
+- Synthetic contract tests are locally verified. Earlier image-build and container checks remain operator-reported because their logs were not preserved.
 
 ## Immediate Next Steps
 
-1. Publish the validated Surveyor image.
+1. Publish the current Surveyor development image after its workflow gates pass.
 2. Transfer 20–30 real images to RunPod with `runpodctl`.
 3. Execute `validate-surveyor.sh` and confirm NVIDIA visibility.
 4. Run `COLMAP_USE_GPU=1 survey-scene.sh <scene>`.
@@ -22,7 +22,7 @@ Roadmap for the headless Surveyor COLMAP image.
 6. Validate and package the scene and evidence.
 7. Transfer the scene package to Trainer and verify its checksum.
 8. Complete `train-scene.sh --check <scene>` and a 100-step training run.
-9. Preserve all transfer commands, hashes, logs, manifests, and summaries for The Eye.
+9. Complete The Eye questionnaire and preserve commands, hashes, logs, manifests, and summaries.
 
 ## Later Work
 

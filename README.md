@@ -72,7 +72,7 @@ Validate the image:
 validate-surveyor.sh
 ```
 
-The image includes pinned `runpodctl v2.5.0` for manual Mac/pod transfers.
+The image includes pinned `runpodctl v2.5.0` for manual Mac/pod transfers. Installation is implemented; successful end-to-end transfer still requires preserved evidence.
 
 Run a minimal sparse reconstruction:
 
@@ -119,15 +119,24 @@ docker run --rm --platform linux/amd64 \
 
 ## Validation Status
 
-Validated locally:
+Implemented and directly verifiable in the repository:
+
+- pinned base image and `runpodctl v2.5.0`
+- complete scene validator and validation-before-packaging gate
+- portable scene and evidence packages
+- default `CMD ["runpod-keepalive.sh"]`
+
+Locally verified on 2026-06-27:
+
+- `bash tests/test-surveyor-contract.sh`
+- valid scene packaging, negative fixtures, and portable checksum verification
+
+Reported by earlier implementation work without preserved logs:
 
 - `docker build --platform linux/amd64`
 - `validate-surveyor.sh`
 - `survey-scene.sh --help`
 - `package-surveyor-scene.sh --help`
-- synthetic scene packaging with checksum
-- complete scene contract tests, negative fixtures, and portable checksums
-- default `CMD ["runpod-keepalive.sh"]`
 
 Pending real validation:
 

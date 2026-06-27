@@ -1,5 +1,13 @@
 # Changelog
 
+## Manual Validation Evidence Policy
+
+- Separated implemented, locally verified, operator-reported, evidence-backed, and pending states.
+- Recorded the current synthetic contract-test result without treating it as a real RunPod reconstruction.
+- Added the operator questionnaire and evidence-package workflow for manual tests.
+- Recorded `runpodctl v2.5.0` as installed while keeping transfer validation pending.
+- Established Aguascalientes local time as the implicit date convention for validation records.
+
 ## Surveyor Contract And Transfer Hardening
 
 - Added pinned `runpodctl v2.5.0` to the Surveyor image.
