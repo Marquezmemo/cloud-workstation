@@ -54,6 +54,7 @@ SQL
 
   jq -n \
     --arg scene "${scene_name}" \
+    --arg scene_path "${scene_path}" \
     '{
       schema: "cloud-workstation.surveyor.v0.1",
       scene: $scene,
@@ -64,18 +65,36 @@ SQL
       colmap_use_gpu: "0",
       single_camera: "1",
       camera_model: "OPENCV",
-      scene_path: "/workspace/scenes/test",
-      trainer_ready_sparse_path: "/workspace/scenes/test/sparse/0"
+      scene_path: $scene_path,
+      sparse_model_count: 1,
+      selected_sparse_original_index: "0",
+      registered_images: 2,
+      trainer_ready_sparse_path: ($scene_path + "/sparse/0")
     }' > "${scene_path}/surveyor-manifest.json"
 
   for log_name in \
     surveyor.env \
     colmap-feature.log \
     colmap-match.log \
-    colmap-mapper.log \
-    model-analyzer.txt; do
+    colmap-mapper.log; do
     printf '%s=synthetic\n' "${log_name}" > "${log_dir}/${log_name}"
   done
+  {
+    echo 'Registered images: 2'
+    echo 'Points: 100'
+  } > "${log_dir}/model-analyzer.txt"
+  {
+    echo 'model_count=1'
+    echo
+    echo 'candidate_index=0'
+    echo 'registered_images=2'
+    echo 'points=100'
+    echo
+    echo 'selected_original_index=0'
+    echo 'selected_registered_images=2'
+    echo 'selected_points=100'
+    echo "selected_final_path=${scene_path}/sparse/0"
+  } > "${log_dir}/sparse-selection.txt"
   printf 'status=success\n' > "${log_dir}/surveyor.summary"
 }
 
@@ -101,6 +120,8 @@ cp "${TEST_ROOT}/archives/valid/"* "${TRANSFER_DIR}/"
 )
 grep -q '^valid/database.db$' < <(tar -tzf "${TRANSFER_DIR}/valid-surveyor-scene.tar.gz")
 grep -q '^valid-surveyor-evidence/logs/model-analyzer.txt$' \
+  < <(tar -tzf "${TRANSFER_DIR}/valid-surveyor-evidence.tar.gz")
+grep -q '^valid-surveyor-evidence/logs/sparse-selection.txt$' \
   < <(tar -tzf "${TRANSFER_DIR}/valid-surveyor-evidence.tar.gz")
 grep -q '^valid-surveyor-evidence/surveyor-manifest.json$' \
   < <(tar -tzf "${TRANSFER_DIR}/valid-surveyor-evidence.tar.gz")
@@ -133,6 +154,41 @@ echo "test=missing_manifest"
 create_valid_fixture missing-manifest
 rm "${TEST_ROOT}/scenes/missing-manifest/surveyor-manifest.json"
 expect_validation_failure missing-manifest "${TEST_ROOT}/scenes/missing-manifest" "${TEST_ROOT}/logs/missing-manifest"
+
+echo "test=missing_selection_evidence"
+create_valid_fixture missing-selection
+rm "${TEST_ROOT}/logs/missing-selection/sparse-selection.txt"
+expect_validation_failure missing-selection "${TEST_ROOT}/scenes/missing-selection" "${TEST_ROOT}/logs/missing-selection"
+
+echo "test=registered_manifest_mismatch"
+create_valid_fixture registered-mismatch
+jq '.registered_images = 1' \
+  "${TEST_ROOT}/scenes/registered-mismatch/surveyor-manifest.json" \
+  > "${TEST_ROOT}/scenes/registered-mismatch/surveyor-manifest.json.tmp"
+mv \
+  "${TEST_ROOT}/scenes/registered-mismatch/surveyor-manifest.json.tmp" \
+  "${TEST_ROOT}/scenes/registered-mismatch/surveyor-manifest.json"
+expect_validation_failure registered-mismatch "${TEST_ROOT}/scenes/registered-mismatch" "${TEST_ROOT}/logs/registered-mismatch"
+
+echo "test=registered_exceeds_database"
+create_valid_fixture registered-exceeds-database
+sed -i.bak 's/Registered images: 2/Registered images: 3/' \
+  "${TEST_ROOT}/logs/registered-exceeds-database/model-analyzer.txt"
+rm "${TEST_ROOT}/logs/registered-exceeds-database/model-analyzer.txt.bak"
+expect_validation_failure \
+  registered-exceeds-database \
+  "${TEST_ROOT}/scenes/registered-exceeds-database" \
+  "${TEST_ROOT}/logs/registered-exceeds-database"
+
+echo "test=invalid_trainer_sparse_path"
+create_valid_fixture invalid-trainer-path
+jq '.trainer_ready_sparse_path = "/wrong/sparse/0"' \
+  "${TEST_ROOT}/scenes/invalid-trainer-path/surveyor-manifest.json" \
+  > "${TEST_ROOT}/scenes/invalid-trainer-path/surveyor-manifest.json.tmp"
+mv \
+  "${TEST_ROOT}/scenes/invalid-trainer-path/surveyor-manifest.json.tmp" \
+  "${TEST_ROOT}/scenes/invalid-trainer-path/surveyor-manifest.json"
+expect_validation_failure invalid-trainer-path "${TEST_ROOT}/scenes/invalid-trainer-path" "${TEST_ROOT}/logs/invalid-trainer-path"
 
 echo "test=empty_sparse_model"
 create_valid_fixture empty-model

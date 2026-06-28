@@ -31,6 +31,21 @@ require_nonempty_file() {
   [[ -f "${path}" && -s "${path}" ]] || fail "required file is missing or empty: ${path}"
 }
 
+extract_analyzer_metric() {
+  local analyzer_path="$1"
+  local metric_name="$2"
+
+  sed -n -E "s/.*${metric_name}:[[:space:]]*([0-9]+).*/\\1/p" "${analyzer_path}" \
+    | tail -n 1
+}
+
+read_evidence_value() {
+  local evidence_path="$1"
+  local key="$2"
+
+  sed -n "s/^${key}=//p" "${evidence_path}" | tail -n 1
+}
+
 if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
   usage
   exit 0
@@ -80,18 +95,70 @@ for name in cameras images points3D; do
   require_nonempty_file "${SCENE_PATH}/sparse/0/${name}.bin"
 done
 
+MODEL_ANALYZER_PATH="${LOG_DIR}/model-analyzer.txt"
+SELECTION_EVIDENCE_PATH="${LOG_DIR}/sparse-selection.txt"
+require_nonempty_file "${MODEL_ANALYZER_PATH}"
+require_nonempty_file "${SELECTION_EVIDENCE_PATH}"
+
+REGISTERED_IMAGES="$(extract_analyzer_metric "${MODEL_ANALYZER_PATH}" "Registered images")"
+SELECTED_POINTS="$(extract_analyzer_metric "${MODEL_ANALYZER_PATH}" "Points")"
+[[ "${REGISTERED_IMAGES}" =~ ^[0-9]+$ ]] || fail "model analyzer has an invalid Registered images metric"
+[[ "${SELECTED_POINTS}" =~ ^[0-9]+$ ]] || fail "model analyzer has an invalid Points metric"
+(( REGISTERED_IMAGES >= 2 )) || fail "selected sparse model has fewer than 2 registered images: ${REGISTERED_IMAGES}"
+(( REGISTERED_IMAGES <= DATABASE_IMAGES )) \
+  || fail "registered image count exceeds database image count: registered=${REGISTERED_IMAGES}, database=${DATABASE_IMAGES}"
+
+EVIDENCE_MODEL_COUNT="$(read_evidence_value "${SELECTION_EVIDENCE_PATH}" "model_count")"
+EVIDENCE_SELECTED_INDEX="$(read_evidence_value "${SELECTION_EVIDENCE_PATH}" "selected_original_index")"
+EVIDENCE_REGISTERED_IMAGES="$(read_evidence_value "${SELECTION_EVIDENCE_PATH}" "selected_registered_images")"
+EVIDENCE_SELECTED_POINTS="$(read_evidence_value "${SELECTION_EVIDENCE_PATH}" "selected_points")"
+EVIDENCE_FINAL_PATH="$(read_evidence_value "${SELECTION_EVIDENCE_PATH}" "selected_final_path")"
+EVIDENCE_CANDIDATE_COUNT="$(grep -c '^candidate_index=' "${SELECTION_EVIDENCE_PATH}" || true)"
+ACTUAL_SPARSE_MODEL_COUNT=0
+for sparse_model_path in "${SCENE_PATH}/sparse"/*; do
+  [[ -d "${sparse_model_path}" ]] || continue
+  sparse_model_index="$(basename "${sparse_model_path}")"
+  [[ "${sparse_model_index}" =~ ^(0|[1-9][0-9]*)$ ]] || continue
+  ACTUAL_SPARSE_MODEL_COUNT=$((ACTUAL_SPARSE_MODEL_COUNT + 1))
+done
+
+[[ "${EVIDENCE_MODEL_COUNT}" =~ ^[1-9][0-9]*$ ]] || fail "selection evidence has an invalid model_count"
+[[ "${EVIDENCE_SELECTED_INDEX}" =~ ^(0|[1-9][0-9]*)$ ]] || fail "selection evidence has an invalid selected_original_index"
+[[ "${EVIDENCE_REGISTERED_IMAGES}" == "${REGISTERED_IMAGES}" ]] \
+  || fail "selection evidence registered image count does not match model analyzer"
+[[ "${EVIDENCE_SELECTED_POINTS}" == "${SELECTED_POINTS}" ]] \
+  || fail "selection evidence point count does not match model analyzer"
+[[ "${EVIDENCE_CANDIDATE_COUNT}" == "${EVIDENCE_MODEL_COUNT}" ]] \
+  || fail "selection evidence candidate count does not match model_count"
+[[ "${ACTUAL_SPARSE_MODEL_COUNT}" == "${EVIDENCE_MODEL_COUNT}" ]] \
+  || fail "numeric sparse directory count does not match model_count"
+grep -qx "candidate_index=${EVIDENCE_SELECTED_INDEX}" "${SELECTION_EVIDENCE_PATH}" \
+  || fail "selected sparse index is not listed as a candidate"
+[[ "${EVIDENCE_FINAL_PATH}" == "${SCENE_PATH}/sparse/0" ]] \
+  || fail "selection evidence final path is invalid: ${EVIDENCE_FINAL_PATH}"
+
 # Manifest consistency
 MANIFEST_PATH="${SCENE_PATH}/surveyor-manifest.json"
 require_nonempty_file "${MANIFEST_PATH}"
 jq -e \
   --arg scene "${SCENE_NAME}" \
+  --arg trainer_ready_sparse_path "${SCENE_PATH}/sparse/0" \
+  --arg selected_sparse_original_index "${EVIDENCE_SELECTED_INDEX}" \
   --argjson image_count "${IMAGE_COUNT}" \
   --argjson database_images "${DATABASE_IMAGES}" \
+  --argjson registered_images "${REGISTERED_IMAGES}" \
+  --argjson sparse_model_count "${EVIDENCE_MODEL_COUNT}" \
   '
     .schema == "cloud-workstation.surveyor.v0.1" and
     .scene == $scene and
     (.image_count | tonumber) == $image_count and
     (.database_images | tonumber) == $database_images and
+    (.registered_images | type) == "number" and
+    .registered_images == $registered_images and
+    (.sparse_model_count | type) == "number" and
+    .sparse_model_count == $sparse_model_count and
+    .selected_sparse_original_index == $selected_sparse_original_index and
+    .trainer_ready_sparse_path == $trainer_ready_sparse_path and
     (.colmap_use_gpu == "0" or .colmap_use_gpu == "1")
   ' "${MANIFEST_PATH}" >/dev/null || fail "manifest is invalid or inconsistent: ${MANIFEST_PATH}"
 
@@ -101,7 +168,8 @@ for log_name in \
   colmap-feature.log \
   colmap-match.log \
   colmap-mapper.log \
-  model-analyzer.txt; do
+  model-analyzer.txt \
+  sparse-selection.txt; do
   require_nonempty_file "${LOG_DIR}/${log_name}"
 done
 
@@ -124,4 +192,7 @@ echo "surveyor_scene_validation=passed"
 echo "scene=${SCENE_NAME}"
 echo "image_count=${IMAGE_COUNT}"
 echo "database_images=${DATABASE_IMAGES}"
+echo "registered_images=${REGISTERED_IMAGES}"
+echo "sparse_model_count=${EVIDENCE_MODEL_COUNT}"
+echo "selected_sparse_original_index=${EVIDENCE_SELECTED_INDEX}"
 echo "colmap_use_gpu=${COLMAP_USE_GPU}"

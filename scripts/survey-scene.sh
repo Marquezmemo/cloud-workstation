@@ -50,6 +50,13 @@ stop_gpu_monitor() {
   fi
 }
 
+cleanup() {
+  stop_gpu_monitor
+  if [[ -n "${SPARSE_SELECTION_TMP:-}" && -f "${SPARSE_SELECTION_TMP}" ]]; then
+    rm -f "${SPARSE_SELECTION_TMP}"
+  fi
+}
+
 start_gpu_monitor() {
   local output_path="$1"
 
@@ -68,6 +75,67 @@ start_gpu_monitor() {
 fail() {
   echo "ERROR: $*" >&2
   exit 1
+}
+
+extract_analyzer_metric() {
+  local analyzer_output="$1"
+  local metric_name="$2"
+
+  printf '%s\n' "${analyzer_output}" \
+    | sed -n -E "s/.*${metric_name}:[[:space:]]*([0-9]+).*/\\1/p" \
+    | tail -n 1
+}
+
+swap_sparse_models() {
+  local selected_index="$1"
+
+  [[ "${selected_index}" != "0" ]] || return 0
+
+  python3 - "${SPARSE_DIR}" "${selected_index}" <<'PY'
+import os
+import sys
+import uuid
+
+sparse_dir, selected_index = sys.argv[1:]
+zero_path = os.path.join(sparse_dir, "0")
+selected_path = os.path.join(sparse_dir, selected_index)
+temporary_path = os.path.join(
+    sparse_dir, f".surveyor-sparse-swap-{uuid.uuid4().hex}"
+)
+
+if not os.path.isdir(zero_path):
+    raise SystemExit(f"ERROR: missing sparse model for swap: {zero_path}")
+if not os.path.isdir(selected_path):
+    raise SystemExit(f"ERROR: missing selected sparse model for swap: {selected_path}")
+if os.path.lexists(temporary_path):
+    raise SystemExit(f"ERROR: sparse swap temporary path already exists: {temporary_path}")
+
+state = 0
+try:
+    os.rename(zero_path, temporary_path)
+    state = 1
+    os.rename(selected_path, zero_path)
+    state = 2
+    os.rename(temporary_path, selected_path)
+    state = 3
+except OSError as error:
+    rollback_errors = []
+    if state == 2:
+        try:
+            os.rename(zero_path, selected_path)
+        except OSError as rollback_error:
+            rollback_errors.append(str(rollback_error))
+    if state in (1, 2) and os.path.lexists(temporary_path):
+        try:
+            os.rename(temporary_path, zero_path)
+        except OSError as rollback_error:
+            rollback_errors.append(str(rollback_error))
+
+    message = f"ERROR: sparse model swap failed: {error}"
+    if rollback_errors:
+        message += "; rollback errors: " + "; ".join(rollback_errors)
+    raise SystemExit(message)
+PY
 }
 
 if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
@@ -98,8 +166,9 @@ OVERWRITE="${OVERWRITE:-false}"
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 VALIDATOR_PATH="${VALIDATOR_PATH:-${SCRIPT_DIR}/validate-surveyor-scene.sh}"
 GPU_MONITOR_PID=""
+SPARSE_SELECTION_TMP=""
 
-trap stop_gpu_monitor EXIT
+trap cleanup EXIT
 
 case "${MATCHER}" in
   exhaustive|sequential) ;;
@@ -225,12 +294,102 @@ stop_gpu_monitor
 echo "Running COLMAP mapper..."
 colmap "${MAPPER_ARGS[@]}" 2>&1 | tee "${LOG_DIR}/colmap-mapper.log"
 
-[[ -d "${SPARSE_DIR}/0" ]] || fail "COLMAP did not produce ${SPARSE_DIR}/0"
-for name in cameras images points3D; do
-  [[ -f "${SPARSE_DIR}/0/${name}.bin" ]] || fail "missing ${SPARSE_DIR}/0/${name}.bin"
-done
+# Sparse model discovery and normalization
+CANDIDATE_INDICES=()
+CANDIDATE_REGISTERED_IMAGES=()
+CANDIDATE_POINTS=()
+SELECTED_POSITION=-1
+SELECTED_ORIGINAL_INDEX=""
+SELECTED_REGISTERED_IMAGES=-1
+SELECTED_POINTS=-1
+HAS_SPARSE_ZERO=false
 
-colmap model_analyzer --path "${SPARSE_DIR}/0" 2>&1 | tee "${LOG_DIR}/model-analyzer.txt"
+while IFS= read -r candidate_index; do
+  candidate_path="${SPARSE_DIR}/${candidate_index}"
+  [[ "${candidate_index}" == "0" ]] && HAS_SPARSE_ZERO=true
+
+  for name in cameras images points3D; do
+    [[ -s "${candidate_path}/${name}.bin" ]] \
+      || fail "sparse model ${candidate_index} is missing a non-empty ${name}.bin"
+  done
+
+  if ! candidate_analysis="$(colmap model_analyzer --path "${candidate_path}" 2>&1)"; then
+    printf '%s\n' "${candidate_analysis}" >&2
+    fail "could not analyze sparse model ${candidate_index}"
+  fi
+  candidate_registered_images="$(extract_analyzer_metric "${candidate_analysis}" "Registered images")"
+  candidate_points="$(extract_analyzer_metric "${candidate_analysis}" "Points")"
+  [[ "${candidate_registered_images}" =~ ^[0-9]+$ ]] \
+    || fail "invalid Registered images metric for sparse model ${candidate_index}"
+  [[ "${candidate_points}" =~ ^[0-9]+$ ]] \
+    || fail "invalid Points metric for sparse model ${candidate_index}"
+
+  CANDIDATE_INDICES+=("${candidate_index}")
+  CANDIDATE_REGISTERED_IMAGES+=("${candidate_registered_images}")
+  CANDIDATE_POINTS+=("${candidate_points}")
+  candidate_position=$((${#CANDIDATE_INDICES[@]} - 1))
+
+  if (( SELECTED_POSITION < 0 \
+      || candidate_registered_images > SELECTED_REGISTERED_IMAGES \
+      || (candidate_registered_images == SELECTED_REGISTERED_IMAGES \
+          && candidate_points > SELECTED_POINTS) \
+      || (candidate_registered_images == SELECTED_REGISTERED_IMAGES \
+          && candidate_points == SELECTED_POINTS \
+          && candidate_index < SELECTED_ORIGINAL_INDEX) )); then
+    SELECTED_POSITION="${candidate_position}"
+    SELECTED_ORIGINAL_INDEX="${candidate_index}"
+    SELECTED_REGISTERED_IMAGES="${candidate_registered_images}"
+    SELECTED_POINTS="${candidate_points}"
+  fi
+done < <(
+  for candidate_path in "${SPARSE_DIR}"/*; do
+    [[ -d "${candidate_path}" ]] || continue
+    candidate_index="$(basename "${candidate_path}")"
+    [[ "${candidate_index}" =~ ^(0|[1-9][0-9]*)$ ]] || continue
+    printf '%s\n' "${candidate_index}"
+  done | sort -n
+)
+
+SPARSE_MODEL_COUNT="${#CANDIDATE_INDICES[@]}"
+(( SPARSE_MODEL_COUNT > 0 )) || fail "COLMAP did not produce a valid numeric sparse model"
+[[ "${HAS_SPARSE_ZERO}" == "true" ]] || fail "COLMAP did not produce ${SPARSE_DIR}/0"
+(( SELECTED_REGISTERED_IMAGES >= 2 )) \
+  || fail "best sparse model has fewer than 2 registered images: ${SELECTED_REGISTERED_IMAGES}"
+
+SPARSE_SELECTION_TMP="${LOG_DIR}/.sparse-selection.$$.tmp"
+{
+  echo "model_count=${SPARSE_MODEL_COUNT}"
+  for ((candidate_position = 0; candidate_position < SPARSE_MODEL_COUNT; candidate_position++)); do
+    echo
+    echo "candidate_index=${CANDIDATE_INDICES[candidate_position]}"
+    echo "registered_images=${CANDIDATE_REGISTERED_IMAGES[candidate_position]}"
+    echo "points=${CANDIDATE_POINTS[candidate_position]}"
+  done
+} > "${SPARSE_SELECTION_TMP}"
+
+swap_sparse_models "${SELECTED_ORIGINAL_INDEX}"
+
+if ! FINAL_MODEL_ANALYSIS="$(colmap model_analyzer --path "${SPARSE_DIR}/0" 2>&1)"; then
+  printf '%s\n' "${FINAL_MODEL_ANALYSIS}" >&2
+  fail "could not analyze normalized sparse model: ${SPARSE_DIR}/0"
+fi
+printf '%s\n' "${FINAL_MODEL_ANALYSIS}" | tee "${LOG_DIR}/model-analyzer.txt"
+REGISTERED_IMAGES="$(extract_analyzer_metric "${FINAL_MODEL_ANALYSIS}" "Registered images")"
+FINAL_MODEL_POINTS="$(extract_analyzer_metric "${FINAL_MODEL_ANALYSIS}" "Points")"
+[[ "${REGISTERED_IMAGES}" == "${SELECTED_REGISTERED_IMAGES}" ]] \
+  || fail "normalized sparse model registered image count changed: selected=${SELECTED_REGISTERED_IMAGES}, final=${REGISTERED_IMAGES}"
+[[ "${FINAL_MODEL_POINTS}" == "${SELECTED_POINTS}" ]] \
+  || fail "normalized sparse model point count changed: selected=${SELECTED_POINTS}, final=${FINAL_MODEL_POINTS}"
+
+{
+  echo
+  echo "selected_original_index=${SELECTED_ORIGINAL_INDEX}"
+  echo "selected_registered_images=${REGISTERED_IMAGES}"
+  echo "selected_points=${FINAL_MODEL_POINTS}"
+  echo "selected_final_path=${SPARSE_DIR}/0"
+} >> "${SPARSE_SELECTION_TMP}"
+mv "${SPARSE_SELECTION_TMP}" "${LOG_DIR}/sparse-selection.txt"
+SPARSE_SELECTION_TMP=""
 
 # Manifest and contract validation
 IMAGE_COUNT="$(find "${SCENE_PATH}/images" -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.tif' -o -iname '*.tiff' \) | wc -l | tr -d ' ')"
@@ -248,7 +407,10 @@ python3 - \
   "${SINGLE_CAMERA}" \
   "${CAMERA_MODEL}" \
   "${SCENE_PATH}" \
-  "${SPARSE_DIR}/0" <<'PY'
+  "${SPARSE_DIR}/0" \
+  "${SPARSE_MODEL_COUNT}" \
+  "${SELECTED_ORIGINAL_INDEX}" \
+  "${REGISTERED_IMAGES}" <<'PY'
 import json
 import sys
 
@@ -264,6 +426,9 @@ manifest = {
     "camera_model": sys.argv[9],
     "scene_path": sys.argv[10],
     "trainer_ready_sparse_path": sys.argv[11],
+    "sparse_model_count": int(sys.argv[12]),
+    "selected_sparse_original_index": sys.argv[13],
+    "registered_images": int(sys.argv[14]),
 }
 
 with open(sys.argv[1], "w", encoding="utf-8") as f:
