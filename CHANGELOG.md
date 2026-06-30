@@ -1,5 +1,13 @@
 # Changelog
 
+## Prueba02 Surveyor Validation
+
+- Recorded the corrected real run with 30 input and database images.
+- Validated two-model enumeration, original model `1` selection, and normalization to `sparse/0`.
+- Recorded 30 registered images, 4,555 points, 19,928 observations, mean track length `4.374973`, and reprojection error `1.133537 px`.
+- Recorded valid manifest generation, contract validation, packaging, checksums, transfer, Trainer receipt, dataset acceptance, and 300-step training.
+- Preserved `prueba-01` as the historical evidence that motivated best-model selection.
+
 ## First Real Surveyor Run Documentation
 
 - Recorded evidence from `prueba-01`, the first real 30-image RunPod run.

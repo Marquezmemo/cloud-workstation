@@ -15,7 +15,7 @@ Surveyor COLMAP sparse reconstruction
 |
 /workspace/scenes/<scene>/sparse/*
 |
-best sparse model selection and normalization
+automatic best sparse model selection and normalization to sparse/0
 |
 conditional Trainer validation with train-scene.sh --check <scene>
 ```
@@ -51,13 +51,13 @@ The image installs `gdown 6.1.0` and all transitive Python dependencies from a h
 
 `preparar-escena` validates a ZIP in temporary storage, flattens supported images without collisions, and atomically creates both `images/` and the preserved ZIP under `source/`. It never writes to `/workspace/scenes`.
 
-`/workspace/scenes/<scene>` is a candidate Trainer input. COLMAP may write multiple sparse models; it is Trainer-ready only after the best model has been identified and the output contract points to it consistently.
+`/workspace/scenes/<scene>` is the Trainer handoff. COLMAP may write multiple sparse models; Surveyor analyzes every candidate, selects by registered-image count, point count, and original index, then normalizes the winner to `sparse/0`.
 
 `/workspace/logs/<scene>` contains Surveyor/COLMAP logs and summaries.
 
 `/workspace/archives/<scene>` contains packaged scene archives and checksums.
 
-`validate-surveyor-scene.sh <scene>` is the current structural gate used before packaging. It validates `sparse/0` by presence and consistency but does not compare all sparse models or prove that `sparse/0` has the highest registered-image count.
+`validate-surveyor-scene.sh <scene>` validates the normalized `sparse/0` files and checks manifest consistency for registered-image count, sparse-model count, and selected original index.
 
 ## Surveyor To Trainer Contract
 
@@ -76,9 +76,9 @@ The generated scene must include:
 +-- surveyor-manifest.json
 ```
 
-The first real run demonstrated that this contract is incomplete: `sparse/0` contained only 2 registered images, while `colmap-mapper.log` later reached 30. Best-model selection and contract normalization are critical prerequisites for Trainer handoff.
+The historical `prueba-01` run demonstrated the original contract gap. `Prueba02` validated the correction by selecting original model `1` with 30 registered images and normalizing it to `sparse/0`.
 
-After the sparse-model issue is resolved, the Trainer handoff check is:
+The Trainer handoff check is:
 
 ```bash
 train-scene.sh --check <scene>

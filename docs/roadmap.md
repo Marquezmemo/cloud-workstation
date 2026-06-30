@@ -12,17 +12,16 @@ Roadmap for the headless Surveyor COLMAP image.
 - Trainer and `gsplat` runtime scripts were removed from this branch.
 - Synthetic contract tests are locally verified. Earlier image-build and container checks remain operator-reported because their logs were not preserved.
 - The first real `prueba-01` run validated RunPod startup, 30-image intake, GPU reconstruction execution, packaging, checksums, and `runpodctl send`.
-- Trainer handoff remains blocked because `sparse/0` reports 2 registered images while a later mapper reconstruction reaches 30.
+- The `prueba-01` Trainer handoff was blocked because `sparse/0` reported 2 registered images while a later mapper reconstruction reached 30.
+- `Prueba02` validated the corrected best-model selection: original model `1`, 30 registered images, 4,555 points, normalized to `sparse/0`.
+- The `Prueba02` package was received and checksum-verified by Trainer; dataset validation and a 300-step run completed.
 
 ## Immediate Next Steps
 
-1. Enumerate and analyze every `sparse/*` model from the first real run.
-2. Define and implement the best-model selection rule outside this documentation update.
-3. Normalize the selected sparse path across output, manifest, validation, and packaging contracts.
-4. Permanently correct manifest newline generation and repeat a clean real run.
-5. Receive exported packages and verify their checksums at the destination.
-6. Complete `train-scene.sh --check <scene>` and a 100-step training run only after model selection is resolved.
-7. Preserve the resulting commands, hashes, logs, manifests, and summaries for The Eye.
+1. Repeat the corrected Surveyor flow with additional capture sets.
+2. Define registered-image and reconstruction-quality acceptance thresholds.
+3. Evaluate OPENCV distortion handling versus an undistorted/PINHOLE handoff.
+4. Preserve each run's commands, hashes, logs, manifest, selection report, and Trainer result.
 
 ## Later Work
 

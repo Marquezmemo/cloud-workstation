@@ -2,7 +2,7 @@
 
 PLY export is not a Surveyor capability.
 
-Surveyor produces one or more COLMAP sparse reconstruction artifacts. PLY generation belongs to the Trainer image only after the best sparse model has been selected, the handoff has been validated, and training has produced checkpoints.
+Surveyor produces and normalizes the selected COLMAP sparse reconstruction. PLY generation belongs to the Trainer image after handoff validation and training have produced checkpoints.
 
 ## Surveyor Output
 
@@ -14,7 +14,7 @@ Surveyor output stops at:
 /workspace/archives/<scene>/<scene>-surveyor-scene.tar.gz
 ```
 
-The current Surveyor automation points to `sparse/0`, but the first real run showed that this directory may not contain the reconstruction with the most registered images. PLY export remains downstream and must not be used to imply that the current Surveyor handoff is validated.
+Surveyor normalizes the selected best model to `sparse/0`. `Prueba02` validated this handoff and Trainer subsequently generated both standard and compressed PLY exports.
 
 ## Trainer Responsibility
 

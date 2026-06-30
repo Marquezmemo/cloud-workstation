@@ -33,7 +33,7 @@ The current output shape is a COLMAP sparse reconstruction under:
 +-- surveyor-manifest.json
 ```
 
-The generated scene is a Trainer candidate. Do not treat it as Trainer-ready until the best sparse model has been identified and normalized. The conditional Trainer check is:
+Surveyor selects the sparse model with the highest registered-image count, normalizes it to `sparse/0`, and validates the resulting handoff contract. The Trainer check is:
 
 ```bash
 train-scene.sh --check <scene>
@@ -140,7 +140,7 @@ docker run --rm --platform linux/amd64 \
   validate-surveyor.sh
 ```
 
-## First Real Run
+## Real Validation Runs
 
 The first real RunPod run is recorded in [docs/validation-runs/2026-06-27-prueba-01-real-run.md](docs/validation-runs/2026-06-27-prueba-01-real-run.md).
 
@@ -152,7 +152,18 @@ Validated with evidence for `prueba-01`:
 - successful ZIP preparation, reconstruction execution, package generation, portable checksums, and `runpodctl send`
 - GPU telemetry from an NVIDIA GeForce RTX 4090
 
-Critical limitation: `model-analyzer.txt` reports only 2 registered images in `sparse/0`, while the mapper log later reaches 30 registered images in another reconstruction. The current scripts assume `sparse/0`; therefore the Trainer handoff is not validated.
+Historical limitation: `model-analyzer.txt` reported only 2 registered images in `sparse/0`, while the mapper log later reached 30 registered images in another reconstruction. The scripts used for that run assumed `sparse/0`; therefore its Trainer handoff was not validated.
+
+That limitation is historical. The corrected `Prueba02` run is recorded in [docs/validation-runs/2026-06-29-prueba02-surveyor.md](docs/validation-runs/2026-06-29-prueba02-surveyor.md).
+
+Validated with evidence for `Prueba02`:
+
+- two sparse candidates evaluated automatically
+- original model `1` selected with 30 registered images and 4,555 points
+- selected model normalized to `sparse/0`
+- manifest, model analyzer, and validator agree on 30 registered images
+- scene and evidence packages verified
+- scene received by Trainer, checksum verified, dataset check passed, and a 300-step training run completed
 
 ## Validation Status
 
@@ -180,10 +191,8 @@ Reported by earlier implementation work without preserved logs:
 
 Pending real validation:
 
-- identify and normalize the sparse model with the highest registered-image count
-- permanently correct manifest newline generation and repeat a clean run
-- verify `runpodctl` reception and checksums at the destination
-- Trainer acceptance plus a real 100-step training run
+- repeat the corrected handoff with additional capture sets
+- define capture-quality thresholds and reconstruction-quality acceptance criteria
 
 Known usability gap: packaging may remain silent while compressing. Stage messages and byte-based progress are proposed but not implemented.
 

@@ -112,7 +112,7 @@ MAX_IMAGE_SIZE=1600 survey-scene.sh room
 +-- surveyor-manifest.json
 ```
 
-COLMAP may create more than one numeric subdirectory under `sparse/`. The current automation analyzes `sparse/0` only. Before Trainer handoff, inspect every generated model and identify the one with the greatest registered-image count.
+COLMAP may create more than one numeric subdirectory under `sparse/`. Surveyor analyzes all candidates, selects the best one, and normalizes it to `sparse/0`. Inspect `sparse-selection.txt` to audit the decision.
 
 ## Inspect Logs
 
@@ -122,14 +122,12 @@ cat /workspace/logs/room/surveyor.summary
 cat /workspace/logs/room/model-analyzer.txt
 ```
 
-List generated sparse models and inspect each one manually:
+Inspect the selection evidence and normalized model:
 
 ```bash
-find /workspace/scenes/room/sparse -mindepth 1 -maxdepth 1 -type d -print
+cat /workspace/logs/room/sparse-selection.txt
 colmap model_analyzer --path /workspace/scenes/room/sparse/0
 ```
-
-Repeat `model_analyzer` for every numeric model directory. Presence of valid files in `sparse/0` is not evidence that it is the best model.
 
 Key logs:
 
@@ -148,7 +146,7 @@ Validate the complete scene first:
 validate-surveyor-scene.sh room
 ```
 
-This is currently a structural check of `sparse/0`, the database, manifest, and logs. It does not compare multiple sparse models or validate the model with the highest registered-image count.
+This validates the normalized `sparse/0`, database, manifest, logs, and sparse-selection metrics.
 
 ```bash
 package-surveyor-scene.sh room
@@ -177,7 +175,7 @@ Mac to pod: run `runpodctl send <input-archive>` on the Mac, then run `runpodctl
 
 Pod to Trainer or Mac: send each scene/evidence archive and its `.sha256` file from the Surveyor pod, receive it at the destination, then run `sha256sum -c` beside the received archive.
 
-The first real run validated sender-side `runpodctl send`, including real progress, speed, transferred bytes, and percentage. Receiving and destination checksum verification remain pending. Record direction, exact command shape, file size, hashes at both ends, duration, result, and any retry. Do not store credentials or ephemeral transfer codes in Git.
+`Prueba02` validated sender-side transfer, Trainer receipt, and destination checksum verification. Record direction, command shape, file size, hashes at both ends, duration, result, and any retry. Do not store credentials or ephemeral transfer codes in Git.
 
 For a completed Surveyor scene:
 
@@ -190,7 +188,7 @@ runpodctl send /workspace/archives/room/room-surveyor-evidence.tar.gz.sha256
 
 ## Trainer Handoff
 
-Do not hand off a scene merely because `validate-surveyor-scene.sh` and packaging succeed. First identify and normalize the best sparse model. After that correction, transfer and unpack the scene in Trainer and run:
+After transfer and unpacking in Trainer, run:
 
 ```bash
 train-scene.sh --check room
@@ -201,7 +199,7 @@ MAX_STEPS=100 train-scene.sh room
 
 ## Full Smoke Sequence
 
-The first real run required manual manifest repair before validation. On commit `946b732`, stop and preserve the error if `validate-surveyor-scene.sh` reports invalid JSON; follow the troubleshooting guidance below rather than claiming an uninterrupted successful flow.
+The historical `prueba-01` run required manual manifest repair. Current Surveyor generates valid JSON and normalizes the selected sparse model automatically.
 
 ```bash
 cd /workspace
@@ -229,13 +227,13 @@ MAX_STEPS=100 train-scene.sh room
 
 ## Troubleshooting
 
-### Manifest rejected by jq
+### Historical manifest rejection
 
-The first real run produced a manifest ending in literal `\n`, which made the JSON invalid. The run artifact was repaired manually and then passed `validate-surveyor-scene.sh`. Preserve the original error and repair evidence before retrying. The permanent source correction is still pending in commit `946b732`; do not describe manual repair as a repository fix.
+`prueba-01` produced a manifest ending in literal `\n`; commit `8409125` corrected manifest generation. If current validation reports invalid JSON, preserve the artifact as a regression rather than applying the old manual repair.
 
 ### Mapper reaches more images than model-analyzer
 
-`database_images=30` means the database contains 30 images; it does not mean that the analyzed sparse model registered all 30. In `prueba-01`, the mapper log reached 30 registered images, but `model-analyzer.txt` for `sparse/0` reported only 2. Inspect every `sparse/*` model and block Trainer handoff until the best model is normalized.
+`database_images=30` means the database contains 30 images; it does not by itself prove registration. Current validation also reports `registered_images` and sparse-selection metadata. `Prueba02` validated 30 database and 30 registered images.
 
 ### Packaging appears idle
 

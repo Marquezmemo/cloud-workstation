@@ -72,7 +72,24 @@ Not validated:
 - receiving and checksum verification at the transfer destination
 - automatic selection of the best sparse model
 
-Critical evidence conflict: `model-analyzer.txt` reports 2 registered images in `sparse/0`, while `colmap-mapper.log` later reaches 30 registered images. `database_images=30` does not resolve this conflict. The current validator checks `sparse/0` structurally but does not compare sparse models.
+Historical evidence conflict: `model-analyzer.txt` reported 2 registered images in `sparse/0`, while `colmap-mapper.log` later reached 30 registered images. `database_images=30` did not resolve this conflict. The validator used for that run checked `sparse/0` structurally without comparing sparse models.
+
+This remains the historical verdict for `prueba-01`; it is not the current implementation status.
+
+## Corrected Real Run: Prueba02
+
+The evidence-backed record is [2026-06-29-prueba02-surveyor.md](validation-runs/2026-06-29-prueba02-surveyor.md).
+
+Validated:
+
+- valid manifest generation
+- two sparse candidates enumerated and analyzed
+- original sparse model `1` selected with 30 registered images and 4,555 points
+- selected model normalized to `sparse/0`
+- 30/30 image registration, one camera, 19,928 observations, mean track length `4.374973`, and mean reprojection error `1.133537 px`
+- GPU-enabled reconstruction on an RTX 4090
+- scene/evidence packaging and checksum verification
+- transfer, receipt, destination checksum verification, Trainer dataset check, and 300-step Trainer execution
 
 ## Local And Reported Validation
 
@@ -146,7 +163,7 @@ package-surveyor-scene.sh <scene>
 
 ## Current Structural Validation Gate
 
-The current scripts accept a Surveyor scene when all of these exist:
+The current scripts accept a Surveyor scene when all of these exist and the manifest/model-selection metrics agree:
 
 ```text
 /workspace/scenes/<scene>/images
@@ -164,7 +181,7 @@ The current scripts accept a Surveyor scene when all of these exist:
 /workspace/logs/<scene>/surveyor.summary
 ```
 
-Passing this gate does not prove that `sparse/0` is the best reconstruction or that it contains every database image. It is sufficient for packaging, not for declaring Trainer handoff validated.
+The current validator checks `registered_images`, `sparse_model_count`, and `selected_sparse_original_index`. `Prueba02` demonstrated that the selected best model is normalized to `sparse/0` before packaging.
 
 Packaging evidence:
 
@@ -177,19 +194,15 @@ Packaging evidence:
 
 ## Pending Validation
 
-- Identify every sparse model generated for `prueba-01` and select the one with the highest registered-image count.
-- Normalize the selected model path in the scene contract, manifest, analyzer, and validator.
-- Apply the permanent manifest newline correction; the evidence package contains the manually repaired manifest, not proof of the repository fix.
-- Repeat a clean real run after those corrections.
-- Receive the `runpodctl` exports and verify checksums at the destination.
-- Confirm the generated scene passes `train-scene.sh --check <scene>` and a 100-step training run in the Trainer image.
+- repeat corrected Surveyor-to-Trainer handoff with additional scenes
+- define minimum acceptable registered-image ratio and reconstruction-quality thresholds
+- compare `OPENCV` input against an undistorted/PINHOLE handoff before long Trainer runs
 
 ## Known Risks
 
 - SIFT GPU extraction or matching may fail without visible NVIDIA runtime.
 - `exhaustive_matcher` scales poorly for larger image sets.
-- COLMAP can produce multiple sparse components; v0.1 analyzes and validates `sparse/0` without proving it is the best model.
-- The current manifest source can emit literal `\n`; the first run was repaired manually and the permanent correction remains pending.
+- COLMAP can produce multiple sparse components; current selection prefers registered-image count, then point count, then original index.
 - Packaging can remain silent during compression; byte-based progress is not implemented.
 - Dense reconstruction is intentionally excluded from v0.1.
 - Capture quality requirements are not formalized yet.
