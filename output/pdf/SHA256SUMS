@@ -1,0 +1,15 @@
+8fd685255fdb6839cc121e4f2f7b45aea5eee7c6c1f8cde3cc258e763bb60da4  docs/releases/v0.1/Cloud-Workstation-v0.1-Functional-Baseline-Freeze-Record.md
+3153c7c3433167b5ffa5d44687a3d0552ef864ceb51092625aa92f8e224fa532  docs/releases/v0.1/evidence/prueba02/2026-06-29-prueba02-surveyor.md
+0a17007983ae711b48d79d5a5ea23ed924cdc95ee9d99c64667329ff8ad29fa5  docs/releases/v0.1/evidence/prueba02/2026-06-29-prueba02-trainer-e2e.md
+5c18b61b221311d61769e54842dc29fe6c6c2fd1b0d85bd58ff717a0134aac28  docs/releases/v0.1/evidence/prueba02/prueba02-supersplat.png
+10eb79ed95cf8eea42c64467008ca369d489dd4f0907d6aa4022a78e376cde06  docs/releases/v0.1/sources/surveyor/README-handoff-to-the-eye.md
+ef60e4289e01bb1dc8dcbbc570b05d031533a05fd5b34783090d590426b1ce66  docs/releases/v0.1/sources/surveyor/SHA256SUMS.source
+8291d1fc7f3fe2d584e54ff60093f6cab4210e30197abd23daca47665ef72d5d  docs/releases/v0.1/sources/surveyor/surveyor-v0.1-freeze-manifest.json
+4d56b66841d655b72ac590e15198b48c9a8db7b6c821e1ffbf4c94c4fd4d1dc7  docs/releases/v0.1/sources/surveyor/surveyor-v0.1-freeze-report.md
+5df6a1b66b755044bb357279f01721a3e351eddfe5e2a6c0608a5aba157a0782  docs/releases/v0.1/sources/trainer/README-handoff-to-the-eye.md
+3a498b1f3e6c89d5d8610029206b99f82f7822c70e41aa98cf0561f057c046a8  docs/releases/v0.1/sources/trainer/SHA256SUMS.source
+413d7d561d6f846da5101958d1d38af802a1138e1fc32ead617d7a9a18941f0b  docs/releases/v0.1/sources/trainer/trainer-v0.1-freeze-manifest.json
+b44e1e48b133dc51e110657a6c0464b9021f4c94c0df4c534d2ba4a686f81db8  docs/releases/v0.1/sources/trainer/trainer-v0.1-freeze-report.md
+77bcf07ca95d7c498bd5d0098f9c2ba76a71b358215296c2bfedebcf08c083a7  output/pdf/Cloud-Workstation-v0.1-Functional-Baseline-Freeze-Record.pdf
+147d4ba1218b8431740fe153f86daf58feff0bbbefdfed98dc4c39fe07e53d82  output/pdf/The-Surveyor-v0.1-Freeze-Report.pdf
+28dcc401472f0553778fe85d2482d726c4b6b953a1db2e94e6da36857b521786  output/pdf/The-Trainer-v0.1-Freeze-Report.pdf

@@ -1,0 +1,152 @@
+{
+  "schema": "cloud-workstation.trainer.freeze.v0.1",
+  "generated_at": "2026-06-30T04:24:38Z",
+  "status": "smoke-validated-baseline-proposal",
+  "repository": {
+    "remote": "https://github.com/Marquezmemo/cloud-workstation.git",
+    "source_branch": "headless-gsplat-v0.1-dev",
+    "source_head": "221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3",
+    "source_tree": "f26a1a2fddd2f0a3398b3b49b5fbb61ea24038d5",
+    "audit_branch": "audit/trainer-v0.1-freeze",
+    "audit_base": "221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3",
+    "tracked_diff_at_audit_start": "clean",
+    "source_worktree_untracked_items": [
+      "output/ (pre-existing Surveyor freeze artifacts; excluded)"
+    ]
+  },
+  "validated_runtime": {
+    "evidence_level": "inferred_from_immutable_workflow_chronology_plus_prueba02_record",
+    "source_commit": "90196251d59907754cc19caf76b59a737752893b",
+    "source_tree": "9568224839eb12bfd0bfbca4625bdea3bfe7a8bb",
+    "workflow_name": "Publish Headless gsplat Dev",
+    "workflow_run_id": 28285526569,
+    "workflow_url": "https://github.com/Marquezmemo/cloud-workstation/actions/runs/28285526569",
+    "workflow_result": "success",
+    "docker_tag_template": "docker.io/${DOCKERHUB_USERNAME}/cloud-workstation:headless-gsplat-v0.1-dev",
+    "docker_manifest_digest": "sha256:535822530f4b23fca3eee3970b147e3e979162a32c2e9de9f76a829836b63a89",
+    "platform": "linux/amd64",
+    "dockerfile_sha256": "8320688d7c7db1f54059da80708f305fc843687145cc431f747fd6a30b005f28"
+  },
+  "current_source_publication": {
+    "source_commit": "221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3",
+    "workflow_run_id": 28413758338,
+    "workflow_url": "https://github.com/Marquezmemo/cloud-workstation/actions/runs/28413758338",
+    "workflow_result": "success",
+    "docker_manifest_digest": "sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98",
+    "relationship_to_prueba02": "post-validation image; not used by Prueba02"
+  },
+  "proposed_tags": {
+    "git": {
+      "name": "trainer-v0.1.0-smoke-validated",
+      "target_commit": "90196251d59907754cc19caf76b59a737752893b",
+      "created_by_audit": false
+    },
+    "docker": {
+      "name": "headless-gsplat-v0.1.0",
+      "target_digest": "sha256:535822530f4b23fca3eee3970b147e3e979162a32c2e9de9f76a829836b63a89",
+      "must_rebuild": false,
+      "created_by_audit": false
+    }
+  },
+  "base_image": {
+    "reference": "runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04",
+    "digest": "sha256:61a4aafb0094cd773f11eefa378929d5a687bd775febeb78eac62fc824141fb5"
+  },
+  "trainer": {
+    "gsplat_version": "1.5.3",
+    "official_repository": "https://github.com/nerfstudio-project/gsplat.git",
+    "official_examples_commit": "937e29912570c372bed6747a5c9bf85fed877bae",
+    "entrypoint": "/opt/gsplat/examples/simple_trainer.py",
+    "headless_patch_sha256": "386013e935dd3650aa2985cc29d933dcdc3cbe6027ecedbe555d897dd2aea850",
+    "requirements_core_sha256": "26bdb98a4d87a33e3fc9cc10b53a7130747d729c16a43592c4f2063151cfed3d",
+    "requirements_trainer_sha256": "e55652a71269b832f7695993ab7adc53984124d911d86822c0f48ed36e48f77f",
+    "opencv": "4.10.0.84",
+    "pycolmap_commit": "cc7ea4b7301720ac29287dbe450952511b32125e",
+    "fused_ssim_commit": "328dc9836f513d00c4b5bc38fe30478b4435cbb5",
+    "runpodctl_version": "2.5.0",
+    "cmd": [
+      "runpod-keepalive.sh"
+    ]
+  },
+  "camera_contract": {
+    "input_model": "OPENCV",
+    "parameters": [
+      "fx",
+      "fy",
+      "cx",
+      "cy",
+      "k1",
+      "k2",
+      "p1",
+      "p2"
+    ],
+    "parser_behavior": [
+      "getOptimalNewCameraMatrix",
+      "initUndistortRectifyMap",
+      "cv2.remap",
+      "crop valid ROI",
+      "supply corrected K and image to training"
+    ],
+    "surveyor_undistorts_images": false,
+    "trainer_undistortion_count": 1,
+    "double_undistortion_warning": true
+  },
+  "prueba02": {
+    "date": "2026-06-29",
+    "scene_archive": "Prueba02-surveyor-scene.tar.gz",
+    "scene_archive_size_reported": "741.1 MB",
+    "scene_archive_checksum": "verified; exact digest not preserved",
+    "images": 30,
+    "cameras": 1,
+    "camera_model": "OPENCV",
+    "max_steps": 300,
+    "duration": "2:20",
+    "throughput_iterations_per_second": 2.13,
+    "final_reported_loss": 0.196,
+    "loss_is_quality_score": false,
+    "initial_gaussians": 4555,
+    "final_gaussians": 4555,
+    "checkpoint": "ckpt_299_rank0.pt",
+    "reported_gpu_memory_gb": 3.2356,
+    "standard_ply_bytes": 1076455,
+    "compressed_ply_bytes": 280894,
+    "standard_ply_vertices": 4555,
+    "compressed_ply_vertices": 4555,
+    "standard_ply_nan": 0,
+    "standard_ply_infinities": 0,
+    "compressed_ply_nan": 0,
+    "compressed_ply_infinities": 0,
+    "compressed_nonfinite_evidence": "operator assertion in freeze mission; raw artifact not versioned",
+    "standard_ply_sha256": "f7acbb332667a028756f7f2426dd07bfde577f66f30ef0dfa27b02449eea5c71",
+    "supersplat_version": "2.27.4",
+    "supersplat_load_validated": true,
+    "densification_validated": false,
+    "professional_quality_validated": false,
+    "commercial_quality_validated": false
+  },
+  "audit_tests": {
+    "gpu_training_run": false,
+    "image_rebuild": false,
+    "additional_model_download": false,
+    "shell_syntax": "passed",
+    "preparar_escena_regression_cases": 15,
+    "preparar_escena_regression_result": "passed",
+    "functional_diff_against_source_head": "zero"
+  },
+  "evidence_files": [
+    "docs/validation-runs/2026-06-29-prueba02-trainer-e2e.md",
+    "docs/evidence/prueba02-supersplat.png",
+    "docs/proposals/trainer/freeze-v0.1/trainer-v0.1-freeze-report.md",
+    "docs/proposals/trainer/freeze-v0.1/README-handoff-to-the-eye.md",
+    "output/pdf/The-Trainer-v0.1-Freeze-Report.pdf",
+    "output/pdf/SHA256SUMS"
+  ],
+  "known_evidence_gaps": [
+    "pod-side image digest was not captured during Prueba02",
+    "exact Surveyor scene archive digest was not preserved",
+    "large scene archive, checkpoint and PLY artifacts are not versioned",
+    "compressed PLY independent non-finite inspection output is not versioned",
+    "professional and commercial quality are not validated",
+    "densification is not validated"
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "schema": "cloud-workstation.surveyor.freeze.v0.1",
+  "status": "proposed",
+  "inspection": {
+    "started_at": "2026-06-29T22:00:19-06:00",
+    "tests_completed_at": "2026-06-29T22:03:54-06:00",
+    "timezone": "America/Mexico_City",
+    "host": {
+      "os": "macOS 26.5.1",
+      "build": "25F80",
+      "kernel": "Darwin 25.5.0",
+      "architecture": "arm64",
+      "docker_available": false
+    }
+  },
+  "git": {
+    "remote_fetch": "https://github.com/Marquezmemo/cloud-workstation.git",
+    "remote_push": "https://github.com/Marquezmemo/cloud-workstation.git",
+    "source_branch": "headless-surveyor-v0.1-dev",
+    "source_commit": "01b7f6876f0af933e610eb67a3583cb628ea2ddd",
+    "source_tree_clean": true,
+    "source_diff_empty": true,
+    "audit_branch": "audit/surveyor-v0.1-freeze",
+    "proposed_tag": "surveyor-v0.1.0-smoke-validated",
+    "proposed_tag_created": false
+  },
+  "docker": {
+    "current_tag": "docker.io/marquezmemo/cloud-workstation:headless-surveyor-v0.1-dev",
+    "proposed_stable_tag": "docker.io/marquezmemo/cloud-workstation:headless-surveyor-v0.1.0",
+    "proposed_stable_tag_created": false,
+    "verified_digest": null,
+    "verified_digest_status": "PENDING",
+    "verified_digest_pending_reason": "Docker, docker image inspect, and docker buildx imagetools inspect are unavailable in the inspection environment.",
+    "ci_reported_digest": "sha256:51e9a9236cdc8c8351195709e5f0a864a01c62d4a79251f71e182219acdeb7d8",
+    "ci_reported_digest_is_independently_verified": false,
+    "base_image": "colmap/colmap:20240723.601",
+    "base_digest": "sha256:73003557e3ffa36d801e71b7630c117f9d373c55f24e3afc6791b9b3d1ec01da",
+    "rebuild_performed": false,
+    "publication_performed_by_audit": false
+  },
+  "components": {
+    "colmap_version": "3.10",
+    "colmap_runtime_evidence": "3.10-dev",
+    "colmap_commit": "0bd66d901c7549051e21e8f648777f802eb20a73",
+    "cuda_version": "12.3.1",
+    "ubuntu_version": "22.04",
+    "gdown_version": "6.1.0",
+    "runpodctl_version": "2.5.0",
+    "runpodctl_sha256": "f484ce7d790ddc6b4a63363f3c975c70fa87bf3be1bcbad019812f6e3f4ba54e",
+    "camera_model_default": "OPENCV",
+    "single_camera_default": "1",
+    "matcher_default": "exhaustive",
+    "gpu_default": "1",
+    "container_cmd": [
+      "runpod-keepalive.sh"
+    ]
+  },
+  "workflow": {
+    "path": ".github/workflows/publish-headless-surveyor-dev.yml",
+    "name": "Publish Headless Surveyor Dev",
+    "automatic_branch": "headless-surveyor-v0.1-dev",
+    "latest_source_run_id": 28411071377,
+    "latest_source_job_id": 84183939795,
+    "latest_source_run_conclusion": "success",
+    "latest_source_run_head_sha": "01b7f6876f0af933e610eb67a3583cb628ea2ddd"
+  },
+  "workspace": [
+    "/workspace/incoming",
+    "/workspace/scenes",
+    "/workspace/logs",
+    "/workspace/archives",
+    "/workspace/temp"
+  ],
+  "public_commands": [
+    "validate-surveyor.sh",
+    "preparar-escena [archivo.zip]",
+    "survey-scene.sh <scene>",
+    "validate-surveyor-scene.sh <scene>",
+    "package-surveyor-scene.sh <scene>",
+    "gdown --version",
+    "runpodctl version"
+  ],
+  "prueba02": {
+    "evidence_source": "docs/validation-runs/2026-06-29-prueba02-surveyor.md",
+    "attachments_present_locally": false,
+    "input_images": 30,
+    "database_images": 30,
+    "camera_model": "OPENCV",
+    "single_camera": "1",
+    "sparse_candidate_count": 2,
+    "selected_original_index": "1",
+    "registered_images": 30,
+    "points": 4555,
+    "observations": 19928,
+    "mean_track_length": 4.374973,
+    "mean_reprojection_error_px": 1.133537,
+    "normalized_path": "/workspace/scenes/Prueba02/sparse/0",
+    "packaged": true,
+    "checksum_verified_in_record": true,
+    "trainer_received": true,
+    "trainer_check_passed": true,
+    "trainer_training_steps": 300,
+    "evidence_archive_sha256_reported": "03d4f4f764e8dc4a53cff4b029781cd31877ec5c795db9f39b6e962dfed21157",
+    "evidence_archive_sha256_reverified_by_audit": false,
+    "scope_statement": "Esta evidencia valida funcionalidad, reconstrucción sparse y handoff. No valida calidad profesional ni comercial."
+  },
+  "tests": [
+    {
+      "command": "bash -n scripts/*.sh scripts/preparar-escena tests/*.sh",
+      "environment": "macOS 26.5.1 arm64, Bash 3.2.57",
+      "exit_code": 0,
+      "result": "passed",
+      "output": "no output"
+    },
+    {
+      "command": "tests/test-surveyor-contract.sh",
+      "environment": "macOS 26.5.1 arm64; synthetic fixtures; no GPU",
+      "exit_code": 0,
+      "result": "passed",
+      "output_marker": "surveyor_contract_tests=passed"
+    },
+    {
+      "command": "tests/test-survey-scene-manifest.sh",
+      "environment": "macOS 26.5.1 arm64; COLMAP stub; no GPU",
+      "exit_code": 0,
+      "result": "passed",
+      "output_marker": "survey_scene_manifest_tests=passed"
+    },
+    {
+      "command": "tests/test-preparar-escena.sh",
+      "environment": "macOS 26.5.1 arm64; temporary ZIP fixtures; no GPU",
+      "exit_code": 0,
+      "result": "passed",
+      "output_marker": "preparar_escena_tests=passed"
+    }
+  ],
+  "freeze": {
+    "functional_changes": false,
+    "gpu_run_performed": false,
+    "image_build_performed": false,
+    "image_published": false,
+    "official_documentation_modified": false
+  }
+}
