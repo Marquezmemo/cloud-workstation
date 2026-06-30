@@ -72,6 +72,7 @@ COPY scripts/validate-gpu.sh /usr/local/bin/validate-gpu.sh
 COPY scripts/collect-training-diagnostics.sh /usr/local/bin/collect-training-diagnostics.sh
 COPY scripts/runpod-keepalive.sh /usr/local/bin/runpod-keepalive.sh
 COPY scripts/prepare-dataset.sh /usr/local/bin/prepare-dataset.sh
+COPY scripts/preparar-escena-trainer.sh /usr/local/bin/preparar-escena
 COPY scripts/train-scene.sh /usr/local/bin/train-scene.sh
 COPY scripts/patch-gsplat-simple-trainer-headless.sh /usr/local/bin/patch-gsplat-simple-trainer-headless.sh
 COPY scripts/generate-ply.py /usr/local/bin/generate-ply.py
@@ -86,13 +87,15 @@ RUN mkdir -p \
     /workspace/scenes \
     /workspace/outputs \
     /workspace/logs \
-    /workspace/checkpoints
+    /workspace/checkpoints \
+    /workspace/temp
 
 RUN chmod +x \
     /usr/local/bin/validate-gpu.sh \
     /usr/local/bin/collect-training-diagnostics.sh \
     /usr/local/bin/runpod-keepalive.sh \
     /usr/local/bin/prepare-dataset.sh \
+    /usr/local/bin/preparar-escena \
     /usr/local/bin/train-scene.sh \
     /usr/local/bin/patch-gsplat-simple-trainer-headless.sh \
     /usr/local/bin/generate-ply.py \

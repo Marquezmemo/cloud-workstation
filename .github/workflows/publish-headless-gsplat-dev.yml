@@ -18,6 +18,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Run Trainer regression tests
+        run: |
+          bash -n scripts/preparar-escena-trainer.sh
+          bash -n scripts/train-scene.sh
+          bash tests/test-preparar-escena-trainer.sh
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
