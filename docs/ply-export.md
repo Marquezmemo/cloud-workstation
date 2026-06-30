@@ -4,6 +4,8 @@
 
 The missing `.ply` was not a pipeline failure. The official `simple_trainer.py` only writes PLY during training when PLY export is requested. This image now includes a manual export command for existing checkpoints.
 
+`Prueba02` validates this path from `ckpt_299_rank0.pt` to standard and compressed PLY. The standard export was independently verified as binary little endian with 4,555 vertices, 59 float properties, an exact payload, and no NaN or infinite values. It also loaded in SuperSplat v2.27.4 as 4,555 splats. See [the run record](validation-runs/2026-06-29-prueba02-trainer-e2e.md).
+
 ## Generate Exports
 
 Complete command syntax is maintained in [command-reference.md](command-reference.md).
@@ -109,7 +111,7 @@ runpodctl send /workspace/outputs/bonsai/exports/bonsai-ply-exports.tar.gz.sha25
 runpodctl receive <transfer-code>
 ```
 
-The exact Mac-to-pod syntax, large-file behavior, interruption behavior, and checksum verification flow remain pending smoke test.
+`Prueba02` validates real `runpodctl` use for the scene and result flow. Files above 1 GB, interruption behavior, resume support, measured throughput, and systematic checksum capture on both ends remain pending.
 
 Package scene-scoped logs separately with:
 

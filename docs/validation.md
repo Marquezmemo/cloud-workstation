@@ -60,20 +60,19 @@ runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd77
 
 ## Estado actual pendiente
 
-- Nuevo smoke test con GPU cuando vuelva a estar disponible.
-- Confirmar `MAX_STEPS=100 train-scene.sh room`.
-- Confirmar `generar --scene room`.
-- Confirmar `empaquetar room`.
-- Descargar paquete mediante `runpodctl`.
-- Verificar checksum en la Mac.
+- `Prueba02` ya valida con evidencia el check de escena, entrenamiento GPU de 300 pasos, checkpoint, exportación PLY, empaquetado, transferencia y carga en SuperSplat. Ver [el registro completo](validation-runs/2026-06-29-prueba02-trainer-e2e.md).
+- Automatizar la extracción y preparación segura de escenas recibidas.
+- Mejorar el mensaje correctivo para el orden `generar --scene <scene>` y después `empaquetar <scene>`.
+- Repetir la verificación de checksum en ambos extremos para cada artefacto.
 - Probar transferencia de archivo superior a 1 GB.
 - Medir velocidad de transferencia.
 - Probar interrupcion y confirmar si puede reanudarse.
-- Documentar la sintaxis exacta de `runpodctl` que haya funcionado.
+- Evaluar OPENCV frente a PINHOLE o undistortion.
+- Validar densificación, métricas de calidad y captura profesional.
 
 ## Current Operational Decisions
 
-`runpodctl v2.5.0` is installed in the image from the official GitHub release with checksum verification during build. End-to-end transfer still needs smoke testing against the active RunPod pod and receiving Mac.
+`runpodctl v2.5.0` is installed in the image from the official GitHub release with checksum verification during build. `Prueba02` records successful real transfers in both directions across the Surveyor/Trainer workflow. Transfer robustness above 1 GB, interruption, resume behavior, and systematic end-to-end checksum capture remain pending.
 
 Expected use cases:
 
@@ -89,11 +88,12 @@ Implementation evidence:
 - binary checksum: `f484ce7d790ddc6b4a63363f3c975c70fa87bf3be1bcbad019812f6e3f4ba54e`
 - image build command check: `runpodctl version`
 
-Transfer evidence still required:
+Transfer evidence still required for the robust baseline:
 
-- successful Mac-to-pod transfer
-- successful pod-to-Mac transfer
-- checksum verification after transfer
+- systematic checksum capture before and after every transfer
+- files larger than 1 GB
+- interruption and resume behavior
+- measured throughput
 
 ## Current Command Smoke Matrix
 
@@ -224,7 +224,7 @@ comprimir
 
 This packages exports and prints final archive/checksum paths. It does not transfer files automatically.
 
-The accepted transfer method is `runpodctl`; end-to-end commands remain pending smoke test.
+The accepted transfer method is `runpodctl`; real use is validated by `Prueba02`, while large-file and recovery behavior remain pending.
 
 Local validation completed:
 
@@ -236,7 +236,7 @@ Local validation completed:
 - `/usr/local/bin/PrepararDescarga` is no longer installed.
 - `/usr/local/bin/descarga` is no longer installed.
 
-PLY generation from the real checkpoint should be validated directly in the RunPod RTX 4090 pod.
+PLY generation from a real checkpoint was validated by `Prueba02`, including independent structural inspection and loading in SuperSplat v2.27.4.
 
 ## Phase 5A Official gsplat Trainer Adoption
 

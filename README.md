@@ -20,7 +20,9 @@ The active branch is:
 headless-gsplat-v0.1-dev
 ```
 
-The current implemented work is the headless `gsplat` Trainer image line. Earlier RunPod GPU checks and a 30,000-iteration training run were reported by the operator, but their original logs and artifacts were not preserved. They are historical observations, not evidence-backed validation of the current image.
+The current implemented work is the headless `gsplat` Trainer image line. `Prueba02` is the first evidence-backed end-to-end validation of the current Surveyor-to-Trainer path: 30 images, a 300-step GPU run, checkpoint export, PLY packaging and transfer, and a standard PLY loaded in SuperSplat v2.27.4 with 4,555 splats. See [the Prueba02 record](docs/validation-runs/2026-06-29-prueba02-trainer-e2e.md).
+
+Earlier RunPod GPU checks and a 30,000-iteration training run were reported by the operator, but their original logs and artifacts were not preserved. They remain historical observations and are not substituted for `Prueba02` evidence.
 
 The image starts with a minimal RunPod keepalive command so non-interactive pods remain running for SSH and manual validation.
 
@@ -200,7 +202,7 @@ Logs and outputs are written under:
 
 This phase does not promise final quality. It only establishes the first official training backend path.
 
-Phase 5A local checks for image build, trainer help, absence of viewer dependencies, and `train-scene.sh --check` were reported as successful, but their original logs were not preserved. A current evidence-backed COLMAP training run on RunPod remains pending.
+Phase 5A local checks for image build, trainer help, and absence of viewer dependencies were reported as successful but their original logs were not preserved. `Prueba02` now validates the current scene check, GPU training, checkpoint, export, packaging, transfer, and external load path with preserved evidence. It does not validate professional or commercial quality.
 
 ## PLY Export
 
@@ -227,7 +229,7 @@ pod -> runpodctl -> Mac
 
 The previous SCP path through `ssh.runpod.io` is discarded for this workflow.
 
-Installation is implemented; successful end-to-end transfer is not yet evidence-backed. Use [docs/command-reference.md](docs/command-reference.md) for the intended `runpodctl send` / `runpodctl receive` command shape. Mac-to-pod syntax and large-file behavior still need smoke testing and exact command capture.
+Installation and real `runpodctl` use are evidence-backed by `Prueba02`: the Surveyor scene reached Trainer and the result package left the pod. Checksums were verified where preserved, and the standard PLY was independently inspected and loaded on the Mac. Files above 1 GB, interruption, resume behavior, and measured throughput remain pending.
 
 ## Current Command Reference
 
@@ -254,18 +256,14 @@ runpodctl send /workspace/outputs/room/exports/room-ply-exports.tar.gz
 - Exports are missing: run `generar --scene <scene>` before `empaquetar <scene>`.
 - File is on external Mac storage: move it to local storage such as `~/Downloads/` before using `runpodctl`.
 
-## Pending Smoke Tests
+## Remaining Validation
 
-- Run new GPU smoke test when GPU is available.
-- Confirm `MAX_STEPS=100 train-scene.sh room`.
-- Confirm `generar --scene room`.
-- Confirm `empaquetar room`.
-- Transfer package with `runpodctl`.
-- Verify checksum on the Mac.
+- Repeat checksum capture on both ends for every transferred artifact.
 - Test a file larger than 1 GB.
 - Measure transfer speed.
 - Test interruption and whether resume is supported.
-- Record exact working `runpodctl` syntax.
+- Evaluate OPENCV input versus PINHOLE or undistortion.
+- Validate densification, PSNR, SSIM, LPIPS, comparative renders, capture quality, and commercial suitability.
 
 ## Repository Structure
 

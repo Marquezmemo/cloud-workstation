@@ -1,5 +1,14 @@
 # Changelog
 
+## Prueba02 End-to-End Documentation
+
+- Added the evidence-backed `Prueba02` Trainer validation record.
+- Recorded a 30-image scene check, 300-step RTX 4090 training run, `ckpt_299_rank0.pt`, standard/compressed PLY export, packaging, and `runpodctl` transfer.
+- Recorded independent standard PLY inspection: binary little endian, 4,555 vertices, 59 float properties, exact payload, and no NaN or infinite values.
+- Added a deterministic privacy crop proving `Prueba02.ply` loaded as 4,555 splats in SuperSplat v2.27.4.
+- Marked the functional Surveyor-to-Trainer-to-SuperSplat path validated while keeping densification, quality metrics, professional capture, and commercial quality explicitly pending.
+- No Dockerfile, scripts, workflows, or tests changed.
+
 ## Documentation Correction And Evidence Policy
 
 - Corrected current Trainer documentation to match the implemented workspace and command surface.

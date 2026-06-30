@@ -219,7 +219,14 @@ runpodctl send /workspace/outputs/room/exports/room-ply-exports.tar.gz.sha256
 runpodctl receive <transfer-code>
 ```
 
-La instalacion de `runpodctl` esta implementada. El smoke test end-to-end debe registrar comandos reales, tamanos, hashes antes y despues, duracion y resultado. Los codigos efimeros de transferencia no se guardan en Git.
+La instalacion y el uso real de `runpodctl` quedaron validados en `Prueba02`. Cada prueba futura debe seguir registrando comandos, tamaños, hashes antes y despues, duracion y resultado. Los codigos efimeros de transferencia no se guardan en Git.
+
+El orden validado es generar primero y empaquetar después. `empaquetar` no prepara ni extrae escenas y falla correctamente si los exports todavía no existen:
+
+```bash
+generar --scene Prueba02
+empaquetar Prueba02
+```
 
 ## Flujo Completo De Una Escena
 

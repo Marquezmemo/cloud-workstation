@@ -22,22 +22,21 @@ Roadmap for the headless Gaussian Splatting pipeline.
 - Phase 4 complete: minimal pinned `gsplat` install/import validation passed on RunPod RTX 4090.
 - Phase 5A local implementation complete: official `gsplat` `examples/simple_trainer.py` adopted as the first backend, with viewer imports removed by a build-time headless patch.
 - A 30,000-iteration RunPod training run was reported historically, but its evidence was not preserved and does not validate the current image.
-- Manual PLY export and packaging commands exist; new GPU smoke test is pending.
-- Scene-scoped log packaging exists through `empaquetar-logs`; its real RunPod use is pending.
+- `Prueba02` validates a real Surveyor-to-Trainer handoff, 300-step GPU training, checkpoint, standard/compressed PLY export, packaging, transfer, independent PLY inspection, and SuperSplat v2.27.4 loading.
+- The standard PLY contained 4,555 vertices and loaded as 4,555 splats; professional and commercial quality remain unvalidated.
 
 ## Immediate Priorities
 
-1. Wait for GPU availability.
-2. Run `validate-gpu.sh`.
-3. Run `MAX_STEPS=100 train-scene.sh room`.
-4. Run `generar --scene room`.
-5. Run `empaquetar room`.
-6. Transfer the package with `runpodctl`.
-7. Verify checksum on the Mac.
-8. Test a file larger than 1 GB.
-9. Record exact working `runpodctl` commands.
-10. Define the Trainer baseline.
-11. Validate the Surveyor-to-Trainer handoff.
+1. Automate safe scene archive extraction and preparation.
+2. Improve corrective messaging for export-before-packaging order.
+3. Investigate first-run CUDA compilation and AlexNet download costs.
+4. Address the future `torch.load` warning.
+5. Evaluate OPENCV input against PINHOLE or undistortion.
+6. Validate densification and Gaussian growth.
+7. Add PSNR, SSIM, LPIPS, and comparable renders.
+8. Test a file larger than 1 GB and record interruption/resume behavior.
+9. Define the reproducible Trainer baseline.
+10. Validate professional capture and commercial output quality.
 
 ## Recently Implemented
 
@@ -46,10 +45,11 @@ Roadmap for the headless Gaussian Splatting pipeline.
 
 ## Accepted But Pending
 
-- Validate Mac-to-pod and pod-to-Mac transfer.
+- Automate Trainer scene preparation.
+- Validate transfer behavior above 1 GB and under interruption.
 - Measure transfer speed and interruption behavior.
 
-Transfer behavior is not fully validated by this image update.
+Basic real transfer is validated by `Prueba02`; robustness is not.
 
 ## Criteria
 

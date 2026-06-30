@@ -74,7 +74,7 @@ MAX_STEPS=1000 train-scene.sh room
 MAX_STEPS=10000 train-scene.sh room
 ```
 
-Only the 100-step run is part of the next evidence-backed smoke test. Longer runs must not be described as validated without their logs and artifacts.
+`Prueba02` completed an evidence-backed 300-step run. Other depths must not be described as validated without their own logs and artifacts.
 
 Scenes are trained individually. The wrapper does not train every scene automatically:
 
@@ -144,7 +144,7 @@ The log package excludes datasets, checkpoints, and PLY files. It can include op
 
 ## Transfer After Packaging
 
-`runpodctl v2.5.0` is installed in the image from the official GitHub release with checksum verification during build. The transfer path still needs end-to-end smoke testing against the active RunPod pod and the receiving Mac.
+`runpodctl v2.5.0` is installed in the image from the official GitHub release with checksum verification during build. Real scene and result transfers were exercised during `Prueba02`; files above 1 GB, interruption, resume behavior, and systematic checksum capture remain pending.
 
 Pod-to-Mac command shape:
 
@@ -175,8 +175,9 @@ The upstream trainer includes viewer support, but this image removes viewer impo
 This phase does not include:
 
 - custom trainer implementation
-- long training validation
+- long training validation beyond the preserved 300-step `Prueba02` run
 - quality benchmark
+- demonstrated densification or Gaussian growth
 - Nerfstudio
 - COLMAP installation
 - viewer workflow
