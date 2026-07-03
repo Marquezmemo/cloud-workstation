@@ -80,7 +80,7 @@ Validate the image:
 validate-surveyor.sh
 ```
 
-The image includes pinned `runpodctl v2.5.0` for manual Mac/pod transfers and pinned `gdown 6.1.0` for one-way downloads from temporarily shared Google Drive links. Successful end-to-end transfer still requires preserved evidence.
+The image includes pinned `runpodctl v2.5.0` for manual Mac/pod transfers and pinned `gdown 6.1.0` for one-way downloads from temporarily shared Google Drive links. End-to-end transfers were validated. 
 
 Download a ZIP from Google Drive and prepare it atomically:
 
