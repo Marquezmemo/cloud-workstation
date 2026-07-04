@@ -1,5 +1,15 @@
 # Changelog
 
+## The Trainer v0.1 Final Operator Attestation
+
+- Added the `2026-07-04` operator attestation for the image corresponding to commit `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3` and digest `sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98`.
+- Recorded `validation_status: passed`, `validation_authority: repository-owner-operator`, `evidence_level: operator-confirmed`, and `primary_execution_records: not-preserved`.
+- Documented the confirmed real flow from Surveyor archive transfer and checksum through automatic transactional `preparar-escena`, CUDA training, checkpoint, PLY generation, packaging, transfer, and viewer load.
+- Documented `preparar-escena` as implemented and tested; removed documentation that described automatic Trainer scene preparation as pending.
+- Kept the original evidence-backed `Prueba02` record separate as an earlier runtime execution with manual extraction.
+- Added no later-run metrics because the exact execution date, logs, transcript, checkpoint, and primary artifacts were not preserved.
+- No Dockerfile, workflow, script, requirement, test, command, dependency, or runtime behavior changed.
+
 ## Prueba02 End-to-End Documentation
 
 - Added the evidence-backed `Prueba02` Trainer validation record.

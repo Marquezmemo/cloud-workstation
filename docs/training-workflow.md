@@ -48,6 +48,14 @@ LOG_PATH=/workspace/logs/<scene>/train.log
 
 Complete command syntax is maintained in [command-reference.md](command-reference.md).
 
+Install a received Surveyor scene package with its adjacent checksum:
+
+```bash
+preparar-escena <scene>-surveyor-scene.tar.gz
+```
+
+The command verifies the portable SHA-256 record, inspects the archive and manifest before installation, stages the scene under `/workspace/temp`, installs it transactionally under `/workspace/scenes/<scene>`, and runs the productive `train-scene.sh --check`. A failed final check triggers rollback. The command is regression-tested and was confirmed with a real Surveyor package in the final v0.1 operator attestation.
+
 Create a dataset skeleton:
 
 ```bash
@@ -74,7 +82,7 @@ MAX_STEPS=1000 train-scene.sh room
 MAX_STEPS=10000 train-scene.sh room
 ```
 
-`Prueba02` completed an evidence-backed 300-step run. Other depths must not be described as validated without their own logs and artifacts.
+The original `Prueba02` completed an evidence-backed 300-step run on an earlier runtime after manual archive extraction. The final v0.1 run on `221c4ef` used `preparar-escena`, but no training depth or other metric is attributed to it because its primary execution records were not preserved. Other depths must not be described as validated without their own logs and artifacts.
 
 Scenes are trained individually. The wrapper does not train every scene automatically:
 
@@ -144,7 +152,7 @@ The log package excludes datasets, checkpoints, and PLY files. It can include op
 
 ## Transfer After Packaging
 
-`runpodctl v2.5.0` is installed in the image from the official GitHub release with checksum verification during build. Real scene and result transfers were exercised during `Prueba02`; files above 1 GB, interruption, resume behavior, and systematic checksum capture remain pending.
+`runpodctl v2.5.0` is installed in the image from the official GitHub release with checksum verification during build. Real scene and result transfers were preserved in the original `Prueba02` record. The final v0.1 execution also passed both transfers by operator attestation, but its primary records were not preserved. Files above 1 GB, interruption, resume behavior, and systematic checksum capture remain pending.
 
 Pod-to-Mac command shape:
 
@@ -158,7 +166,17 @@ The checksum written by `empaquetar` currently contains an absolute pod path. Af
 
 ## Full Manual Flow
 
-Use [command-reference.md](command-reference.md) for the complete one-scene and multi-scene command sequences.
+For a received Surveyor archive, the command order is:
+
+```bash
+preparar-escena <scene>-surveyor-scene.tar.gz
+MAX_STEPS=<steps> train-scene.sh <scene>
+generar --scene <scene>
+empaquetar <scene>
+runpodctl send /workspace/outputs/<scene>/exports/<scene>-ply-exports.tar.gz
+```
+
+`preparar-escena` already runs `train-scene.sh --check`; an explicit repeat is optional. Use [command-reference.md](command-reference.md) for checksum verification and complete one-scene and multi-scene command sequences.
 
 ## Headless Mode
 
@@ -175,7 +193,7 @@ The upstream trainer includes viewer support, but this image removes viewer impo
 This phase does not include:
 
 - custom trainer implementation
-- long training validation beyond the preserved 300-step `Prueba02` run
+- long training validation beyond the preserved 300-step original `Prueba02` run
 - quality benchmark
 - demonstrated densification or Gaussian growth
 - Nerfstudio

@@ -9,12 +9,15 @@ Use these states consistently:
 - `implemented`: directly verifiable in the current repository
 - `locally verified`: command executed locally with date and command recorded
 - `operator reported`: manual result without sufficient preserved evidence
+- `operator-confirmed`: repository owner/operator attestation that a specified execution passed, with primary execution records not preserved
 - `validated with evidence`: operator questionnaire, logs, versions, commands, outputs, and hashes agree
 - `pending`: not executed or insufficient evidence
 
 Dates in validation questionnaires use Aguascalientes local time by convention.
 
 The historical 30,000-iteration training result below is `operator reported`. Its original logs, checkpoints, run metadata, and diagnostics archive were not preserved, so it does not validate the current image.
+
+An `operator-confirmed` run is accepted as an attestation of the stated pass/fail outcomes only. It must not be described as `validated with evidence`, and missing dates, metrics, hashes, sizes, counts, or artifacts must not be inferred.
 
 ## Manual Validation Protocol
 
@@ -58,10 +61,15 @@ runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd77
 - networking funcional en Runpod
 - compatibilidad general con Runpod validada
 
+## Current Trainer Validations
+
+- [Prueba02 original](validation-runs/2026-06-29-prueba02-trainer-e2e.md): `validated with evidence`; ejecución sobre un runtime anterior, extracción manual, check de escena, entrenamiento GPU de 300 pasos, checkpoint, exportación PLY, empaquetado, transferencia, inspección y carga en SuperSplat.
+- [Validación final v0.1](validation-runs/2026-07-04-trainer-v0.1-final-operator-attestation.md): `validation_status: passed`, `validation_authority: repository-owner-operator`, `evidence_level: operator-confirmed`, `primary_execution_records: not-preserved`; runtime `221c4ef`, digest `sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98`, preparación automática y transaccional mediante `preparar-escena`, entrenamiento CUDA, checkpoint, PLY, empaquetado, transferencia y carga en visor.
+
+La segunda declaración no hereda las métricas ni la evidencia primaria de la primera ejecución. No evalúa calidad profesional o comercial y no certifica densificación.
+
 ## Estado actual pendiente
 
-- `Prueba02` ya valida con evidencia el check de escena, entrenamiento GPU de 300 pasos, checkpoint, exportación PLY, empaquetado, transferencia y carga en SuperSplat. Ver [el registro completo](validation-runs/2026-06-29-prueba02-trainer-e2e.md).
-- Automatizar la extracción y preparación segura de escenas recibidas.
 - Mejorar el mensaje correctivo para el orden `generar --scene <scene>` y después `empaquetar <scene>`.
 - Repetir la verificación de checksum en ambos extremos para cada artefacto.
 - Probar transferencia de archivo superior a 1 GB.
@@ -72,7 +80,7 @@ runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd77
 
 ## Current Operational Decisions
 
-`runpodctl v2.5.0` is installed in the image from the official GitHub release with checksum verification during build. `Prueba02` records successful real transfers in both directions across the Surveyor/Trainer workflow. Transfer robustness above 1 GB, interruption, resume behavior, and systematic end-to-end checksum capture remain pending.
+`runpodctl v2.5.0` is installed in the image from the official GitHub release with checksum verification during build. The original `Prueba02` preserves successful real transfers in both directions across the Surveyor/Trainer workflow. The final v0.1 run also passed transfer by operator attestation, without preserved primary records. Transfer robustness above 1 GB, interruption, resume behavior, and systematic end-to-end checksum capture remain pending.
 
 Expected use cases:
 
@@ -108,8 +116,11 @@ validate-gpu.sh
 Scene validation:
 
 ```bash
+preparar-escena room-surveyor-scene.tar.gz
 train-scene.sh --check room
 ```
+
+`preparar-escena` verifies the adjacent portable checksum, validates the Surveyor archive and manifest, installs the scene transactionally, and runs `train-scene.sh --check`. Its local regression suite passes, and its real use on runtime `221c4ef` is `operator-confirmed`.
 
 Training:
 
@@ -142,6 +153,8 @@ empaquetar-logs room
 
 ## Known Operator Errors
 
+- A Surveyor archive requires an adjacent `<scene>-surveyor-scene.tar.gz.sha256` file before running `preparar-escena`.
+- An existing scene is not replaced unless `OVERWRITE=true` is set explicitly.
 - `generar --room` is invalid; use `generar --scene room`.
 - `generar /room` is invalid; use `generar --scene room` or an explicit checkpoint argument.
 - `generar --/workspace/checkpoints/room` is invalid; use `generar --ckpt-dir /workspace/outputs/room/ckpts`.
@@ -224,7 +237,7 @@ comprimir
 
 This packages exports and prints final archive/checksum paths. It does not transfer files automatically.
 
-The accepted transfer method is `runpodctl`; real use is validated by `Prueba02`, while large-file and recovery behavior remain pending.
+The accepted transfer method is `runpodctl`; real use is preserved by the original `Prueba02` and operator-confirmed for the final v0.1 run, while large-file and recovery behavior remain pending.
 
 Local validation completed:
 
@@ -236,7 +249,7 @@ Local validation completed:
 - `/usr/local/bin/PrepararDescarga` is no longer installed.
 - `/usr/local/bin/descarga` is no longer installed.
 
-PLY generation from a real checkpoint was validated by `Prueba02`, including independent structural inspection and loading in SuperSplat v2.27.4.
+PLY generation from a real checkpoint was validated with preserved evidence by the original `Prueba02`, including independent structural inspection and loading in SuperSplat v2.27.4. The final v0.1 execution confirms generation and viewer load only at `operator-confirmed` evidence level.
 
 ## Phase 5A Official gsplat Trainer Adoption
 

@@ -40,6 +40,39 @@ El layout minimo esperado para entrenamiento es:
 
 Tambien pueden existir archivos COLMAP en formato `.txt`.
 
+## Instalar Una Escena Recibida De Surveyor
+
+Para un paquete real producido por Surveyor, mantener juntos el archivo y su checksum portable:
+
+```text
+<scene>-surveyor-scene.tar.gz
+<scene>-surveyor-scene.tar.gz.sha256
+```
+
+Instalar y validar la escena:
+
+```bash
+preparar-escena <scene>-surveyor-scene.tar.gz
+```
+
+`preparar-escena`:
+
+1. verifica que el checksum contenga exactamente el nombre portable del archivo;
+2. valida el checksum antes de extraer;
+3. rechaza rutas absolutas, traversal, enlaces, entradas especiales, raíces múltiples y nombres de escena inconsistentes;
+4. valida `surveyor-manifest.json` y el contrato COLMAP bajo `sparse/0`;
+5. instala la escena transaccionalmente bajo `/workspace/scenes/<scene>`;
+6. ejecuta `train-scene.sh --check <scene>`;
+7. revierte la instalación si la validación final falla.
+
+Por defecto no reemplaza una escena existente. El reemplazo explícito usa:
+
+```bash
+OVERWRITE=true preparar-escena <scene>-surveyor-scene.tar.gz
+```
+
+El comando y su rollback están cubiertos por la suite de regresión. La validación final v0.1 confirmó su uso con una escena Surveyor real en el runtime `221c4ef`; esa ejecución es `operator-confirmed` y sus registros primarios no fueron preservados.
+
 ## Validar Escena
 
 Validar una escena sin iniciar entrenamiento:
@@ -219,7 +252,7 @@ runpodctl send /workspace/outputs/room/exports/room-ply-exports.tar.gz.sha256
 runpodctl receive <transfer-code>
 ```
 
-La instalacion y el uso real de `runpodctl` quedaron validados en `Prueba02`. Cada prueba futura debe seguir registrando comandos, tamaños, hashes antes y despues, duracion y resultado. Los codigos efimeros de transferencia no se guardan en Git.
+La instalacion y el uso real de `runpodctl` quedaron validados con evidencia en la ejecución original de `Prueba02`. La validación final v0.1 también pasó las transferencias por declaración del operador, sin registros primarios preservados. Cada prueba futura debe seguir registrando comandos, tamaños, hashes antes y despues, duracion y resultado. Los codigos efimeros de transferencia no se guardan en Git.
 
 El orden validado es generar primero y empaquetar después. `empaquetar` no prepara ni extrae escenas y falla correctamente si los exports todavía no existen:
 
@@ -231,6 +264,7 @@ empaquetar Prueba02
 ## Flujo Completo De Una Escena
 
 ```bash
+preparar-escena /ruta/room-surveyor-scene.tar.gz
 train-scene.sh --check room
 MAX_STEPS=100 train-scene.sh room
 generar --scene room
