@@ -363,7 +363,7 @@ No GPU run, image build, Docker pull, Docker tag, Docker push, or new publicatio
 
 - No professional or commercial quality threshold is defined.
 - `OPENCV` distortion versus a PINHOLE/undistorted workflow remains unevaluated.
-- Trainer-side archive extraction remains manual.
+- Trainer-side archive extraction was manual in Prueba02 original; the final Trainer runtime uses `preparar-escena`.
 - Dense reconstruction and PLY export are outside Surveyor v0.1.
 - Video frame extraction is not implemented.
 - The stable image digest still requires independent verification with Docker-capable tooling.
@@ -410,7 +410,25 @@ The Eye should integrate:
 8. Prueba02 facts and the explicit non-commercial-quality disclaimer.
 9. Local test record and latest successful CI record.
 10. Recovery procedure and warning against rebuilding or pushing to the development branch.
+11. Final downstream operator confirmation for Trainer runtime `221c4ef`.
 
-## 16. Freeze Declaration
+## 16. Final Downstream Amendment
 
-This audit branch adds only proposal documents and generated forensic artifacts. It makes no functional change to The Surveyor v0.1. The source commit remains `01b7f6876f0af933e610eb67a3583cb628ea2ddd`; runtime files, workflows, dependencies, contracts, and behavior remain untouched.
+Final Surveyor documentation commit: `28731aed2ea8d4de9c4c9a308f61b66ef7753045`.
+
+The repository owner and operator confirmed a later real downstream execution using Trainer runtime `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3` and digest `sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98`.
+
+```text
+validation_status: passed
+validation_authority: repository-owner-operator
+evidence_level: operator-confirmed
+primary_execution_records: not-preserved
+```
+
+The confirmed stages were Surveyor package compatibility, checksum acceptance, transactional `preparar-escena`, `train-scene.sh --check`, CUDA training, checkpoint generation, PLY generation and packaging, transfer, and viewer load. These downstream operations were executed by Trainer, not Surveyor.
+
+This confirmation supplements the preserved Prueba02 evidence. It does not convert the later execution into primary evidence and does not authorize inference of missing dates, metrics, hashes, sizes, counts, densification, or quality.
+
+## 17. Freeze Declaration
+
+The final Surveyor runtime remains `01b7f6876f0af933e610eb67a3583cb628ea2ddd` with Docker digest `sha256:51e9a9236cdc8c8351195709e5f0a864a01c62d4a79251f71e182219acdeb7d8`. This release amendment changes documentation only; runtime files, workflows, dependencies, contracts, and behavior remain untouched.

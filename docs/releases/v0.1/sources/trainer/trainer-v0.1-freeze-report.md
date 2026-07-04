@@ -1,46 +1,52 @@
 # The Trainer v0.1 - Freeze and Forensic Dossier
 
-Document status: audit baseline proposal  
-Generated: 2026-06-30T04:24:38Z  
-Audit branch: `audit/trainer-v0.1-freeze`  
+Document status: functional baseline final amendment
+
+Final amendment: 2026-07-04
+
+Audit branch: `audit/trainer-v0.1-freeze`
+
 Read-only source branch: `headless-gsplat-v0.1-dev`
 
 ## 1. Executive summary
 
-The Trainer v0.1 has one evidence-backed end-to-end smoke run: `Prueba02`. That run received a Surveyor scene package, verified its checksum, accepted the COLMAP scene, trained on CUDA for 300 steps, wrote `ckpt_299_rank0.pt`, exported standard and compressed PLY, packaged and transferred the result, and loaded the standard PLY in SuperSplat v2.27.4.
+The final Trainer v0.1 baseline is runtime commit `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3`, tree `f26a1a2fddd2f0a3398b3b49b5fbb61ea24038d5`, and Docker digest `sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98`.
 
-The immutable runtime identity that was published during Prueba02 is:
+Its real end-to-end execution was confirmed by the repository owner and operator:
+
+```text
+validation_status: passed
+validation_authority: repository-owner-operator
+evidence_level: operator-confirmed
+primary_execution_records: not-preserved
+```
+
+The confirmed final flow includes Surveyor archive transfer, checksum verification, automatic transactional `preparar-escena`, dataset check, CUDA training, checkpoint, PLY generation, packaging, result transfer, and viewer load. Primary logs, transcript, checkpoint, packages, and PLY were not preserved, so this confirmation is not classified as primary evidence and carries no inferred metrics.
+
+The original Prueba02 run remains separate primary evidence for an earlier runtime:
 
 - source commit: `90196251d59907754cc19caf76b59a737752893b`;
 - source tree: `9568224839eb12bfd0bfbca4625bdea3bfe7a8bb`;
-- workflow: `Publish Headless gsplat Dev`, run `28285526569`, successful;
-- published development tag: `docker.io/${DOCKERHUB_USERNAME}/cloud-workstation:headless-gsplat-v0.1-dev`;
-- published manifest digest: `sha256:535822530f4b23fca3eee3970b147e3e979162a32c2e9de9f76a829836b63a89`.
+- Docker digest associated by workflow chronology: `sha256:535822530f4b23fca3eee3970b147e3e979162a32c2e9de9f76a829836b63a89`;
+- evidence: manual extraction, 300-step training, `ckpt_299_rank0.pt`, PLY inspection, packaging, transfer, and SuperSplat v2.27.4.
 
-This digest is identified by workflow chronology: it was the last successful publication before the 2026-06-29 Prueba02 validation and remained the development tag target throughout the run. The pod-side image digest was not captured in the preserved Prueba02 transcript, so the linkage is a strong forensic inference rather than a directly recorded pod observation.
-
-The read-only source branch was later advanced to:
-
-- source HEAD: `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3`;
-- source tree: `f26a1a2fddd2f0a3398b3b49b5fbb61ea24038d5`;
-- current publication digest: `sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98`.
-
-That later image adds the Trainer-side `preparar-escena` command and its regression suite. It was not the image used for Prueba02 and must not replace the validated digest in the stable v0.1 tag proposal.
+Prueba02 metrics are not inherited by the final run. The older digest remains a historical artifact and is not the stable Trainer v0.1 digest.
 
 Proposed immutable identifiers:
 
-- Git tag `trainer-v0.1.0-smoke-validated` targeting commit `90196251d59907754cc19caf76b59a737752893b`;
-- Docker tag `headless-gsplat-v0.1.0` targeting digest `sha256:535822530f4b23fca3eee3970b147e3e979162a32c2e9de9f76a829836b63a89` without rebuilding.
+- Git tag `trainer-v0.1.0-smoke-validated` targeting commit `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3`;
+- Docker tag `headless-gsplat-v0.1.0` targeting digest `sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98` without rebuilding.
 
 No Git tag or Docker tag was created by this audit.
 
 ## 2. Evidence language and confidence
 
-This dossier uses three evidence levels:
+This dossier uses four evidence levels:
 
 - **Validated**: supported by versioned evidence, a preserved workflow log, an executable local test, or an inspected artifact.
 - **Reported**: preserved as an operator observation, but the original raw artifact or log is unavailable.
 - **Inferred**: derived from immutable chronology or source behavior and explicitly identified as inference.
+- **Operator-confirmed**: pass/fail outcome confirmed by the repository owner and operator without preserved primary execution records.
 
 This distinction is important because the repository preserves the Prueba02 report and screenshot, but not the large scene archive, checkpoint, PLY files, full pod transcript, or pod-side image digest.
 
@@ -54,8 +60,10 @@ This distinction is important because the repository preserves the Prueba02 repo
 | Source tree | `f26a1a2fddd2f0a3398b3b49b5fbb61ea24038d5` |
 | Audit branch | `audit/trainer-v0.1-freeze` |
 | Audit branch base | `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3` |
-| Validated image source commit | `90196251d59907754cc19caf76b59a737752893b` |
-| Validated image source tree | `9568224839eb12bfd0bfbca4625bdea3bfe7a8bb` |
+| Final documentation commit | `123652ea97f549e1d06d3993f55c2bcab252f840` |
+| Final baseline runtime commit | `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3` |
+| Final baseline runtime tree | `f26a1a2fddd2f0a3398b3b49b5fbb61ea24038d5` |
+| Historical Prueba02 runtime | `90196251d59907754cc19caf76b59a737752893b` |
 
 The tracked source tree had no diff at audit start. The original shared worktree contained an unrelated untracked `output/` directory with Surveyor freeze artifacts. It was not modified, moved, staged, or copied. The audit was created in an isolated worktree based on the exact source HEAD.
 
@@ -63,28 +71,29 @@ The audit changes only this dossier and its generated artifacts. Functional path
 
 ## 4. Docker identity
 
-### 4.1 Validated Prueba02 image
+### 4.1 Final v0.1 image
 
 | Item | Value |
 | --- | --- |
 | Workflow | `Publish Headless gsplat Dev` |
-| Workflow run | `https://github.com/Marquezmemo/cloud-workstation/actions/runs/28285526569` |
+| Workflow run | `https://github.com/Marquezmemo/cloud-workstation/actions/runs/28413758338` |
 | Result | success |
-| Source commit | `90196251d59907754cc19caf76b59a737752893b` |
+| Source commit | `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3` |
 | Tag configured by workflow | `docker.io/${DOCKERHUB_USERNAME}/cloud-workstation:headless-gsplat-v0.1-dev` |
-| Manifest digest | `sha256:535822530f4b23fca3eee3970b147e3e979162a32c2e9de9f76a829836b63a89` |
+| Manifest digest | `sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98` |
 | Platform | `linux/amd64` |
+| Validation | `operator-confirmed`; primary records not preserved |
 
-### 4.2 Current development publication
+### 4.2 Historical Prueba02 publication
 
 | Item | Value |
 | --- | --- |
-| Workflow run | `https://github.com/Marquezmemo/cloud-workstation/actions/runs/28413758338` |
-| Source commit | `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3` |
-| Manifest digest | `sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98` |
-| Relationship to Prueba02 | post-validation image; not used by Prueba02 |
+| Workflow run | `https://github.com/Marquezmemo/cloud-workstation/actions/runs/28285526569` |
+| Source commit | `90196251d59907754cc19caf76b59a737752893b` |
+| Manifest digest | `sha256:535822530f4b23fca3eee3970b147e3e979162a32c2e9de9f76a829836b63a89` |
+| Relationship to final baseline | historical runtime with preserved Prueba02 evidence |
 
-The failed documentation-triggered workflow run `28411332932` did not replace the development tag. The next successful run was the post-validation `221c4ef` build.
+The failed documentation-triggered workflow run `28411332932` did not replace the development tag. The next successful run published the final `221c4ef` image.
 
 ### 4.3 Base image
 
@@ -178,8 +187,9 @@ The patch does not alter training math, camera parsing, optimizer behavior, chec
 
 ```text
 Surveyor package
-  -> /workspace/scenes/<scene>
-  -> train-scene.sh --check <scene>
+  -> preparar-escena <scene>-surveyor-scene.tar.gz
+  -> transactional /workspace/scenes/<scene>
+  -> train-scene.sh --check <scene> (invoked by importer)
   -> official simple_trainer.py default --disable_viewer
   -> CUDA training
   -> /workspace/outputs/<scene>/ckpts/ckpt_<step>_rank<rank>.pt
@@ -203,7 +213,7 @@ Optional pose or appearance state is added only when the corresponding features 
 
 ## 8. Workspace, command surface, and persistence
 
-### 8.1 Validated image layout at commit 9019625
+### 8.1 Final baseline layout at commit 221c4ef
 
 ```text
 /workspace/datasets
@@ -211,13 +221,6 @@ Optional pose or appearance state is added only when the corresponding features 
 /workspace/outputs
 /workspace/logs
 /workspace/checkpoints
-```
-
-### 8.2 Current source HEAD addition
-
-Commit `221c4ef` additionally creates:
-
-```text
 /workspace/temp
 ```
 
@@ -233,7 +236,7 @@ The keepalive command creates `/workspace/logs`, prints validation hints, and ru
 
 ### 8.4 Commands
 
-| Command | Responsibility | Prueba02 image |
+| Command | Responsibility | Final v0.1 image |
 | --- | --- | --- |
 | `prepare-dataset.sh` | Creates an empty COLMAP scene skeleton | present |
 | `train-scene.sh --check` | Structural dataset gate and run metadata | present and exercised |
@@ -244,7 +247,7 @@ The keepalive command creates `/workspace/logs`, prints validation hints, and ru
 | `empaquetar-logs` | Packages scene-scoped existing evidence with portable checksum | present; not part of preserved Prueba02 sequence |
 | `collect-training-diagnostics.sh` | Captures runtime, GPU, environment, trees and recent logs | present |
 | `validate-gpu.sh` | Verifies NVIDIA, torch, CUDA operation and gsplat import | present |
-| `preparar-escena` | Securely verifies and imports Surveyor archive | added at 221c4ef after Prueba02 |
+| `preparar-escena` | Securely verifies and imports Surveyor archive | present; regression-tested; operator-confirmed |
 
 ## 9. Surveyor-to-Trainer scene contract
 
@@ -263,7 +266,7 @@ Minimum Trainer scene structure:
 
 Surveyor evidence records 30 input/database/registered images, one camera, `camera_model=OPENCV`, two sparse candidates, and selection of the 30-image, 4,555-point model normalized to `sparse/0`.
 
-During Prueba02 the archive was manually extracted before `train-scene.sh --check` passed. `preparar-escena` automates that segment in current source HEAD, including checksum verification, safe tar inspection, manifest consistency, transactional overwrite and rollback. It is regression-tested but was not available in the validated Prueba02 image.
+During Prueba02 original the archive was manually extracted before `train-scene.sh --check` passed. In the final baseline, `preparar-escena` verifies the portable checksum, inspects the tar and manifest, installs transactionally with rollback, and runs the productive dataset check. Its real use is operator-confirmed; primary execution records were not preserved.
 
 ## 10. Camera and real OPENCV undistortion behavior
 
@@ -370,9 +373,35 @@ f7acbb332667a028756f7f2426dd07bfde577f66f30ef0dfa27b02449eea5c71
 
 It was binary little endian, contained 59 float properties, had an exact payload for its header and vertex count, and contained no NaN or infinite values.
 
-![Prueba02 loaded in SuperSplat](../../../evidence/prueba02-supersplat.png)
+![Prueba02 loaded in SuperSplat](../../evidence/prueba02/prueba02-supersplat.png)
 
 The unchanged Gaussian count means the run did not validate densification. The screenshot proves compatibility and rendering, not professional geometry, commercial quality, capture quality, or production readiness.
+
+## 12A. Final v0.1 Operator Validation
+
+The repository owner and execution operator confirmed the final runtime flow for scene `Prueba02`:
+
+```text
+validation_status: passed
+validation_authority: repository-owner-operator
+evidence_level: operator-confirmed
+primary_execution_records: not-preserved
+```
+
+| Field | Result |
+| --- | --- |
+| Runtime commit | `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3` |
+| Docker digest | `sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98` |
+| Transfer and checksum | passed |
+| `preparar-escena` and transactional installation | passed |
+| Dataset check and CUDA training | passed |
+| Checkpoint and PLY | generated |
+| Packaging, transfer and viewer load | passed |
+| Primary logs, transcript and artifacts | not preserved |
+| Professional/commercial quality | not evaluated |
+| Densification | not certified |
+
+This attestation validates the stated outcomes only. It does not inherit Prueba02 metrics and does not authorize inference of the exact execution date, training depth, duration, performance, hashes, sizes, counts, or quality.
 
 ## 13. Tests executed for this freeze
 
@@ -395,7 +424,7 @@ Functional diff against source HEAD: zero.
 
 The suite covers help/arguments, success through the productive `train-scene.sh --check`, missing files, checksum mismatch, path traversal, absolute paths, multiple roots, filename/root mismatch, invalid manifest, manifest consistency, COLMAP structure, existing destination, safe overwrite, rollback, capitalization, and source archive preservation.
 
-These tests validate current source HEAD `221c4ef`. The validated Prueba02 image at commit `9019625` predates `preparar-escena` and its suite.
+These tests validate final runtime `221c4ef`. Prueba02 original at `9019625` predates `preparar-escena` and remains a separate evidence-bearing execution.
 
 ## 14. Limitations
 
@@ -407,6 +436,7 @@ These tests validate current source HEAD `221c4ef`. The validated Prueba02 image
 - The full scene archive, checkpoint, PLY files, compressed PLY inspector output, and full pod logs are outside Git.
 - The exact scene archive digest was not preserved in the local attachments.
 - The pod-side image digest was not captured. The validated digest association is based on immutable workflow chronology.
+- Primary execution records for the final `221c4ef` validation were not preserved.
 - `empaquetar` writes an absolute-path checksum in the validated image.
 - GPU telemetry was not continuously packaged by Trainer.
 - Files above 1 GB, interrupted transfers, resume behavior, and measured transfer throughput remain unvalidated.
@@ -414,8 +444,8 @@ These tests validate current source HEAD `221c4ef`. The validated Prueba02 image
 
 ## 15. Risks
 
-1. **Moving development tag.** `headless-gsplat-v0.1-dev` is mutable and has already moved beyond the Prueba02 image.
-2. **Source/image mismatch.** Tagging current HEAD as if it produced the validated digest would be incorrect.
+1. **Moving development tag.** `headless-gsplat-v0.1-dev` is mutable; restoration must use the final digest.
+2. **Evidence-level confusion.** The final operator confirmation must not be presented as preserved primary evidence.
 3. **Unpinned transitive dependencies.** Rebuilding the same Dockerfile can produce a different manifest digest.
 4. **Double undistortion.** Changing only Surveyor image geometry or only camera metadata can cause a second remap or inconsistent intrinsics.
 5. **Evidence gaps.** Missing large artifacts prevent independent replay of every numerical claim.
@@ -424,22 +454,20 @@ These tests validate current source HEAD `221c4ef`. The validated Prueba02 image
 
 ## 16. Recovery procedure
 
-To recover the exact validated runtime without rebuilding:
+To recover the final v0.1 runtime without rebuilding:
 
-1. Resolve the proposed Git tag target to commit `90196251d59907754cc19caf76b59a737752893b`.
+1. Resolve the proposed Git tag target to commit `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3`.
 2. Pull the image by digest, not by mutable development tag:
 
 ```text
-docker.io/${DOCKERHUB_USERNAME}/cloud-workstation@sha256:535822530f4b23fca3eee3970b147e3e979162a32c2e9de9f76a829836b63a89
+docker.io/${DOCKERHUB_USERNAME}/cloud-workstation@sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98
 ```
 
 3. Mount persistent storage at `/workspace`.
 4. Restore `Prueba02-surveyor-scene.tar.gz` and its adjacent checksum.
-5. Verify the checksum from the archive directory.
-6. Because the validated image predates `preparar-escena`, extract manually into `/workspace/scenes`.
-7. Run `train-scene.sh --check Prueba02`.
-8. For a pipeline smoke replay, use the preserved command depth `MAX_STEPS=300`. This is an optional replay procedure, not an action performed by this audit.
-9. Export with `generar --scene Prueba02`, package with `empaquetar Prueba02`, and compare artifacts against preserved sizes/counts where available.
+5. Run `preparar-escena /workspace/Prueba02-surveyor-scene.tar.gz`; it verifies the checksum and runs the dataset check.
+6. Define an explicit `MAX_STEPS` for a new replay and preserve all primary records.
+7. Export with `generar --scene Prueba02`, package with `empaquetar Prueba02`, and verify checksums at both ends.
 
 To create the proposed stable Docker tag without rebuilding, an authorized registry operation should copy the existing digest to `headless-gsplat-v0.1.0`. The operation must verify the resulting tag resolves to the same manifest digest. This audit does not execute that mutation.
 
@@ -447,11 +475,11 @@ To create the proposed stable Docker tag without rebuilding, an authorized regis
 
 The Eye should integrate the following facts into official documentation without altering runtime behavior:
 
-- distinguish source HEAD `221c4ef` from validated runtime source `9019625`;
-- record validated digest `sha256:535822...b63a89` and current post-validation digest `sha256:726ac98...a6bf98` separately;
+- freeze runtime source `221c4ef` and digest `sha256:726ac98...a6bf98` as the final baseline;
+- retain `9019625` and `sha256:535822...b63a89` only as historical Prueba02 identity;
 - record the OPENCV remap/crop behavior and remove any implication that the warning means distortion is ignored;
 - preserve the double-undistortion warning;
-- state that `preparar-escena` is post-Prueba02 functionality validated by regression/CI, not by the Prueba02 pod run;
+- state that `preparar-escena` is regression-tested and operator-confirmed in real operation, without preserved primary records;
 - preserve Prueba02 numbers with evidence grades and limitations;
 - do not claim densification, professional quality, or commercial quality;
 - do not claim the compressed PLY non-finite scan is independently reproducible unless its raw inspection evidence is preserved;
@@ -461,15 +489,16 @@ The Eye should integrate the following facts into official documentation without
 ## 18. Primary references
 
 - Repository: `https://github.com/Marquezmemo/cloud-workstation`
-- Validated image workflow: `https://github.com/Marquezmemo/cloud-workstation/actions/runs/28285526569`
-- Current source workflow: `https://github.com/Marquezmemo/cloud-workstation/actions/runs/28413758338`
+- Historical Prueba02 image workflow: `https://github.com/Marquezmemo/cloud-workstation/actions/runs/28285526569`
+- Final baseline image workflow: `https://github.com/Marquezmemo/cloud-workstation/actions/runs/28413758338`
 - Official trainer: `https://github.com/nerfstudio-project/gsplat/blob/937e29912570c372bed6747a5c9bf85fed877bae/examples/simple_trainer.py`
 - Official COLMAP parser: `https://github.com/nerfstudio-project/gsplat/blob/937e29912570c372bed6747a5c9bf85fed877bae/examples/datasets/colmap.py`
 - Versioned Prueba02 record: `docs/validation-runs/2026-06-29-prueba02-trainer-e2e.md`
+- Final operator attestation: `docs/validation-runs/2026-07-04-trainer-v0.1-final-operator-attestation.md`
 - Versioned SuperSplat evidence: `docs/evidence/prueba02-supersplat.png`
 
 ## 19. Freeze declaration
 
-The Trainer v0.1 smoke baseline is functionally demonstrated by Prueba02 under the immutable image digest `sha256:535822530f4b23fca3eee3970b147e3e979162a32c2e9de9f76a829836b63a89`. The audit branch adds evidence only. Functional diff against source HEAD is zero.
+The Trainer v0.1 final baseline is runtime `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3` under digest `sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98`. Its real flow is operator-confirmed and its primary execution records were not preserved. Prueba02 original remains separate primary evidence for runtime `9019625` and historical digest `sha256:535822530f4b23fca3eee3970b147e3e979162a32c2e9de9f76a829836b63a89`.
 
 This is a smoke-validated baseline, not a quality-certified release.

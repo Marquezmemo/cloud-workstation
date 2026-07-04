@@ -1,4 +1,4 @@
-b44e1e48b133dc51e110657a6c0464b9021f4c94c0df4c534d2ba4a686f81db8  docs/proposals/trainer/freeze-v0.1/trainer-v0.1-freeze-report.md
-413d7d561d6f846da5101958d1d38af802a1138e1fc32ead617d7a9a18941f0b  docs/proposals/trainer/freeze-v0.1/trainer-v0.1-freeze-manifest.json
-5df6a1b66b755044bb357279f01721a3e351eddfe5e2a6c0608a5aba157a0782  docs/proposals/trainer/freeze-v0.1/README-handoff-to-the-eye.md
-28dcc401472f0553778fe85d2482d726c4b6b953a1db2e94e6da36857b521786  output/pdf/The-Trainer-v0.1-Freeze-Report.pdf
+0f0ff148b61fb3595682fdc46d0f7e1a97cf462d1493948aa23c2d9017775444  docs/releases/v0.1/sources/trainer/README-handoff-to-the-eye.md
+e1f17604844ca55fd82cc110b34436482705428722e5c36809e3ddd11866eabe  docs/releases/v0.1/sources/trainer/trainer-v0.1-freeze-manifest.json
+7f0bc12f2c97744cf927eff652cfb324c7e9e4e426d48b603961aeb92e9895e3  docs/releases/v0.1/sources/trainer/trainer-v0.1-freeze-report.md
+4f0ed460f9693a740a66432f64ba1db54300418bc2156c3d16ff71253f6be1e4  output/pdf/The-Trainer-v0.1-Freeze-Report.pdf

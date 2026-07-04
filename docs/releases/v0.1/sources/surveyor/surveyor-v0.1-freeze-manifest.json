@@ -1,6 +1,7 @@
 {
   "schema": "cloud-workstation.surveyor.freeze.v0.1",
-  "status": "proposed",
+  "status": "functional-baseline-final",
+  "final_amendment_date": "2026-07-04",
   "inspection": {
     "started_at": "2026-06-29T22:00:19-06:00",
     "tests_completed_at": "2026-06-29T22:03:54-06:00",
@@ -20,6 +21,8 @@
     "source_commit": "01b7f6876f0af933e610eb67a3583cb628ea2ddd",
     "source_tree_clean": true,
     "source_diff_empty": true,
+    "final_documentation_commit": "28731aed2ea8d4de9c4c9a308f61b66ef7753045",
+    "final_documentation_tree": "3a855b2d07cbfa467e965718482d25abf0533e29",
     "audit_branch": "audit/surveyor-v0.1-freeze",
     "proposed_tag": "surveyor-v0.1.0-smoke-validated",
     "proposed_tag_created": false
@@ -103,6 +106,28 @@
     "evidence_archive_sha256_reported": "03d4f4f764e8dc4a53cff4b029781cd31877ec5c795db9f39b6e962dfed21157",
     "evidence_archive_sha256_reverified_by_audit": false,
     "scope_statement": "Esta evidencia valida funcionalidad, reconstrucción sparse y handoff. No valida calidad profesional ni comercial."
+  },
+  "final_downstream_validation": {
+    "validation_status": "passed",
+    "validation_authority": "repository-owner-operator",
+    "evidence_level": "operator-confirmed",
+    "primary_execution_records": "not-preserved",
+    "trainer_runtime_commit": "221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3",
+    "trainer_docker_digest": "sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98",
+    "confirmed_stages": [
+      "Surveyor package compatibility",
+      "checksum acceptance",
+      "preparar-escena",
+      "transactional scene installation",
+      "train-scene.sh --check",
+      "CUDA training",
+      "checkpoint generation",
+      "PLY generation",
+      "PLY packaging",
+      "result transfer",
+      "viewer load"
+    ],
+    "scope_note": "Operator-confirmed downstream validation without preserved primary execution records; no missing metrics or artifacts are inferred."
   },
   "tests": [
     {

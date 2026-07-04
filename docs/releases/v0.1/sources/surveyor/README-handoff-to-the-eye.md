@@ -56,6 +56,21 @@ Docker: headless-surveyor-v0.1.0
 
 The Docker tag must point to the verified existing digest. Do not rebuild.
 
+## Final Downstream Confirmation
+
+Final Surveyor documentation commit: `28731aed2ea8d4de9c4c9a308f61b66ef7753045`.
+
+The repository owner and operator confirmed that final Trainer runtime `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3`, digest `sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98`, consumed the Surveyor package successfully through `preparar-escena`, CUDA training, checkpoint, PLY packaging, transfer and viewer load.
+
+```text
+validation_status: passed
+validation_authority: repository-owner-operator
+evidence_level: operator-confirmed
+primary_execution_records: not-preserved
+```
+
+This confirmation supplements Prueba02 and does not replace its preserved primary evidence.
+
 ## Integration Checklist For The Eye
 
 1. Verify the published digest independently.

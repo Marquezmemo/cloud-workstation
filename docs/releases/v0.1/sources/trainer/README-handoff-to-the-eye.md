@@ -2,34 +2,39 @@
 
 ## What this package establishes
 
-The evidence-backed Prueba02 runtime is the image produced from commit:
+The final Trainer v0.1 runtime is:
 
 ```text
-90196251d59907754cc19caf76b59a737752893b
+commit: 221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3
+digest: sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98
 ```
 
-and published as:
+Its real end-to-end result is classified as:
 
 ```text
-sha256:535822530f4b23fca3eee3970b147e3e979162a32c2e9de9f76a829836b63a89
+validation_status: passed
+validation_authority: repository-owner-operator
+evidence_level: operator-confirmed
+primary_execution_records: not-preserved
 ```
 
-The association is based on immutable GitHub Actions chronology. The pod did not preserve its own resolved image digest, so this must remain labeled as a forensic inference.
+This confirms `preparar-escena`, training, checkpoint, PLY, packaging, transfer and viewer load. It does not provide primary records or missing metrics.
 
 ## Do not merge identities
 
-The source branch later advanced to `221c4ef`, whose successful image digest is:
+The original Prueba02 runtime remains historical primary evidence:
 
 ```text
-sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98
+commit: 90196251d59907754cc19caf76b59a737752893b
+digest: sha256:535822530f4b23fca3eee3970b147e3e979162a32c2e9de9f76a829836b63a89
 ```
 
-That later image adds `preparar-escena` and regression tests. It was not the image that ran Prueba02.
+That execution used manual extraction and preserves the 300-step, checkpoint, PLY and SuperSplat evidence. Its metrics must not be attributed to the final run.
 
 ## Proposed immutable tags
 
-- Git: `trainer-v0.1.0-smoke-validated` -> `90196251d59907754cc19caf76b59a737752893b`
-- Docker: `headless-gsplat-v0.1.0` -> `sha256:535822530f4b23fca3eee3970b147e3e979162a32c2e9de9f76a829836b63a89`
+- Git: `trainer-v0.1.0-smoke-validated` -> `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3`
+- Docker: `headless-gsplat-v0.1.0` -> `sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98`
 
 Create the Docker tag by digest-preserving registry retag only. Do not rebuild.
 
@@ -39,7 +44,7 @@ Create the Docker tag by digest-preserving registry retag only. Do not rebuild.
 2. The OPENCV warning does not mean distortion is ignored. The fixed parser computes corrected intrinsics, remaps, crops the valid ROI and trains on the corrected image/K pair.
 3. Surveyor does not run image undistortion; Trainer performs one remap.
 4. Warn against changing only one half of the camera contract, which can cause double undistortion.
-5. `preparar-escena` is post-Prueba02 functionality. It has regression/CI evidence, not Prueba02 runtime evidence.
+5. `preparar-escena` is part of the final baseline and is regression-tested plus operator-confirmed in real operation; primary execution records were not preserved.
 6. The 0.196 loss is a reproducibility observation, not a quality score.
 7. No densification, professional quality or commercial quality was validated.
 8. Standard PLY non-finite inspection is independently preserved. The compressed PLY zero-NaN/zero-infinity claim is operator-supplied but its raw independent inspection is not versioned.

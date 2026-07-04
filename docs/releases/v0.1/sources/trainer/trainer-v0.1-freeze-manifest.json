@@ -1,7 +1,7 @@
 {
   "schema": "cloud-workstation.trainer.freeze.v0.1",
-  "generated_at": "2026-06-30T04:24:38Z",
-  "status": "smoke-validated-baseline-proposal",
+  "generated_at": "2026-07-04",
+  "status": "functional-baseline-final",
   "repository": {
     "remote": "https://github.com/Marquezmemo/cloud-workstation.git",
     "source_branch": "headless-gsplat-v0.1-dev",
@@ -9,41 +9,48 @@
     "source_tree": "f26a1a2fddd2f0a3398b3b49b5fbb61ea24038d5",
     "audit_branch": "audit/trainer-v0.1-freeze",
     "audit_base": "221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3",
+    "final_documentation_commit": "123652ea97f549e1d06d3993f55c2bcab252f840",
+    "final_documentation_tree": "9d0fab652a1a8c35c70710fafd1d5e7585919463",
     "tracked_diff_at_audit_start": "clean",
     "source_worktree_untracked_items": [
       "output/ (pre-existing Surveyor freeze artifacts; excluded)"
     ]
   },
   "validated_runtime": {
-    "evidence_level": "inferred_from_immutable_workflow_chronology_plus_prueba02_record",
-    "source_commit": "90196251d59907754cc19caf76b59a737752893b",
-    "source_tree": "9568224839eb12bfd0bfbca4625bdea3bfe7a8bb",
-    "workflow_name": "Publish Headless gsplat Dev",
-    "workflow_run_id": 28285526569,
-    "workflow_url": "https://github.com/Marquezmemo/cloud-workstation/actions/runs/28285526569",
-    "workflow_result": "success",
-    "docker_tag_template": "docker.io/${DOCKERHUB_USERNAME}/cloud-workstation:headless-gsplat-v0.1-dev",
-    "docker_manifest_digest": "sha256:535822530f4b23fca3eee3970b147e3e979162a32c2e9de9f76a829836b63a89",
-    "platform": "linux/amd64",
-    "dockerfile_sha256": "8320688d7c7db1f54059da80708f305fc843687145cc431f747fd6a30b005f28"
-  },
-  "current_source_publication": {
+    "validation_status": "passed",
+    "validation_authority": "repository-owner-operator",
+    "evidence_level": "operator-confirmed",
+    "primary_execution_records": "not-preserved",
     "source_commit": "221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3",
+    "source_tree": "f26a1a2fddd2f0a3398b3b49b5fbb61ea24038d5",
+    "workflow_name": "Publish Headless gsplat Dev",
     "workflow_run_id": 28413758338,
     "workflow_url": "https://github.com/Marquezmemo/cloud-workstation/actions/runs/28413758338",
     "workflow_result": "success",
+    "docker_tag_template": "docker.io/${DOCKERHUB_USERNAME}/cloud-workstation:headless-gsplat-v0.1-dev",
     "docker_manifest_digest": "sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98",
-    "relationship_to_prueba02": "post-validation image; not used by Prueba02"
+    "platform": "linux/amd64",
+    "dockerfile_sha256": "5a1af2471aacfd45e55f5e2d69d62f41602099e3a4d90bd69af1ee917d187a79"
+  },
+  "original_prueba02_runtime": {
+    "evidence_level": "preserved_primary_evidence_with_runtime_digest_inferred_from_immutable_workflow_chronology",
+    "source_commit": "90196251d59907754cc19caf76b59a737752893b",
+    "source_tree": "9568224839eb12bfd0bfbca4625bdea3bfe7a8bb",
+    "workflow_run_id": 28285526569,
+    "workflow_url": "https://github.com/Marquezmemo/cloud-workstation/actions/runs/28285526569",
+    "workflow_result": "success",
+    "docker_manifest_digest": "sha256:535822530f4b23fca3eee3970b147e3e979162a32c2e9de9f76a829836b63a89",
+    "relationship_to_final_baseline": "historical Prueba02 runtime; preserved primary evidence; not the final Trainer runtime"
   },
   "proposed_tags": {
     "git": {
       "name": "trainer-v0.1.0-smoke-validated",
-      "target_commit": "90196251d59907754cc19caf76b59a737752893b",
+      "target_commit": "221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3",
       "created_by_audit": false
     },
     "docker": {
       "name": "headless-gsplat-v0.1.0",
-      "target_digest": "sha256:535822530f4b23fca3eee3970b147e3e979162a32c2e9de9f76a829836b63a89",
+      "target_digest": "sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98",
       "must_rebuild": false,
       "created_by_audit": false
     }
@@ -124,6 +131,33 @@
     "professional_quality_validated": false,
     "commercial_quality_validated": false
   },
+  "final_operator_validation": {
+    "declaration_recorded": "2026-07-04",
+    "exact_execution_date": "not-preserved",
+    "validation_status": "passed",
+    "validation_authority": "repository-owner-operator",
+    "evidence_level": "operator-confirmed",
+    "primary_execution_records": "not-preserved",
+    "scene": "Prueba02",
+    "runtime_commit": "221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3",
+    "docker_manifest_digest": "sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98",
+    "confirmed_results": {
+      "scene_archive_transfer": "passed",
+      "checksum": "passed",
+      "preparar_escena": "passed",
+      "transactional_installation": "passed",
+      "train_scene_check": "passed",
+      "cuda_training": "passed",
+      "checkpoint": "generated",
+      "ply": "generated",
+      "packaging": "passed",
+      "result_transfer": "passed",
+      "viewer_load": "passed"
+    },
+    "densification": "not-certified-by-this-attestation",
+    "professional_or_commercial_quality": "not-evaluated",
+    "metrics_inherited_from_prueba02": false
+  },
   "audit_tests": {
     "gpu_training_run": false,
     "image_rebuild": false,
@@ -135,6 +169,7 @@
   },
   "evidence_files": [
     "docs/validation-runs/2026-06-29-prueba02-trainer-e2e.md",
+    "docs/validation-runs/2026-07-04-trainer-v0.1-final-operator-attestation.md",
     "docs/evidence/prueba02-supersplat.png",
     "docs/proposals/trainer/freeze-v0.1/trainer-v0.1-freeze-report.md",
     "docs/proposals/trainer/freeze-v0.1/README-handoff-to-the-eye.md",
@@ -147,6 +182,7 @@
     "large scene archive, checkpoint and PLY artifacts are not versioned",
     "compressed PLY independent non-finite inspection output is not versioned",
     "professional and commercial quality are not validated",
-    "densification is not validated"
+    "densification is not validated",
+    "final Trainer runtime primary logs, transcript, checkpoint, packages and PLY were not preserved"
   ]
 }
