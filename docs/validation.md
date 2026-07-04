@@ -11,6 +11,7 @@ Use these states consistently:
 - `implemented`: directly verifiable in the current repository
 - `locally verified`: command executed locally with date and command recorded
 - `operator reported`: manual result without sufficient preserved evidence
+- `operator-confirmed`: result confirmed by the repository owner and operator, without preserved primary execution records
 - `validated with evidence`: operator questionnaire, logs, versions, commands, outputs, and hashes agree
 - `pending`: not executed or insufficient evidence
 
@@ -90,6 +91,29 @@ Validated:
 - GPU-enabled reconstruction on an RTX 4090
 - scene/evidence packaging and checksum verification
 - transfer, receipt, destination checksum verification, Trainer dataset check, and 300-step Trainer execution
+
+## Validación downstream posterior confirmada por el operador
+
+```text
+handoff_status: passed
+validation_authority: repository-owner-operator
+evidence_level: operator-confirmed
+primary_execution_records: not-preserved
+trainer_runtime: 221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3
+```
+
+The repository owner and operator confirmed a second downstream execution against the final Trainer runtime that incorporates `preparar-escena`:
+
+- the Surveyor package was compatible with Trainer's `preparar-escena`;
+- the checksum was accepted;
+- the scene was installed correctly;
+- `train-scene.sh --check` passed;
+- CUDA training completed;
+- a checkpoint was generated;
+- a PLY was generated and packaged;
+- the result was opened in a viewer.
+
+These outcomes demonstrate that the downstream Trainer stages consumed the Surveyor contract. They do not mean that Surveyor executed training, checkpoint generation, PLY export or packaging, or the viewer. Primary execution records from this second run were not preserved. Its evidence level is therefore `operator-confirmed`; it supplements and does not replace or downgrade the preserved Prueba02 evidence.
 
 ## Local And Reported Validation
 

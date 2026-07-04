@@ -165,6 +165,20 @@ Validated with evidence for `Prueba02`:
 - scene and evidence packages verified
 - scene received by Trainer, checksum verified, dataset check passed, and a 300-step training run completed
 
+## Validación downstream posterior confirmada por el operador
+
+```text
+handoff_status: passed
+validation_authority: repository-owner-operator
+evidence_level: operator-confirmed
+primary_execution_records: not-preserved
+trainer_runtime: 221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3
+```
+
+The repository owner and operator confirmed a later downstream execution using the final Trainer runtime that incorporates `preparar-escena`. The Surveyor package was compatible with Trainer's preparation command, its checksum was accepted, the scene was installed correctly, and `train-scene.sh --check` passed. Trainer then completed CUDA training, generated a checkpoint, generated and packaged a PLY, and opened the result in a viewer.
+
+The training, checkpoint, PLY, packaging, and viewer stages were executed downstream by Trainer; they were not executed by Surveyor. Primary execution records for this second run were not preserved. This operator-confirmed result supplements and does not replace or reduce the preserved Prueba02 evidence above.
+
 ## Validation Status
 
 Implemented and directly verifiable in the repository:

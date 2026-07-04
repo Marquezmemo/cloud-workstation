@@ -8,6 +8,26 @@
 - Recorded valid manifest generation, contract validation, packaging, checksums, transfer, Trainer receipt, dataset acceptance, and 300-step training.
 - Preserved `prueba-01` as the historical evidence that motivated best-model selection.
 
+## Validación downstream posterior confirmada por el operador
+
+```text
+handoff_status: passed
+validation_authority: repository-owner-operator
+evidence_level: operator-confirmed
+primary_execution_records: not-preserved
+trainer_runtime: 221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3
+```
+
+The repository owner and operator confirmed that a later run of the final Trainer runtime, which includes `preparar-escena`, successfully consumed the Surveyor contract:
+
+- the Surveyor package was compatible with Trainer's `preparar-escena`;
+- its checksum was accepted and the scene was installed correctly;
+- `train-scene.sh --check` passed;
+- CUDA training completed and generated a checkpoint;
+- a PLY was generated, packaged, and opened in a viewer.
+
+These were downstream Trainer stages; Surveyor did not execute training, PLY export, packaging of the PLY, or the viewer. Primary records from this later run were not preserved, so this operator-confirmed record supplements and does not replace or downgrade the preserved Prueba02 evidence.
+
 ## First Real Surveyor Run Documentation
 
 - Recorded evidence from `prueba-01`, the first real 30-image RunPod run.

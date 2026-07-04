@@ -93,6 +93,29 @@ Trainer subsequently:
 - passed `train-scene.sh --check Prueba02`;
 - completed a 300-step training run.
 
+## Validación downstream posterior confirmada por el operador
+
+```text
+handoff_status: passed
+validation_authority: repository-owner-operator
+evidence_level: operator-confirmed
+primary_execution_records: not-preserved
+trainer_runtime: 221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3
+```
+
+The repository owner and operator confirmed a later downstream execution using the final Trainer runtime that incorporates `preparar-escena`. In that execution:
+
+- the Surveyor package was compatible with Trainer's `preparar-escena`;
+- the checksum was accepted;
+- the scene was installed correctly;
+- `train-scene.sh --check` passed;
+- CUDA training completed;
+- a checkpoint was generated;
+- a PLY was generated and packaged;
+- the result was opened in a viewer.
+
+These were downstream Trainer operations that consumed the contract produced by Surveyor. Surveyor did not execute training, checkpoint generation, PLY export or packaging, or the viewer. The primary execution records for this later run were not preserved, so its evidence level is operator-confirmed. This section supplements and does not replace, weaken, or reclassify the preserved Prueba02 evidence elsewhere in this record.
+
 ## Verdict
 
 Validated with evidence:
@@ -105,8 +128,10 @@ Validated with evidence:
 - packaging and checksum verification
 - transfer, receipt, and Trainer dataset acceptance
 
-Still pending:
+Still pending in the preserved Prueba02 execution:
 
 - automated Trainer-side scene preparation
 - quality thresholds for capture and reconstruction
 - OPENCV distortion versus PINHOLE/undistorted workflow evaluation
+
+The later operator-confirmed downstream validation above covers Trainer-side `preparar-escena` compatibility, but it does not convert that result into preserved primary evidence.
