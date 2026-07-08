@@ -1,5 +1,14 @@
 # Changelog
 
+## Trainer v0.2 5000-Step Validation And Local Agent Milestone
+
+- Added the `2026-07-07` Trainer v0.2 validation record for `Prueba02`.
+- Recorded the real two-pod Surveyor-to-Trainer-to-PLY-to-SuperSplat flow with `preparar-escena`, CUDA training, checkpoint export, packaging, transfer, and viewer load.
+- Recorded densification as validated for this run: `4,541` to `51,255` Gaussians over `5,000` steps, with duplication, splitting, pruning, and continued training after the step `3,100` prune.
+- Documented the standard PLY with `51,255` vertices and compressed PLY with `51,252` vertices; the three-vertex compressed difference remains an observation, not a failure.
+- Recorded the local multi-agent milestone: Surveyor and Trainer operate from isolated checkouts and branches, with manual coordination and no automatic orchestration yet.
+- No Dockerfile, workflow, script, requirement, test, command, dependency, or runtime behavior changed.
+
 ## The Trainer v0.1 Final Operator Attestation
 
 - Added the `2026-07-04` operator attestation for the image corresponding to commit `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3` and digest `sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98`.

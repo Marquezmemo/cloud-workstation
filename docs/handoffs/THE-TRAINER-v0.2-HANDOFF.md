@@ -26,7 +26,7 @@ Este handoff no autoriza desarrollo funcional, ejecución GPU, cambio de depende
 
 El primer commit propio de v0.2 incorpora únicamente `AGENTS.md` y este handoff. No modifica `Dockerfile`, workflows, requirements, scripts, patches, tests ni runtime. Por tanto, los archivos funcionales de inicio de v0.2 permanecen idénticos al runtime `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3`.
 
-La diferencia entre `221c4ef...` y `123652e...` está limitada a `README.md`, `CHANGELOG.md` y documentación de validación/operación. Verificar esta afirmación con `git diff --name-status 221c4ef... 123652e...` antes de usarla en un release.
+La diferencia entre `221c4ef...` y `123652e...` está limitada a `README.md`, `CHANGELOG.md`, `docs/roadmap.md` y documentación de validación/operación. Verificar esta afirmación con `git diff --name-status 221c4ef... 123652e...` antes de usarla en un release.
 
 ## 3. Dos niveles de validación
 

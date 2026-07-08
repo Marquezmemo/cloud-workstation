@@ -76,6 +76,12 @@ Installation is implemented. It is intended for compressed datasets, PLY package
 
 Trainer evidence is scene-scoped under `/workspace/logs/<scene>`. `empaquetar-logs <scene>` packages existing training, export, and optional GPU logs with a portable checksum; it does not create telemetry.
 
+## Local Agent Isolation
+
+Surveyor and Trainer v0.2 are operated from separate local checkouts/worktrees and separate branches. The Trainer checkout owns `headless-gsplat-v0.2-dev`; Surveyor owns its Surveyor branch in its own checkout. This lets both agents work in parallel without switching or disturbing the other agent's physical branch.
+
+The arrangement is manual infrastructure. It does not yet provide automatic orchestration, automatic handoff execution, or a combined release workflow.
+
 ## Backend Strategy
 
 `gsplat` is the initial technical baseline.

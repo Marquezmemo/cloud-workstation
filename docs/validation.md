@@ -65,8 +65,9 @@ runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04@sha256:61a4aafb0094cd77
 
 - [Prueba02 original](validation-runs/2026-06-29-prueba02-trainer-e2e.md): `validated with evidence`; ejecución sobre un runtime anterior, extracción manual, check de escena, entrenamiento GPU de 300 pasos, checkpoint, exportación PLY, empaquetado, transferencia, inspección y carga en SuperSplat.
 - [Validación final v0.1](validation-runs/2026-07-04-trainer-v0.1-final-operator-attestation.md): `validation_status: passed`, `validation_authority: repository-owner-operator`, `evidence_level: operator-confirmed`, `primary_execution_records: not-preserved`; runtime `221c4ef`, digest `sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98`, preparación automática y transaccional mediante `preparar-escena`, entrenamiento CUDA, checkpoint, PLY, empaquetado, transferencia y carga en visor.
+- [Trainer v0.2 5000-step validation](validation-runs/2026-07-07-trainer-v0.2-5000-step-e2e.md): `validated with evidence`; ejecución real con dos pods, `preparar-escena`, entrenamiento CUDA de 5,000 pasos, densificación de 4,541 a 51,255 Gaussianas, checkpoint `ckpt_4999_rank0.pt`, PLY estándar y comprimido, empaquetado, transferencia básica y carga en SuperSplat.
 
-La segunda declaración no hereda las métricas ni la evidencia primaria de la primera ejecución. No evalúa calidad profesional o comercial y no certifica densificación.
+Cada declaración mantiene métricas, hashes y conclusiones separados. Ninguna evalúa calidad profesional o comercial. La validación v0.2 sí certifica densificación para esa ejecución de `Prueba02`; no transfiere esa conclusión a otros datasets o entrenamientos.
 
 ## Estado actual pendiente
 
@@ -76,11 +77,11 @@ La segunda declaración no hereda las métricas ni la evidencia primaria de la p
 - Medir velocidad de transferencia.
 - Probar interrupcion y confirmar si puede reanudarse.
 - Evaluar OPENCV frente a PINHOLE o undistortion.
-- Validar densificación, métricas de calidad y captura profesional.
+- Validar métricas de calidad y captura profesional.
 
 ## Current Operational Decisions
 
-`runpodctl v2.5.0` is installed in the image from the official GitHub release with checksum verification during build. The original `Prueba02` preserves successful real transfers in both directions across the Surveyor/Trainer workflow. The final v0.1 run also passed transfer by operator attestation, without preserved primary records. Transfer robustness above 1 GB, interruption, resume behavior, and systematic end-to-end checksum capture remain pending.
+`runpodctl v2.5.0` is installed in the image from the official GitHub release with checksum verification during build. The original `Prueba02` preserves successful real transfers in both directions across the Surveyor/Trainer workflow. The final v0.1 run also passed transfer by operator attestation, without preserved primary records. The v0.2 5000-step run records a basic result package checksum and transfer record. Transfer robustness above 1 GB, interruption, resume behavior, and systematic end-to-end checksum capture remain pending.
 
 Expected use cases:
 
@@ -249,7 +250,7 @@ Local validation completed:
 - `/usr/local/bin/PrepararDescarga` is no longer installed.
 - `/usr/local/bin/descarga` is no longer installed.
 
-PLY generation from a real checkpoint was validated with preserved evidence by the original `Prueba02`, including independent structural inspection and loading in SuperSplat v2.27.4. The final v0.1 execution confirms generation and viewer load only at `operator-confirmed` evidence level.
+PLY generation from a real checkpoint was validated with preserved evidence by the original `Prueba02`, including independent structural inspection and loading in SuperSplat v2.27.4. The final v0.1 execution confirms generation and viewer load only at `operator-confirmed` evidence level. The v0.2 5000-step validation confirms checkpoint-to-PLY export from `ckpt_4999_rank0.pt`, including a standard PLY with 51,255 vertices and a compressed PLY with 51,252 vertices.
 
 ## Phase 5A Official gsplat Trainer Adoption
 
@@ -297,10 +298,10 @@ Expected validation with a real dataset:
 - outputs are written under `/workspace/outputs/<scene>`
 - checkpoints are discoverable through `/workspace/checkpoints/<scene>`
 
-Not included:
+Not included in the initial Phase 5A implementation:
 
 - no custom trainer
-- no long training validation
+- no long training validation at that phase
 - no COLMAP installation
 - no Nerfstudio
 - no viewer workflow or viewer dependency stack
@@ -445,13 +446,13 @@ Pinned install set:
 
 - `gsplat==1.5.3`
 - `jaxtyping==0.3.11`
-- `markdown-it-py==4.2.0`
-- `mdurl==0.1.2`
 - `ninja==1.13.0`
-- `rich==15.0.0`
+- `numpy==1.26.3`
+- `rich==14.3.4`
+- `typing_extensions==4.15.0`
 - `wadler-lindig==0.1.7`
 
-`torch` and `numpy` are provided by the pinned RunPod PyTorch base image.
+`torch` is provided by the pinned RunPod PyTorch base image.
 
 The Dockerfile installs from:
 

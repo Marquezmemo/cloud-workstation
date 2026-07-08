@@ -82,7 +82,7 @@ MAX_STEPS=1000 train-scene.sh room
 MAX_STEPS=10000 train-scene.sh room
 ```
 
-The original `Prueba02` completed an evidence-backed 300-step run on an earlier runtime after manual archive extraction. The final v0.1 run on `221c4ef` used `preparar-escena`, but no training depth or other metric is attributed to it because its primary execution records were not preserved. Other depths must not be described as validated without their own logs and artifacts.
+The original `Prueba02` completed an evidence-backed 300-step run on an earlier runtime after manual archive extraction. The final v0.1 run on `221c4ef` used `preparar-escena`, but no training depth or other metric is attributed to it because its primary execution records were not preserved. The v0.2 `Prueba02` run completed 5,000 steps with `preparar-escena`, CUDA training, densification from 4,541 to 51,255 Gaussians, `ckpt_4999_rank0.pt`, standard/compressed PLY export, packaging, transfer, and SuperSplat loading. Other depths or datasets must not be described as validated without their own logs and artifacts.
 
 Scenes are trained individually. The wrapper does not train every scene automatically:
 
@@ -152,7 +152,7 @@ The log package excludes datasets, checkpoints, and PLY files. It can include op
 
 ## Transfer After Packaging
 
-`runpodctl v2.5.0` is installed in the image from the official GitHub release with checksum verification during build. Real scene and result transfers were preserved in the original `Prueba02` record. The final v0.1 execution also passed both transfers by operator attestation, but its primary records were not preserved. Files above 1 GB, interruption, resume behavior, and systematic checksum capture remain pending.
+`runpodctl v2.5.0` is installed in the image from the official GitHub release with checksum verification during build. Real scene and result transfers were preserved in the original `Prueba02` record. The final v0.1 execution also passed both transfers by operator attestation, but its primary records were not preserved. The v0.2 5000-step validation records basic Surveyor package receipt and result package transfer. Files above 1 GB, interruption, resume behavior, and systematic checksum capture remain pending.
 
 Pod-to-Mac command shape:
 
@@ -193,9 +193,7 @@ The upstream trainer includes viewer support, but this image removes viewer impo
 This phase does not include:
 
 - custom trainer implementation
-- long training validation beyond the preserved 300-step original `Prueba02` run
 - quality benchmark
-- demonstrated densification or Gaussian growth
 - Nerfstudio
 - COLMAP installation
 - viewer workflow

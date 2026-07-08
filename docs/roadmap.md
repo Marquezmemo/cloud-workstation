@@ -24,7 +24,7 @@ Roadmap for the headless Gaussian Splatting pipeline.
 - A 30,000-iteration RunPod training run was reported historically, but its evidence was not preserved and does not validate the current image.
 - The original `Prueba02` validates an earlier runtime with preserved evidence: manual scene extraction, a real Surveyor-to-Trainer handoff, 300-step GPU training, checkpoint, standard/compressed PLY export, packaging, transfer, independent PLY inspection, and SuperSplat v2.27.4 loading.
 - The final v0.1 operator attestation records that runtime `221c4ef` and image digest `sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98` passed the real flow with automatic transactional `preparar-escena`. Its evidence level is `operator-confirmed`; primary execution records were not preserved.
-- The standard PLY contained 4,555 vertices and loaded as 4,555 splats; professional and commercial quality remain unvalidated.
+- The v0.2 5000-step `Prueba02` validation records automatic import, CUDA training, densification from 4,541 to 51,255 Gaussians, standard/compressed PLY export, packaging, basic transfer, and SuperSplat loading. Professional and commercial quality remain unvalidated.
 
 ## Immediate Priorities
 
@@ -32,18 +32,18 @@ Roadmap for the headless Gaussian Splatting pipeline.
 2. Investigate first-run CUDA compilation and AlexNet download costs.
 3. Address the future `torch.load` warning.
 4. Evaluate OPENCV input against PINHOLE or undistortion.
-5. Validate densification and Gaussian growth.
-6. Add PSNR, SSIM, LPIPS, and comparable renders.
-7. Test a file larger than 1 GB and record interruption/resume behavior.
-8. Preserve complete primary records for future runtime validations.
-9. Define the reproducible Trainer baseline release process.
-10. Validate professional capture and commercial output quality.
+5. Add PSNR, SSIM, LPIPS, and comparable renders.
+6. Test a file larger than 1 GB and record interruption/resume behavior.
+7. Preserve complete primary records for future runtime validations.
+8. Define the reproducible Trainer baseline release process.
+9. Validate professional capture and commercial output quality.
 
 ## Recently Implemented
 
 - Included fixed-version `runpodctl v2.5.0` in the Trainer image build.
 - Added scene-scoped evidence packaging with `empaquetar-logs`.
 - Added and regression-tested transactional Surveyor scene installation with `preparar-escena`.
+- Recorded the v0.2 5000-step `Prueba02` validation with densification and a denser PLY export.
 
 ## Accepted But Pending
 

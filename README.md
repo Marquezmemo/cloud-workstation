@@ -17,13 +17,14 @@ This repository is no longer targeting a remote desktop workstation. The active 
 The active branch is:
 
 ```text
-headless-gsplat-v0.1-dev
+headless-gsplat-v0.2-dev
 ```
 
-The current implemented work is the headless `gsplat` Trainer image line. Two distinct `Prueba02` executions are recorded:
+The current implemented work is the headless `gsplat` Trainer image line. Three distinct `Prueba02` executions are recorded:
 
 - The [original Prueba02 run](docs/validation-runs/2026-06-29-prueba02-trainer-e2e.md) used an earlier runtime and manual archive extraction. Its preserved evidence records 30 images, a 300-step GPU run, checkpoint export, PLY packaging and transfer, and a standard PLY loaded in SuperSplat v2.27.4 with 4,555 splats.
 - The [final v0.1 operator attestation](docs/validation-runs/2026-07-04-trainer-v0.1-final-operator-attestation.md) covers commit `221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3` and image digest `sha256:726ac98c9678431fc34fbcc1de0bf07b71adbff215d672f04740a95999a6bf98`. It confirms the real end-to-end flow with automatic `preparar-escena`, but its primary execution records were not preserved and its evidence level is `operator-confirmed`.
+- The [Trainer v0.2 5000-step validation](docs/validation-runs/2026-07-07-trainer-v0.2-5000-step-e2e.md) records a real two-pod Surveyor-to-Trainer-to-PLY-to-SuperSplat run. It validates automatic import, CUDA training, densification from 4,541 to 51,255 Gaussians, checkpoint export, PLY packaging, basic transfer, and viewer loading.
 
 Earlier RunPod GPU checks and a 30,000-iteration training run were reported by the operator, but their original logs and artifacts were not preserved. They remain historical observations and are not substituted for `Prueba02` evidence.
 
@@ -214,7 +215,7 @@ Logs and outputs are written under:
 
 This phase does not promise final quality. It only establishes the first official training backend path.
 
-Phase 5A local checks for image build, trainer help, and absence of viewer dependencies were reported as successful but their original logs were not preserved. The original `Prueba02` validates the earlier runtime with preserved evidence. The final v0.1 operator attestation confirms the same functional path plus automatic scene preparation on runtime `221c4ef`, but does not preserve the primary execution records. Neither record validates professional or commercial quality, and the final attestation does not certify densification.
+Phase 5A local checks for image build, trainer help, and absence of viewer dependencies were reported as successful but their original logs were not preserved. The original `Prueba02` validates the earlier runtime with preserved evidence. The final v0.1 operator attestation confirms the same functional path plus automatic scene preparation on runtime `221c4ef`, but does not preserve the primary execution records. The v0.2 5000-step validation confirms densification and a denser PLY export for `Prueba02`. None of these records validates professional or commercial quality.
 
 ## PLY Export
 
@@ -241,7 +242,7 @@ pod -> runpodctl -> Mac
 
 The previous SCP path through `ssh.runpod.io` is discarded for this workflow.
 
-Installation and real `runpodctl` use are evidence-backed by the original `Prueba02`: the Surveyor scene reached Trainer and the result package left the pod. Checksums were verified where preserved, and the standard PLY was independently inspected and loaded on the Mac. The final v0.1 run also passed transfer in both directions by operator attestation, without preserved primary records. Files above 1 GB, interruption, resume behavior, and measured throughput remain pending.
+Installation and real `runpodctl` use are evidence-backed by the original `Prueba02`: the Surveyor scene reached Trainer and the result package left the pod. Checksums were verified where preserved, and the standard PLY was independently inspected and loaded on the Mac. The final v0.1 run also passed transfer in both directions by operator attestation, without preserved primary records. The v0.2 5000-step validation confirms basic Surveyor package receipt and result package transfer with `runpodctl`. Files above 1 GB, interruption, resume behavior, and systematic throughput measurement remain pending.
 
 ## Current Command Reference
 
@@ -277,7 +278,7 @@ runpodctl send /workspace/outputs/room/exports/room-ply-exports.tar.gz
 - Measure transfer speed.
 - Test interruption and whether resume is supported.
 - Evaluate OPENCV input versus PINHOLE or undistortion.
-- Validate densification, PSNR, SSIM, LPIPS, comparative renders, capture quality, and commercial suitability.
+- Evaluate PSNR, SSIM, LPIPS, comparative renders, capture quality, and commercial suitability.
 
 ## Repository Structure
 
