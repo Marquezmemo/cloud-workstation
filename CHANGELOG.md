@@ -1,5 +1,12 @@
 # Changelog
 
+## Surveyor v0.2 Two-Pod Handoff And Multiagent Milestone
+
+- Recorded the 2026-07-07 manual two-pod `Prueba02` flow as operator-confirmed downstream evidence.
+- Confirmed that the Surveyor scene package and checksum were received by Trainer, accepted by Trainer-side `preparar-escena`, installed as `/workspace/scenes/Prueba02`, and consumed by the downstream parser as 30 images from one camera.
+- Recorded downstream Trainer completion of `MAX_STEPS=5000` training, checkpoint creation, PLY and compressed PLY export, PLY packaging, transfer, and viewer opening without assigning those stages to Surveyor.
+- Recorded the local manual multiagent milestone: Surveyor v0.2 and Trainer v0.2 operate in separate checkouts and branches, with manual coordination and no automatic orchestration yet.
+
 ## Prueba02 Surveyor Validation
 
 - Recorded the corrected real run with 30 input and database images.

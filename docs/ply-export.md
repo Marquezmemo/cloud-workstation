@@ -27,4 +27,4 @@ comprimir
 PLY and compressed PLY exports
 ```
 
-Those commands are intentionally not part of `headless-surveyor-v0.1-dev`.
+Those commands are intentionally not part of the inherited `headless-surveyor-v0.1-dev` runtime or the active `headless-surveyor-v0.2-dev` Surveyor scope.

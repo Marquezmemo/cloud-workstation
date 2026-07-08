@@ -1,6 +1,9 @@
 # Command Reference
 
-Operator command reference for `headless-surveyor-v0.1-dev`.
+Operator command reference for the active `headless-surveyor-v0.2-dev` branch.
+The commands document the inherited `headless-surveyor-v0.1-dev` runtime; v0.1
+image tags and workflow identifiers remain inherited unless a separate runtime
+or release mission changes them.
 
 ## Validate Image
 

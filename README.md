@@ -2,17 +2,21 @@
 
 Headless COLMAP image for the photogrammetry reconstruction phase before Gaussian Splatting training.
 
-Active branch:
+Active development branch:
 
 ```text
-headless-surveyor-v0.1-dev
+headless-surveyor-v0.2-dev
 ```
 
-Published development image target:
+Inherited runtime image target:
 
 ```text
 docker.io/${DOCKERHUB_USERNAME}/cloud-workstation:headless-surveyor-v0.1-dev
 ```
+
+Surveyor v0.2 continues from the inherited v0.1 runtime. Runtime labels,
+image tags, workflow names, and the manifest schema may still say v0.1; those
+identifiers describe the unchanged inherited runtime, not a branch mismatch.
 
 ## Role
 
@@ -140,6 +144,9 @@ docker run --rm --platform linux/amd64 \
   validate-surveyor.sh
 ```
 
+Do not rebuild or publish this inherited runtime from the v0.2 documentation
+branch unless an explicit release/runtime mission authorizes it.
+
 ## Real Validation Runs
 
 The first real RunPod run is recorded in [docs/validation-runs/2026-06-27-prueba-01-real-run.md](docs/validation-runs/2026-06-27-prueba-01-real-run.md).
@@ -178,6 +185,12 @@ trainer_runtime: 221c4ef76a1ff5bfa8a9f45e5e9a084e8fbedfe3
 The repository owner and operator confirmed a later downstream execution using the final Trainer runtime that incorporates `preparar-escena`. The Surveyor package was compatible with Trainer's preparation command, its checksum was accepted, the scene was installed correctly, and `train-scene.sh --check` passed. Trainer then completed CUDA training, generated a checkpoint, generated and packaged a PLY, and opened the result in a viewer.
 
 The training, checkpoint, PLY, packaging, and viewer stages were executed downstream by Trainer; they were not executed by Surveyor. Primary execution records for this second run were not preserved. This operator-confirmed result supplements and does not replace or reduce the preserved Prueba02 evidence above.
+
+## Surveyor v0.2 Two-Pod Handoff
+
+The 2026-07-07 operator-confirmed record [docs/validation-runs/2026-07-07-surveyor-v0.2-two-pod-handoff.md](docs/validation-runs/2026-07-07-surveyor-v0.2-two-pod-handoff.md) documents a manual two-pod `Prueba02` flow. Surveyor produced the scene package and checksum; Trainer received them on a second pod, verified the checksum through Trainer-side `preparar-escena`, installed `/workspace/scenes/Prueba02`, accepted the dataset contract, trained for 5000 steps, generated checkpoint and PLY outputs, packaged the PLY exports, transferred them, and opened the result in a viewer.
+
+Those downstream stages demonstrate that Trainer consumed the Surveyor contract. They are not Surveyor responsibilities and do not certify professional or commercial quality.
 
 ## Validation Status
 

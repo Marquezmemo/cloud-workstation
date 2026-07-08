@@ -1,6 +1,8 @@
 # Architecture
 
-`headless-surveyor-v0.1-dev` is the headless COLMAP image line for the pre-training reconstruction phase.
+`headless-surveyor-v0.2-dev` is the active Surveyor documentation and governance branch.
+It continues from the inherited `headless-surveyor-v0.1-dev` headless COLMAP runtime for the pre-training reconstruction phase.
+Any v0.1 runtime identifiers still present in image labels, workflow names, or manifest schema describe that unchanged inherited runtime.
 
 Surveyor prepares COLMAP scenes for the Trainer. It is not the Trainer image and does not install `gsplat`.
 
@@ -107,6 +109,6 @@ Surveyor does not include:
 
 - `gsplat`
 - Trainer scripts
-- dense reconstruction as a default v0.1 pipeline step
+- dense reconstruction as a default inherited runtime pipeline step
 - PLY export
 - desktop, display manager, VNC, viewer, Blender, or streaming dependencies

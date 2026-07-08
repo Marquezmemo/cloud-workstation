@@ -1,8 +1,8 @@
 # Validation
 
-Validation record for `headless-surveyor-v0.1-dev`.
+Validation record for the active `headless-surveyor-v0.2-dev` branch and its inherited `headless-surveyor-v0.1-dev` runtime.
 
-This branch is the Surveyor COLMAP image line. Trainer and `gsplat` validation records belong to the Trainer branch and are not active validation evidence for this image.
+This branch continues the Surveyor COLMAP image line without changing the inherited runtime. Trainer and `gsplat` validation records belong to the Trainer branch and are not active validation evidence for this image.
 
 ## Evidence Status
 
@@ -115,6 +115,18 @@ The repository owner and operator confirmed a second downstream execution agains
 
 These outcomes demonstrate that the downstream Trainer stages consumed the Surveyor contract. They do not mean that Surveyor executed training, checkpoint generation, PLY export or packaging, or the viewer. Primary execution records from this second run were not preserved. Its evidence level is therefore `operator-confirmed`; it supplements and does not replace or downgrade the preserved Prueba02 evidence.
 
+## Surveyor v0.2 Two-Pod Handoff
+
+The 2026-07-07 record [2026-07-07-surveyor-v0.2-two-pod-handoff.md](validation-runs/2026-07-07-surveyor-v0.2-two-pod-handoff.md) documents a manual two-pod `Prueba02` flow:
+
+- Surveyor produced the scene package and checksum for Trainer.
+- Trainer received `Prueba02-surveyor-scene.tar.gz` and its adjacent checksum in a second pod.
+- Trainer-side `preparar-escena` reported `Checksum: OK` and installed `/workspace/scenes/Prueba02`.
+- The downstream parser recognized 30 images from one camera.
+- Trainer completed 5000-step training, checkpoint creation, PLY export, PLY packaging, transfer, and viewer opening.
+
+This confirms the basic Surveyor-to-Trainer handoff functionally for `Prueba02`. The downstream training, checkpoint, PLY, packaging, transfer, and viewer stages remain Trainer or later-stage responsibilities, not Surveyor responsibilities. Primary execution records and large artifacts are not preserved in this repository, so the evidence level remains `operator-confirmed`.
+
 ## Local And Reported Validation
 
 Locally verified on 2026-06-27 against commit `12428f2`:
@@ -201,8 +213,13 @@ The current scripts accept a Surveyor scene when all of these exist and the mani
 /workspace/logs/<scene>/colmap-match.log
 /workspace/logs/<scene>/colmap-mapper.log
 /workspace/logs/<scene>/model-analyzer.txt
-/workspace/logs/<scene>/surveyor-gpu.log
 /workspace/logs/<scene>/surveyor.summary
+```
+
+When the manifest records `COLMAP_USE_GPU=1`, the validator also requires:
+
+```text
+/workspace/logs/<scene>/surveyor-gpu.log
 ```
 
 The current validator checks `registered_images`, `sparse_model_count`, and `selected_sparse_original_index`. `Prueba02` demonstrated that the selected best model is normalized to `sparse/0` before packaging.
@@ -228,5 +245,5 @@ Packaging evidence:
 - `exhaustive_matcher` scales poorly for larger image sets.
 - COLMAP can produce multiple sparse components; current selection prefers registered-image count, then point count, then original index.
 - Packaging can remain silent during compression; byte-based progress is not implemented.
-- Dense reconstruction is intentionally excluded from v0.1.
+- Dense reconstruction is intentionally excluded from the inherited runtime.
 - Capture quality requirements are not formalized yet.

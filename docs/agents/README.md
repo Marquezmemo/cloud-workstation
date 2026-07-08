@@ -22,6 +22,16 @@ The project is split into headless image roles. This branch is the Surveyor COLM
 
 No active agent should repair or extend desktop, display-manager, VNC, NoMachine, streaming, or Blender GUI workflows.
 
+## Local Multiagent Operation
+
+The manual local multiagent workflow is functional as of 2026-07-07:
+
+- The Surveyor v0.2 agent works from its own checkout/worktree on `headless-surveyor-v0.2-dev`.
+- The Trainer v0.2 agent works from a separate checkout/worktree and a separate branch.
+- Both agents can work in parallel without changing the other agent's physical branch.
+- Coordination is still manual; automatic cross-agent orchestration is not implemented.
+- Each agent must review, test, commit, and publish only its own branch.
+
 ## Ownership
 
 Core Infrastructure owns:

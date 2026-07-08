@@ -20,7 +20,7 @@ Supported image extensions in `survey-scene.sh`:
 .tiff
 ```
 
-The script only reads files directly under `images/`; nested image folders are not part of v0.1.
+The script only reads files directly under `images/`; nested image folders are not part of the inherited runtime contract.
 
 `preparar-escena [archivo.zip]` bridges nested ZIP input into this flat contract. It derives the scene name from the ZIP filename, recursively selects only the supported extensions, rejects case-insensitive basename collisions, and atomically writes:
 
@@ -94,7 +94,7 @@ Those commands are not available in the Surveyor image. The 100-step run is requ
 ## Current Limits
 
 - Best-model selection optimizes registration count and point count; it does not itself define a quality threshold.
-- Dense reconstruction is not part of the default v0.1 output.
+- Dense reconstruction is not part of the default inherited runtime output.
 - Frame extraction from video is not implemented.
 - ZIP preparation is implemented through `preparar-escena`; automatic download is not part of that command.
 - Capture quality rules are pending real dataset validation.

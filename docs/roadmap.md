@@ -4,10 +4,10 @@ Roadmap for the headless Surveyor COLMAP image.
 
 ## Current Status
 
-- Surveyor branch created: `headless-surveyor-v0.1-dev`.
+- Surveyor v0.1 branch created the inherited runtime; active v0.2 work continues on `headless-surveyor-v0.2-dev`.
 - Dockerfile uses a pinned COLMAP 3.10/CUDA 12.3.1 image digest.
 - `validate-surveyor.sh`, `survey-scene.sh`, and `package-surveyor-scene.sh` exist.
-- Docker Hub publish workflow exists for `headless-surveyor-v0.1-dev`.
+- Docker Hub publish workflow still describes the inherited `headless-surveyor-v0.1-dev` image line and is not changed by this documentation branch.
 - Pinned `runpodctl v2.5.0`, hashed `gdown 6.1.0`, and complete scene/evidence validation are implemented.
 - Trainer and `gsplat` runtime scripts were removed from this branch.
 - Synthetic contract tests are locally verified. Earlier image-build and container checks remain operator-reported because their logs were not preserved.
@@ -15,6 +15,8 @@ Roadmap for the headless Surveyor COLMAP image.
 - The `prueba-01` Trainer handoff was blocked because `sparse/0` reported 2 registered images while a later mapper reconstruction reached 30.
 - `Prueba02` validated the corrected best-model selection: original model `1`, 30 registered images, 4,555 points, normalized to `sparse/0`.
 - The `Prueba02` package was received and checksum-verified by Trainer; dataset validation and a 300-step run completed.
+- A later two-pod `Prueba02` flow confirmed Trainer-side `preparar-escena`, dataset acceptance, 5000-step downstream training, checkpoint creation, PLY export, PLY packaging, transfer, and viewer opening. Those downstream stages remain Trainer responsibilities.
+- The local Surveyor/Trainer multiagent setup is functional manually with separate checkouts and branches; automatic orchestration is not implemented.
 
 ## Validación downstream posterior confirmada por el operador
 
@@ -35,7 +37,7 @@ Surveyor did not execute those Trainer stages. The primary records from this lat
 1. Repeat the corrected Surveyor flow with additional capture sets.
 2. Define registered-image and reconstruction-quality acceptance thresholds.
 3. Evaluate OPENCV distortion handling versus an undistorted/PINHOLE handoff.
-4. Preserve each run's commands, hashes, logs, manifest, selection report, and Trainer result.
+4. Preserve each new run's commands, hashes, logs, manifest, selection report, and downstream handoff result.
 
 ## Later Work
 
@@ -51,5 +53,5 @@ Surveyor progress must be evidence-based:
 
 - no desktop, viewer, VNC, Blender, or streaming work
 - no `gsplat` or Trainer runtime added back to this branch
-- no dense reconstruction as default v0.1 behavior
+- no dense reconstruction as default inherited runtime behavior
 - every real scene smoke test records logs, manifest, package, checksum, and Trainer handoff result
