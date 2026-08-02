@@ -1,27 +1,61 @@
 # The Converter v0.2
 
-This directory is the local workspace for Converter-owned conversion assets.
-
 The Converter receives Gaussian Splatting `.ply` output from The Trainer, stages
 conversion inputs, writes converted artifacts, records output sizes, and packages
 results for download or upload.
 
-## Ownership
+The workflow is CPU-first. CUDA is not a required dependency.
 
-Converter may own files under:
+## Quick Start
 
-- `converter/input/`
-- `converter/output/`
-- `converter/reports/`
-- `converter/packages/`
-- `converter/tools/`
-- `docs/converter-contract.md`
-- `docs/converter-checklist.md`
+```bash
+./converter/scripts/convert-scene.sh \
+  --input converter/input/scene.ply \
+  --scene-name room_test_001 \
+  --preset benchmark
+```
 
-Converter must not modify Trainer or Surveyor implementation logic.
+```bash
+./converter/scripts/convert-scene.sh \
+  --input converter/input/scene.ply \
+  --scene-name room_test_001 \
+  --preset mac-preview
+```
 
-## Runtime Direction
+## Docker
 
-The conversion path must remain CPU-first. GPU/CUDA acceleration may be optional
-when a tool supports it, but CUDA must not become a required dependency for the
-Converter workflow.
+```bash
+docker build -f converter/Dockerfile -t cloud-workstation-converter:v0.2 .
+```
+
+```bash
+docker run --rm \
+  -v "$PWD/converter/input:/workspace/converter/input" \
+  -v "$PWD/converter/output:/workspace/converter/output" \
+  -v "$PWD/converter/reports:/workspace/converter/reports" \
+  -v "$PWD/converter/packages:/workspace/converter/packages" \
+  cloud-workstation-converter:v0.2 \
+  --input converter/input/scene.ply \
+  --scene-name room_test_001 \
+  --preset benchmark
+```
+
+## Presets
+
+- `benchmark`: attempts every configured output and writes comparative reports.
+- `mac-preview`: prioritizes SOG, Streamed SOG/LOD, HTML viewer, SPZ, and
+  compressed PLY for lightweight review.
+- `archive-master`: preserves the master PLY copy and attempts high-value
+  archive outputs.
+
+## Outputs
+
+- `converter/output/<scene-name>/`
+- `converter/reports/conversion-report.json`
+- `converter/reports/conversion-report.md`
+- `converter/reports/file-sizes.csv`
+- `converter/reports/checksums.sha256`
+- `converter/packages/<scene-name>-converter-results.tar.gz`
+
+Unsupported targets are reported as `skipped` with a reason instead of forcing a
+GPU stack or heavyweight editor dependency.

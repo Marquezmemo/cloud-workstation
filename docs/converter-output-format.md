@@ -1,0 +1,55 @@
+# Converter Output Format
+
+The Converter writes scene artifacts under:
+
+```text
+converter/output/<scene-name>/
+```
+
+Reports are written under:
+
+```text
+converter/reports/
+```
+
+Packages are written under:
+
+```text
+converter/packages/
+```
+
+## Required Reports
+
+`conversion-report.json` is the machine-readable conversion record. It includes:
+
+- scene name
+- preset
+- input path, size, and checksum
+- target status for every requested format
+- output path, size, and checksum for successful targets
+- skip and failure reasons for unavailable targets
+- package path, size, and checksum
+- CPU-first runtime notes
+
+`conversion-report.md` is the human-readable summary of the same run.
+
+`file-sizes.csv` is a flat table for spreadsheet comparison.
+
+`checksums.sha256` contains checksums for generated output artifacts.
+
+## Target Status Values
+
+- `success`: artifact was generated and measured.
+- `skipped`: required conversion tool was not available.
+- `failed`: tool was available or builtin ran, but conversion failed.
+
+## Format Notes
+
+- `compressed-ply` is generated as `.ply.gz` by the builtin CPU gzip path.
+- `html-viewer` is a lightweight index of generated artifacts, not a bundled
+  heavy editor.
+- `voxel-collision` is broad-phase collision metadata derived from PLY bounds
+  when possible. Binary PLY bounds are reported as unavailable by the builtin
+  parser.
+- `spz`, `sog`, `streamed-sog`, `splat`, and `ksplat` are attempted with
+  `splat-transform` when the command is installed and stable.

@@ -1,0 +1,79 @@
+{
+  "version": "0.2",
+  "notes": [
+    "The Converter is CPU-first. CUDA is never required.",
+    "splat-transform is the preferred conversion tool when it is installed in the runtime image.",
+    "Targets without an available stable tool are reported as skipped."
+  ],
+  "targets": {
+    "spz": {
+      "label": "SPZ",
+      "extension": ".spz",
+      "tool": "splat-transform",
+      "command_variants": [
+        ["splat-transform", "{input}", "{output}"],
+        ["splat-transform", "convert", "{input}", "{output}"],
+        ["splat-transform", "--input", "{input}", "--output", "{output}"]
+      ]
+    },
+    "sog": {
+      "label": "SOG",
+      "extension": ".sog",
+      "tool": "splat-transform",
+      "command_variants": [
+        ["splat-transform", "{input}", "{output}"],
+        ["splat-transform", "convert", "{input}", "{output}"],
+        ["splat-transform", "--input", "{input}", "--output", "{output}"]
+      ]
+    },
+    "streamed-sog": {
+      "label": "Streamed SOG / LOD",
+      "extension": ".sog",
+      "tool": "splat-transform",
+      "subdir": "streamed-sog",
+      "command_variants": [
+        ["splat-transform", "{input}", "{output}", "--lod"],
+        ["splat-transform", "convert", "{input}", "{output}", "--lod"],
+        ["splat-transform", "--input", "{input}", "--output", "{output}", "--lod"]
+      ]
+    },
+    "compressed-ply": {
+      "label": "Compressed PLY",
+      "extension": ".ply.gz",
+      "tool": "python-gzip",
+      "builtin": "gzip_copy"
+    },
+    "html-viewer": {
+      "label": "HTML viewer",
+      "extension": ".html",
+      "tool": "converter-builtin",
+      "builtin": "html_viewer"
+    },
+    "voxel-collision": {
+      "label": "Voxel collision",
+      "extension": ".collision.json",
+      "tool": "converter-builtin",
+      "builtin": "voxel_collision"
+    },
+    "splat": {
+      "label": "SPLAT",
+      "extension": ".splat",
+      "tool": "splat-transform",
+      "command_variants": [
+        ["splat-transform", "{input}", "{output}"],
+        ["splat-transform", "convert", "{input}", "{output}"],
+        ["splat-transform", "--input", "{input}", "--output", "{output}"]
+      ]
+    },
+    "ksplat": {
+      "label": "KSPLAT",
+      "extension": ".ksplat",
+      "tool": "splat-transform",
+      "command_variants": [
+        ["splat-transform", "{input}", "{output}"],
+        ["splat-transform", "convert", "{input}", "{output}"],
+        ["splat-transform", "--input", "{input}", "--output", "{output}"]
+      ]
+    }
+  }
+}

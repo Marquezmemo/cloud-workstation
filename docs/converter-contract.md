@@ -74,6 +74,8 @@ Converter must generate:
 
 - `converter/reports/conversion-report.json`
 - `converter/reports/conversion-report.md`
+- `converter/reports/file-sizes.csv`
+- `converter/reports/checksums.sha256`
 
 The reports should include:
 
@@ -87,6 +89,19 @@ The reports should include:
 - packaging result
 - CPU/GPU requirement notes
 - errors and recovery hints
+
+## Presets
+
+The supported preset names are:
+
+- `benchmark`: attempt all configured targets and compare resulting file sizes.
+- `mac-preview`: prioritize SOG, Streamed SOG/LOD, HTML viewer, SPZ, and
+  compressed PLY for lightweight Mac evaluation.
+- `archive-master`: preserve the master PLY and prioritize SPZ, SOG,
+  checksums, and report completeness.
+
+Every preset must keep the same reporting and packaging contract. Missing tools
+must produce explicit skipped target records.
 
 ## Runtime Limits
 
@@ -109,6 +124,7 @@ Not allowed:
 - manual splat cleanup
 - visual splat editing
 - assuming workstation-grade local hardware
+- installing Blender, Unity, or SuperSplat Studio as mandatory dependencies
 
 ## Integration Boundaries
 

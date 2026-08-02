@@ -1,0 +1,38 @@
+{
+  "version": "0.2",
+  "presets": {
+    "benchmark": {
+      "description": "Generate every supported output and a comparative report.",
+      "targets": [
+        "spz",
+        "sog",
+        "streamed-sog",
+        "compressed-ply",
+        "html-viewer",
+        "voxel-collision",
+        "splat",
+        "ksplat"
+      ]
+    },
+    "mac-preview": {
+      "description": "Prioritize light Mac evaluation artifacts.",
+      "targets": [
+        "sog",
+        "streamed-sog",
+        "html-viewer",
+        "spz",
+        "compressed-ply"
+      ]
+    },
+    "archive-master": {
+      "description": "Prioritize preservation artifacts, checksums, and a report.",
+      "targets": [
+        "compressed-ply",
+        "spz",
+        "sog",
+        "html-viewer"
+      ],
+      "include_original": true
+    }
+  }
+}
