@@ -1,7 +1,7 @@
-FROM python:3.11-slim
+FROM node:22-slim
 
 ARG INSTALL_SPLAT_TRANSFORM=1
-ARG SPLAT_TRANSFORM_PACKAGE=splat-transform
+ARG SPLAT_TRANSFORM_PACKAGE=@playcanvas/splat-transform
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
@@ -13,8 +13,7 @@ RUN apt-get update \
       ca-certificates \
       curl \
       gzip \
-      nodejs \
-      npm \
+      python3 \
       tar \
       unzip \
       zip \

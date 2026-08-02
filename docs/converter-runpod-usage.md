@@ -12,12 +12,13 @@ From the repository root:
 docker build -f converter/Dockerfile -t cloud-workstation-converter:v0.2 .
 ```
 
-If the npm package name for `splat-transform` changes or is unavailable:
+The Dockerfile installs `@playcanvas/splat-transform` by default. If npm is
+unavailable in the build environment:
 
 ```bash
 docker build \
   -f converter/Dockerfile \
-  --build-arg SPLAT_TRANSFORM_PACKAGE=splat-transform \
+  --build-arg SPLAT_TRANSFORM_PACKAGE=@playcanvas/splat-transform \
   --build-arg INSTALL_SPLAT_TRANSFORM=0 \
   -t cloud-workstation-converter:v0.2 .
 ```

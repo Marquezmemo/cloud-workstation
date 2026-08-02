@@ -125,6 +125,28 @@ def run_external_target(
     }
 
 
+def run_builtin(
+    builtin: str,
+    target_name: str,
+    input_path: Path,
+    output_path: Path,
+    scene_name: str,
+    records: list[dict[str, Any]],
+) -> dict[str, Any]:
+    if builtin == "gzip_copy":
+        return gzip_copy(input_path, output_path)
+    if builtin == "html_viewer":
+        return html_viewer(scene_name, output_path, records)
+    if builtin == "voxel_collision":
+        return voxel_collision(input_path, output_path, scene_name)
+    return {
+        "target": target_name,
+        "status": "failed",
+        "tool": "converter-builtin",
+        "reason": f"Unknown builtin target '{builtin}'.",
+    }
+
+
 def success_record(
     target_name: str,
     target: dict[str, Any],
@@ -368,17 +390,18 @@ def convert(args: argparse.Namespace) -> int:
         target = formats["targets"][target_name]
         target_dir = scene_dir / target.get("subdir", "")
         target_dir.mkdir(parents=True, exist_ok=True)
-        output_path = target_dir / f"{args.scene_name}{target['extension']}"
+        output_path = target_dir / target.get("output_name", f"{args.scene_name}{target['extension']}")
         builtin = target.get("builtin")
+        builtin_fallback = target.get("builtin_fallback")
         try:
-            if builtin == "gzip_copy":
-                record = gzip_copy(input_path, output_path)
-            elif builtin == "html_viewer":
-                record = html_viewer(args.scene_name, output_path, records)
-            elif builtin == "voxel_collision":
-                record = voxel_collision(input_path, output_path, args.scene_name)
+            if builtin:
+                record = run_builtin(builtin, target_name, input_path, output_path, args.scene_name, records)
             else:
                 record = run_external_target(target_name, target, input_path, output_path, scene_dir)
+                if record.get("status") != "success" and builtin_fallback:
+                    fallback_record = run_builtin(builtin_fallback, target_name, input_path, output_path, args.scene_name, records)
+                    fallback_record["fallback_for"] = record
+                    record = fallback_record
         except Exception as exc:  # noqa: BLE001 - reports must capture failures without hiding other targets.
             record = {
                 "target": target_name,

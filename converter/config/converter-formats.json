@@ -11,8 +11,8 @@
       "extension": ".spz",
       "tool": "splat-transform",
       "command_variants": [
+        ["splat-transform", "-g", "cpu", "{input}", "{output}"],
         ["splat-transform", "{input}", "{output}"],
-        ["splat-transform", "convert", "{input}", "{output}"],
         ["splat-transform", "--input", "{input}", "--output", "{output}"]
       ]
     },
@@ -21,33 +21,40 @@
       "extension": ".sog",
       "tool": "splat-transform",
       "command_variants": [
+        ["splat-transform", "-g", "cpu", "{input}", "{output}"],
         ["splat-transform", "{input}", "{output}"],
-        ["splat-transform", "convert", "{input}", "{output}"],
         ["splat-transform", "--input", "{input}", "--output", "{output}"]
       ]
     },
     "streamed-sog": {
       "label": "Streamed SOG / LOD",
-      "extension": ".sog",
+      "extension": ".json",
+      "output_name": "lod-meta.json",
       "tool": "splat-transform",
       "subdir": "streamed-sog",
       "command_variants": [
-        ["splat-transform", "{input}", "{output}", "--lod"],
-        ["splat-transform", "convert", "{input}", "{output}", "--lod"],
-        ["splat-transform", "--input", "{input}", "--output", "{output}", "--lod"]
+        ["splat-transform", "-g", "cpu", "{input}", "-l", "0", "{output}"],
+        ["splat-transform", "{input}", "-l", "0", "{output}"]
       ]
     },
     "compressed-ply": {
       "label": "Compressed PLY",
-      "extension": ".ply.gz",
-      "tool": "python-gzip",
-      "builtin": "gzip_copy"
+      "extension": ".compressed.ply",
+      "tool": "splat-transform",
+      "command_variants": [
+        ["splat-transform", "-g", "cpu", "{input}", "{output}"],
+        ["splat-transform", "{input}", "{output}"]
+      ]
     },
     "html-viewer": {
       "label": "HTML viewer",
       "extension": ".html",
-      "tool": "converter-builtin",
-      "builtin": "html_viewer"
+      "tool": "splat-transform",
+      "builtin_fallback": "html_viewer",
+      "command_variants": [
+        ["splat-transform", "-g", "cpu", "{input}", "{output}"],
+        ["splat-transform", "{input}", "{output}"]
+      ]
     },
     "voxel-collision": {
       "label": "Voxel collision",
@@ -60,8 +67,8 @@
       "extension": ".splat",
       "tool": "splat-transform",
       "command_variants": [
+        ["splat-transform", "-g", "cpu", "{input}", "{output}"],
         ["splat-transform", "{input}", "{output}"],
-        ["splat-transform", "convert", "{input}", "{output}"],
         ["splat-transform", "--input", "{input}", "--output", "{output}"]
       ]
     },
@@ -70,8 +77,8 @@
       "extension": ".ksplat",
       "tool": "splat-transform",
       "command_variants": [
+        ["splat-transform", "-g", "cpu", "{input}", "{output}"],
         ["splat-transform", "{input}", "{output}"],
-        ["splat-transform", "convert", "{input}", "{output}"],
         ["splat-transform", "--input", "{input}", "--output", "{output}"]
       ]
     }
